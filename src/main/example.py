@@ -31,7 +31,7 @@ vectors = [[321.213,3213.22,1,0,32.3,0.5],[3212.213,32513.22,1,50,32.3,0.5],[321
 # ids = [id1, id2, id3]
 # datas = [{data1key:data1value}, {data2key:data2value}, {data3key:data3value}]
 # vectors = [[float1_1, float1_2, float1_3], [float2_1, float2_2, float2_3], [float3_1, float3_2, float3_3]]
-b3 = x.vector_add("test", ids, datas, vectors)
+b3 = x.vector_add("test", datas, vectors, ids)
 print(b3)
 # b3 = [{'id': 1, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [321.213, 3213.22, 1.0, 0.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}}}, {'id': 2, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [3212.213, 32513.22, 1.0, 50.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a2': {'fieldType': 'STRING', 'fields': [{'data': 'b2'}]}}}, {'id': 3, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [321.26413, 32143.22, 14536.0, 0.0, 32.345, 0.5], 'binaryValues': []}, 'scalarData': {'a3': {'fieldType': 'STRING', 'fields': [{'data': 'b3'}]}}}, {'id': 4, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [334534336.0, 3213453570.0, 1.0, 0.0, 3265.3, 0.5], 'binaryValues': []}, 'scalarData': {'a4': {'fieldType': 'STRING', 'fields': [{'data': 'b4'}]}}}]
 
