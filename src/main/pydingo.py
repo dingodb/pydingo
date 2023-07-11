@@ -173,7 +173,16 @@ class DingoDB:
             return id
         raise RuntimeError(json.loads(req.content))
 
-    def vector_search(self, index_name, xq, topk=10, search_params=None) -> bool:
+    def vector_search(self, index_name, xq, topk=10, data = None, search_params=None) -> bool:
+        
+        scalarData = {}
+        useScalarFilter = "false"
+
+        if data != None :
+            scalarData = dict((keys, {"fieldType": "STRING", "fields":[
+	    {"data": values}]}) for keys,values in data.items())
+            useScalarFilter = "true"
+        
         q = {
             "parameter":{
                 "search": {
@@ -184,10 +193,11 @@ class DingoDB:
                 "selectedKeys":[],
                 "topN":topk,
                 "withScalarData": "true",
-                "withoutVectorData": "false"
+                "withoutVectorData": "false",
+                "useScalarFilter": useScalarFilter 
 			},
             "vector":{
-                "scalarData":{},
+                "scalarData": scalarData,
                 "vector":{
                     "binaryValues":[],
                     "dimension":len(xq),

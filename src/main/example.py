@@ -44,6 +44,16 @@ print(b4)
 # b4 = {'vectorWithDistances': [{'id': 1, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [321.213, 3213.22, 1.0, 0.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}}, 'distance': 0.0}]}
 # b4 = []
 
+# index_name
+# xq = [float1, float2, float3]
+# topk
+# data = {data1key:data1value}
+# search_paras = []
+b4 = x.vector_search("test", vectors[0], 10, {"a1":"b1"})
+print(b4)
+# b4 = {'vectorWithDistances': [{'id': 1, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [321.213, 3213.22, 1.0, 0.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}}, 'distance': 0.0}]}
+# b4 = []
+
 b5 = x.get_index()
 print(b5)
 # b5 = ['test', 'zetyun_test1']
