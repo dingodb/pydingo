@@ -123,7 +123,6 @@ class DingoDB:
         return False
 
     def vector_add(self, index_name, datas, vectors, ids=None) -> bool:
-        i = 0
         records = []
         scalarData = {}
         vector = {}
