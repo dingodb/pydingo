@@ -122,20 +122,15 @@ class DingoDB:
             return True
         return False
 
-    def vector_add(self, index_name, ids, datas, vectors) -> bool:
+    def vector_add(self, index_name, datas, vectors, ids=None) -> bool:
         i = 0
         records = []
         scalarData = {}
         vector = {}
         for v in vectors :
-            scalarData = {
-                list(datas[i].keys())[0] : {
-                    "fieldType": "STRING",
-                    "fields":[{
-                        "data": list(datas[i].values())[0]
-                    }]
-                }
-            }
+            scalarData = dict((keys, {"fieldType": "STRING", "fields":[
+	    {"data": values}]}) for keys,values in datas[i].items())
+		
             vector = {
                     "binaryValues":[],
                     "dimension":len(v),
