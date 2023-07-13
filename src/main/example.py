@@ -16,13 +16,13 @@ x = pydingo.DingoDB("user", "password", ["172.20.3.20:13000"])
 b1 = x.create_index("test", 6, "hnsw", "euclidean", 0, {}, {}, {})
 print(b1)
 # b1 = True
-# b1 = False
+# RuntimeError
 
 # index_name
 b2 = x.describe_index_info("test")
 print(b2)
 # b2 = {'name': 'test', 'version': 0, 'replica': 0, 'autoIncrement': 1, 'indexParameter': {'indexType': 'INDEX_TYPE_VECTOR', 'vectorIndexParameter': {'vectorIndexType': 'VECTOR_INDEX_TYPE_HNSW', 'flatParam': None, 'ivfFlatParam': None, 'ivfPqParam': None, 'hnswParam': {'dimension': 6, 'metricType': 'METRIC_TYPE_L2', 'efConstruction': 200, 'maxElements': 10000, 'nlinks': 32}, 'diskAnnParam': None}}}
-# b2 = {'version': -1}
+# RuntimeError
 
 ids = [1,2,3,4]
 datas = [{"a1":"b1"},{"a2":"b2"},{"a3":"b3"},{"a4":"b4"}]
@@ -34,6 +34,7 @@ vectors = [[321.213,3213.22,1,0,32.3,0.5],[3212.213,32513.22,1,50,32.3,0.5],[321
 b3 = x.vector_add("test", datas, vectors, ids)
 print(b3)
 # b3 = [{'id': 1, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [321.213, 3213.22, 1.0, 0.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}}}, {'id': 2, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [3212.213, 32513.22, 1.0, 50.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a2': {'fieldType': 'STRING', 'fields': [{'data': 'b2'}]}}}, {'id': 3, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [321.26413, 32143.22, 14536.0, 0.0, 32.345, 0.5], 'binaryValues': []}, 'scalarData': {'a3': {'fieldType': 'STRING', 'fields': [{'data': 'b3'}]}}}, {'id': 4, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [334534336.0, 3213453570.0, 1.0, 0.0, 3265.3, 0.5], 'binaryValues': []}, 'scalarData': {'a4': {'fieldType': 'STRING', 'fields': [{'data': 'b4'}]}}}]
+# RuntimeError
 
 # index_name
 # xq = [float1, float2, float3]
@@ -41,8 +42,8 @@ print(b3)
 # search_paras = []
 b4 = x.vector_search("test", vectors[0])
 print(b4)
-# b4 = {'vectorWithDistances': [{'id': 1, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [321.213, 3213.22, 1.0, 0.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}}, 'distance': 0.0}]}
-# b4 = []
+# b4 = {'vectorWithDistances': [{'id': 1, 'vector': {'dimension': 0, 'valueType': 'FLOAT', 'floatValues': [321.213, 3213.22, 1.0, 0.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}}, 'distance': 0.0}, {'id': 2, 'vector': {'dimension': 0, 'valueType': 'FLOAT', 'floatValues': [3212.213, 32513.22, 1.0, 50.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a2': {'fieldType': 'STRING', 'fields': [{'data': 'b2'}]}}, 'distance': 866850370.0}, {'id': 3, 'vector': {'dimension': 0, 'valueType': 'FLOAT', 'floatValues': [321.26413, 32143.22, 14536.0, 0.0, 32.345, 0.5], 'binaryValues': []}, 'scalarData': {'a3': {'fieldType': 'STRING', 'fields': [{'data': 'b3'}]}}, 'distance': 1048211140.0}, {'id': 4, 'vector': {'dimension': 0, 'valueType': 'FLOAT', 'floatValues': [334534336.0, 3213453570.0, 1.0, 0.0, 3265.3, 0.5], 'binaryValues': []}, 'scalarData': {'a4': {'fieldType': 'STRING', 'fields': [{'data': 'b4'}]}}, 'distance': 1.0438175e+19}]}
+# RuntimeError
 
 # index_name
 # xq = [float1, float2, float3]
@@ -51,36 +52,36 @@ print(b4)
 # search_paras = []
 b4 = x.vector_search("test", vectors[0], 10, {"a1":"b1"})
 print(b4)
-# b4 = {'vectorWithDistances': [{'id': 1, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [321.213, 3213.22, 1.0, 0.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}}, 'distance': 0.0}]}
-# b4 = []
+# b4 = {'vectorWithDistances': [{'id': 1, 'vector': {'dimension': 0, 'valueType': 'FLOAT', 'floatValues': [321.213, 3213.22, 1.0, 0.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}}, 'distance': 0.0}]}
+# RuntimeError
 
 b5 = x.get_index()
 print(b5)
 # b5 = ['test', 'zetyun_test1']
-# b5 = []
+# RuntimeError
 
 # index_name
 # ids = [id1, id2, id3]
 b6 = x.vector_get("test", [1,2,3])
 print(b6)
 # b6 = [{'id': 1, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [321.213, 3213.22, 1.0, 0.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}}}, {'id': 2, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [3212.213, 32513.22, 1.0, 50.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a2': {'fieldType': 'STRING', 'fields': [{'data': 'b2'}]}}}, {'id': 3, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [321.26413, 32143.22, 14536.0, 0.0, 32.345, 0.5], 'binaryValues': []}, 'scalarData': {'a3': {'fieldType': 'STRING', 'fields': [{'data': 'b3'}]}}}]
-# b6 = []
+# RuntimeError
 
 # index_name
 b7 = x.get_max_index_row("test")
 print(b7)
 # b7 = id
-# b7 = -1
+# RuntimeError
 
 # index_name
 # ids = [id1, id2, id3]
 b8 = x.vector_delete("test", [1,2,3])
 print(b8)
 # b8 = [True, True, True]
-# b8 = []
+# RuntimeError
 
 # index_name
 b9 = x.delete_index("test")
 print(b9)
 # b9 = True
-# b9 = False
+# RuntimeError

@@ -18,10 +18,10 @@ class DingoDB:
         self.host = host
 
     def describe_index_info(self, index_name):
-        req = requests.get(self.requestProto+self.host[0]+self.indexApi+index_name, headers = self.headers)
-        if req.status_code == 200:
-            return json.loads(req.content)
-        raise RuntimeError(json.loads(req.content))
+        res = requests.get(self.requestProto+self.host[0]+self.indexApi+index_name, headers = self.headers)
+        if res.status_code == 200:
+            return json.loads(res.content)
+        raise RuntimeError(json.loads(res.content))
 
     def create_index(self, index_name, dimension, index_type="hnsw", metric_type="euclidean", replicas=3, index_config=None, metadata_config=None, partition_rule=None) -> bool:
         efConstruction = 200
@@ -112,37 +112,43 @@ class DingoDB:
             "version": 0
 		}
 
-        req = requests.put(self.requestProto+self.host[0]+self.indexApi, headers = self.headers, data=json.dumps(indexDefinition))
-        if req.status_code == 200 :
+        res = requests.put(self.requestProto+self.host[0]+self.indexApi, headers = self.headers, data=json.dumps(indexDefinition))
+        if res.status_code == 200 :
             return True
-        raise RuntimeError(json.loads(req.content))
+        raise RuntimeError(json.loads(res.content))
 
     def delete_index(self, indexName) -> bool:
-        req = requests.delete(self.requestProto+self.host[0]+self.indexApi+indexName)
-        if req.status_code == 200 :
+        res = requests.delete(self.requestProto+self.host[0]+self.indexApi+indexName)
+        if res.status_code == 200 :
             return True
-        raise RuntimeError(json.loads(req.content))
+        raise RuntimeError(json.loads(res.content))
 
     def vector_add(self, index_name, datas, vectors, ids=None) -> bool:
         records = []
         scalarData = {}
         vector = {}
         i = 0
+        if datas != None and len(datas) != len(vectors) :
+            raise RuntimeError("Datas length should equal to Vectors length")
         for v in vectors :
-            scalarData = dict((keys, {"fieldType": "STRING", "fields":[
-	    {"data": values}]}) for keys,values in datas[i].items())
-		
+            if datas != None :
+                scalarData = dict(
+                    (keys, {"fieldType": "STRING", "fields":[{"data": values}]})
+                    for keys,values in datas[i].items()
+                )
             vector = {
                     "binaryValues":[],
                     "dimension":len(v),
                     "floatValues":v,
                     "valueType":"FLOAT"
             }
-            if ids==None or len(ids) != len(vectors) :
+            if ids == None :
                 record = {
                     "scalarData" : scalarData,
                     "vector" : vector
                 }
+            elif len(ids) != len(vectors) :
+                raise RuntimeError("ids length should equal to Vectors length")
             else :
                 record = {
                     "id" : ids[i],
@@ -153,25 +159,25 @@ class DingoDB:
             records.append(record) 
 
         jsonstr = json.dumps(records)
-        req = requests.put(self.requestProto+self.host[0]+self.vectorApi+index_name, headers = self.headers, data=jsonstr)
-        if req.status_code == 200 :
-            records = json.loads(req.content)
+        res = requests.put(self.requestProto+self.host[0]+self.vectorApi+index_name, headers = self.headers, data=jsonstr)
+        if res.status_code == 200 :
+            records = json.loads(res.content)
             return records
-        raise RuntimeError(json.loads(req.content))
+        raise RuntimeError(json.loads(res.content))
 
     def get_index(self):
-        req = requests.get(self.requestProto+self.host[0]+self.indexApi, headers = self.headers)
-        if req.status_code == 200 :
-            indics = json.loads(req.content)
+        res = requests.get(self.requestProto+self.host[0]+self.indexApi, headers = self.headers)
+        if res.status_code == 200 :
+            indics = json.loads(res.content)
             return indics
-        raise RuntimeError(json.loads(req.content))
+        raise RuntimeError(json.loads(res.content))
 
     def get_max_index_row(self, index_name):
-        req = requests.get(self.requestProto+self.host[0]+self.vectorApi+index_name+"/id?isGetMin=false", headers = self.headers)
-        if req.status_code == 200 :
-            id = json.loads(req.content)
+        res = requests.get(self.requestProto+self.host[0]+self.vectorApi+index_name+"/id?isGetMin=false", headers = self.headers)
+        if res.status_code == 200 :
+            id = json.loads(res.content)
             return id
-        raise RuntimeError(json.loads(req.content))
+        raise RuntimeError(json.loads(res.content))
 
     def vector_search(self, index_name, xq, topk=10, data = None, search_params=None) -> bool:
         
@@ -179,8 +185,10 @@ class DingoDB:
         useScalarFilter = "false"
 
         if data != None :
-            scalarData = dict((keys, {"fieldType": "STRING", "fields":[
-	    {"data": values}]}) for keys,values in data.items())
+            scalarData = dict(
+                (keys, {"fieldType": "STRING", "fields":[{"data": values}]})
+                for keys,values in data.items()
+            )
             useScalarFilter = "true"
         
         q = {
@@ -208,11 +216,11 @@ class DingoDB:
 		}
         
         jsonstr = json.dumps(q)
-        req = requests.post(self.requestProto+self.host[0]+self.vectorApi+index_name, headers = self.headers, data=jsonstr)
-        if req.status_code == 200 :
-            records = json.loads(req.content)
+        res = requests.post(self.requestProto+self.host[0]+self.vectorApi+index_name, headers = self.headers, data=jsonstr)
+        if res.status_code == 200 :
+            records = json.loads(res.content)
             return records
-        raise RuntimeError(json.loads(req.content))
+        raise RuntimeError(json.loads(res.content))
     
     def vector_get(self, index_name, ids) :
         q = {
@@ -222,15 +230,15 @@ class DingoDB:
             "withoutVectorData": "false"
         }
         jsonstr = json.dumps(q)
-        req = requests.post(self.requestProto+self.host[0]+self.vectorApi+index_name+"/get", headers = self.headers, data=jsonstr)
-        if req.status_code == 200 :
-            records = json.loads(req.content)
+        res = requests.post(self.requestProto+self.host[0]+self.vectorApi+index_name+"/get", headers = self.headers, data=jsonstr)
+        if res.status_code == 200 :
+            records = json.loads(res.content)
             return records
-        raise RuntimeError(json.loads(req.content))
+        raise RuntimeError(json.loads(res.content))
 
     def vector_delete(self, index_name, ids) :
         jsonstr = json.dumps(ids)
-        req = requests.delete(self.requestProto+self.host[0]+self.vectorApi+index_name, headers = self.headers, data=jsonstr)
-        if req.status_code == 200 :
-            return json.loads(req.content)
-        raise RuntimeError(json.loads(req.content))
+        res = requests.delete(self.requestProto+self.host[0]+self.vectorApi+index_name, headers = self.headers, data=jsonstr)
+        if res.status_code == 200 :
+            return json.loads(res.content)
+        raise RuntimeError(json.loads(res.content))
