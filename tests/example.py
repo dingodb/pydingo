@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import pydingo
+import numpy as np
 
 x = pydingo.DingoDB("user", "password", ["172.20.3.20:13000"])
 
@@ -24,9 +25,17 @@ print(b2)
 # b2 = {'name': 'test', 'version': 0, 'replica': 0, 'autoIncrement': 1, 'indexParameter': {'indexType': 'INDEX_TYPE_VECTOR', 'vectorIndexParameter': {'vectorIndexType': 'VECTOR_INDEX_TYPE_HNSW', 'flatParam': None, 'ivfFlatParam': None, 'ivfPqParam': None, 'hnswParam': {'dimension': 6, 'metricType': 'METRIC_TYPE_L2', 'efConstruction': 200, 'maxElements': 10000, 'nlinks': 32}, 'diskAnnParam': None}}}
 # RuntimeError
 
-ids = [1,2,3,4]
-datas = [{"a1":"b1"},{"a2":"b2"},{"a3":"b3"},{"a4":"b4"}]
-vectors = [[321.213,3213.22,1,0,32.3,0.5],[3212.213,32513.22,1,50,32.3,0.5],[321.26413,32143.22,14536,0,32.345,0.5],[334534321.213454,3213453453.22,1,0,3265.3,0.5]]
+# 构建训练数据和查询数据
+d = 6                           # dimension
+nb = 4                      # database size
+np.random.seed(1234)             # make reproducible
+xb = np.random.random((nb, d)).astype('float32')
+xb[:, 0] += np.arange(nb) / 1000.
+
+ids = [1, 2, 3, 4]
+datas = [{"a1": "b1"}, {"a2": "b2"}, {"a3": "b3"}, {"a4": "b4"}]
+vectors = xb.tolist()
+# vectors = [[321.213,3213.22,1,0,32.3,0.5],[3212.213,32513.22,1,50,32.3,0.5],[321.26413,32143.22,14536,0,32.345,0.5],[334534321.213454,3213453453.22,1,0,3265.3,0.5]]
 # index_name
 # ids = [id1, id2, id3]
 # datas = [{data1key:data1value}, {data2key:data2value}, {data3key:data3value}]
@@ -50,8 +59,8 @@ print(b4)
 # topk
 # data = {data1key:data1value}
 # search_paras = []
-b4 = x.vector_search("test", vectors[0], 10, {"a1":"b1"})
-print(b4)
+b4 = x.vector_search("test", vectors[0], 10, {"meta_expr": {"a1": "b1"}})
+print(b4) 
 # b4 = {'vectorWithDistances': [{'id': 1, 'vector': {'dimension': 0, 'valueType': 'FLOAT', 'floatValues': [321.213, 3213.22, 1.0, 0.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}}, 'distance': 0.0}]}
 # RuntimeError
 
@@ -62,7 +71,7 @@ print(b5)
 
 # index_name
 # ids = [id1, id2, id3]
-b6 = x.vector_get("test", [1,2,3])
+b6 = x.vector_get("test", [1, 2, 3])
 print(b6)
 # b6 = [{'id': 1, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [321.213, 3213.22, 1.0, 0.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}}}, {'id': 2, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [3212.213, 32513.22, 1.0, 50.0, 32.3, 0.5], 'binaryValues': []}, 'scalarData': {'a2': {'fieldType': 'STRING', 'fields': [{'data': 'b2'}]}}}, {'id': 3, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [321.26413, 32143.22, 14536.0, 0.0, 32.345, 0.5], 'binaryValues': []}, 'scalarData': {'a3': {'fieldType': 'STRING', 'fields': [{'data': 'b3'}]}}}]
 # RuntimeError
@@ -75,7 +84,7 @@ print(b7)
 
 # index_name
 # ids = [id1, id2, id3]
-b8 = x.vector_delete("test", [1,2,3])
+b8 = x.vector_delete("test", [1, 2, 3])
 print(b8)
 # b8 = [True, True, True]
 # RuntimeError

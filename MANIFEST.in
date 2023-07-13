@@ -1,0 +1,2 @@
+include requirements.txt  pydingo/__version__ 
+recursive-exclude tests *

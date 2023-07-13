@@ -1,0 +1,18 @@
+*.pyc
+build/
+dist/
+.idea
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
