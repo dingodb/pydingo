@@ -44,16 +44,19 @@ class DingoDB:
         vector_index_parameter = config.index_config[params.index_type]
 
         if params.index_config is not None:
-            for key, value in params.index_config:
+            for key, value in params.index_config.items():
                 index_keys = vector_index_parameter[list(vector_index_parameter.keys())[0]].keys()
                 if key in index_keys:
                     vector_index_parameter[list(vector_index_parameter.keys())[0]][key] = value
-                    if key == "efConstruction" and key > 500 or key < 100:
-                        warnings.warn(f"efConstruction: {key} suggestion in 100-500")
-                    if key == "maxElements" and key > 10000000 or key < 50000:
-                        warnings.warn(f"maxElements:{key} suggestion in 50000-10000000")
-                    if key == "nlinks" and key > 64 or key < 16:
-                        warnings.warn(f"nlinks:{key} suggestion in 16-64")
+                    if key == "efConstruction" and value > 500 or value < 100:
+                        assert value >= 0, "f{key} must > 0"
+                        warnings.warn(f"efConstruction: {value} suggestion in 100-500")
+                    if key == "maxElements" and value > 1000000000 or value < 50000:
+                        assert value >= 0, "f{key} must > 0"
+                        warnings.warn(f"maxElements:{value} suggestion in 50000-1000000000")
+                    if key == "nlinks" and value > 64 or value < 16:
+                        assert value >= 0, "f{key} must > 0"
+                        warnings.warn(f"nlinks:{value} suggestion in 16-64")
                 else:
                     warnings.warn(f"index_config {key} not in {params.index_type}")
         
@@ -74,7 +77,7 @@ class DingoDB:
         }
         # print(index_definition)
         res = requests.post(f"{self.requestProto}{self.host[0]}{self.indexApi}", headers=self.headers,
-                           data=json.dumps(index_definition))
+                            data=json.dumps(index_definition))
         if res.status_code == 200:
             return True
         raise RuntimeError(res.json())
@@ -149,11 +152,14 @@ class DingoDB:
                 for key, value in params.search_params["meta_expr"].items()
             )
         
+        ef_search = 32 if search_params is None else search_params.get("efSearch", 32)
+        assert ef_search >= 0, f"efSearch must >= 0, but get {ef_search}"
+
         payload = {
             "parameter": {
                 "search": {
                     "hnswParam": {
-                        "efSearch": 32 if search_params is None else search_params.get("efSearch", 32)
+                        "efSearch": ef_search
                         },
                     "flat":
                         {
