@@ -2,6 +2,8 @@
 build/
 dist/
 .idea
+*.egg-info/
+*.egg
 
 # PyInstaller
 *.manifest
