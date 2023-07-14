@@ -89,6 +89,7 @@ class DingoDB:
         raise RuntimeError(res.json())
 
     def vector_add(self, index_name, datas, vectors, ids=None) -> list:
+        datas = [{}] * len(vectors) if datas is None else datas
         params = VectorAddParam(index_name=index_name, datas=datas, vectors=vectors, ids=ids)
         if ids is None:
             assert len(params.datas) == len(params.vectors), \
