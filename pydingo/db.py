@@ -82,6 +82,12 @@ class DingoDB:
             return True
         raise RuntimeError(res.json())
 
+    def update_index_max_element(self, index_name, max_element) -> bool:
+        res = requests.put(f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}/{max_element}")
+        if res.status_code == 200:
+            return True
+        raise RuntimeError(res.json())
+    
     def delete_index(self, index_name) -> bool:
         res = requests.delete(f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}")
         if res.status_code == 200:

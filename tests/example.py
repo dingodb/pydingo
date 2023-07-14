@@ -90,7 +90,15 @@ print(b8)
 # RuntimeError
 
 # index_name
-b9 = x.delete_index("test")
+# max_element
+b9 = x.update_index_max_element("test", 50001)
 print(b9)
 # b9 = True
+# RuntimeError
+print(x.describe_index_info("test"))
+
+# index_name
+b10 = x.delete_index("test")
+print(b10)
+# b10 = True
 # RuntimeError
