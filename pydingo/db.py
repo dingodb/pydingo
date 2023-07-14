@@ -68,12 +68,12 @@ class DingoDB:
                 "vectorIndexParameter": vector_index_parameter
             },
             "name": params.index_name,
-            "partitionRule": partition_rule,
+            "indexPartition": partition_rule,
             "replica": params.replicas,
             "version": 0
         }
-        # print(indexDefinition)
-        res = requests.put(f"{self.requestProto}{self.host[0]}{self.indexApi}", headers=self.headers,
+        # print(index_definition)
+        res = requests.post(f"{self.requestProto}{self.host[0]}{self.indexApi}", headers=self.headers,
                            data=json.dumps(index_definition))
         if res.status_code == 200:
             return True
