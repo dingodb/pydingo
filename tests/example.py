@@ -14,7 +14,8 @@ x = pydingo.DingoDB("user", "password", ["172.20.3.20:13000"])
 # index_config = {"efConstruction":n, "maxElements":n, "nlinks":n}
 # metadata_config = {}
 # partition_rule = {}
-b1 = x.create_index("test", 6, "hnsw", "euclidean", 0, {}, {}, {})
+# operand = []
+b1 = x.create_index("test", 6, "hnsw", "euclidean", 3, {}, {}, {}, [5,10,15,20])
 print(b1)
 # b1 = True
 # RuntimeError
@@ -22,7 +23,7 @@ print(b1)
 # index_name
 b2 = x.describe_index_info("test")
 print(b2)
-# b2 = {'name': 'test', 'version': 0, 'replica': 0, 'autoIncrement': 1, 'indexPartition': None, 'indexParameter': {'indexType': 'INDEX_TYPE_VECTOR', 'vectorIndexParameter': {'vectorIndexType': 'VECTOR_INDEX_TYPE_HNSW', 'flatParam': None, 'ivfFlatParam': None, 'ivfPqParam': None, 'hnswParam': {'dimension': 6, 'metricType': 'METRIC_TYPE_L2', 'efConstruction': 200, 'maxElements': 50000, 'nlinks': 32}, 'diskAnnParam': None}}}
+# b2 = {'name': 'test', 'version': 0, 'replica': 3, 'isAutoIncrement': True, 'autoIncrement': 1, 'indexParameter': {'indexType': 'INDEX_TYPE_VECTOR', 'vectorIndexParameter': {'vectorIndexType': 'VECTOR_INDEX_TYPE_HNSW', 'flatParam': None, 'ivfFlatParam': None, 'ivfPqParam': None, 'hnswParam': {'dimension': 6, 'metricType': 'METRIC_TYPE_L2', 'efConstruction': 200, 'maxElements': 50000, 'nlinks': 32}, 'diskAnnParam': None}}, 'indexPartition': {'funcName': 'RANGE', 'cols': [], 'details': [{'partName': '', 'operator': '', 'operand': [5]}, {'partName': '', 'operator': '', 'operand': [10]}, {'partName': '', 'operator': '', 'operand': [15]}, {'partName': '', 'operator': '', 'operand': [20]}]}}
 # RuntimeError
 
 # 构建训练数据和查询数据
@@ -66,7 +67,7 @@ print(b4)
 
 b5 = x.get_index()
 print(b5)
-# b5 = ['test', 'zetyun_test1']
+# b5 = ['testResult2', 'test11', 'testResult1', 'testPart', 'testdingo2', 'test', 'hch_index1', 'hch_index', 'testPart2', 'hch_index2', 'testhch', 'hch_index3', 'testPart3', 'test_index', 'test_index21', 'testSearch1', 'hhh', 'test_index111', 'testSearch2', 'hchsss', 'test_index112']
 # RuntimeError
 
 # index_name

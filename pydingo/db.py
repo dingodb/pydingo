@@ -27,13 +27,29 @@ class DingoDB:
             raise RuntimeError(res.json())
 
     def create_index(self,  index_name, dimension, index_type="hnsw", metric_type="euclidean", replicas=3,
-                     index_config=None, metadata_config=None, partition_rule=None, auto_id=True) -> bool:
+                     index_config=None, metadata_config=None, partition_rule=None, operand=None, auto_id=True) -> bool:
 
         params = CreateIndexParam(index_name=index_name, dimension=dimension, index_type=index_type,
                                   metric_type=metric_type, replicas=replicas, index_config=index_config,
                                   metadata_config=metadata_config, partition_rule=partition_rule, auto_id=auto_id)
         
         partition_rule = params.partition_rule if params.partition_rule is not None else {}
+
+        if partition_rule == {} and operand is not None and len(operand) != 0:
+            details = []
+            for item in operand:
+                details.append(
+                    {
+                        "operand": [item],
+                        "operator": "",
+                        "partName": ""
+                    }
+                )
+            partition_rule = {
+                "cols":[],
+                "details": details,
+                "funcName": ""
+            }
         
         if params.metric_type not in config.metric_type.keys():
             raise Exception(f"metric_type  must in {list(config.metric_type.keys())}")
