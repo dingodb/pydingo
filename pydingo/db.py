@@ -1,10 +1,9 @@
 #!/usr/bin/python3
-from .dingo_param import ClintParam, CreateIndexParam, VectorAddParam, VectorSearchParam, VectorGetParam, \
-    VectorDeleteParam
-from . import config
-import requests
 import json
-import warnings
+import requests
+
+from .dingo_param import CheckClintParam, CheckCreateIndexParam, CheckVectorAddParam, CheckVectorSearchParam, \
+    CheckVectorGetParam, CheckVectorDeleteParam
 
 
 class DingoDB:
@@ -13,29 +12,68 @@ class DingoDB:
     indexApi = "/index/api/dingo/"
     vectorApi = "/vector/api/dingo/"
     
-    def __init__(self, user, password, host) -> None:
-        params = ClintParam(user=user, password=password, host=host)
+    def __init__(self, user: str, password: str, host: list) -> None:
+        """
+        __init__ init DingoDB
+
+        Args:
+            user (str): DingoDB user
+            password (str): DingoDB password
+            host (list): DingoDB host:port
+        """
+        params = CheckClintParam(user=user, password=password, host=host)
         self.user = params.user
         self.password = params.password
         self.host = params.host
 
-    def describe_index_info(self, index_name) -> dict:
+    def describe_index_info(self, index_name: str) -> dict:
+        """
+        describe_index_info index info
+
+        Args:
+            index_name (str): the name the index
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            dict: index info
+        """
         res = requests.get(f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}", headers=self.headers)
         if res.status_code == 200:
             return res.json()
         else:
             raise RuntimeError(res.json())
 
-    def create_index(self,  index_name, dimension, index_type="hnsw", metric_type="euclidean", replicas=3,
-                     index_config=None, metadata_config=None, partition_rule=None, operand=None, auto_id=True) -> bool:
+    def create_index(self,  index_name: str, dimension: int, index_type: str = "hnsw", metric_type: str = "euclidean", replicas: int = 3,
+                     index_config: dict = None, metadata_config: dict = None, partition_rule: dict = None, operand: list = None, auto_id: bool = True) -> bool:
+        """
+        create_index create index
 
-        params = CreateIndexParam(index_name=index_name, dimension=dimension, index_type=index_type,
-                                  metric_type=metric_type, replicas=replicas, index_config=index_config,
-                                  metadata_config=metadata_config, partition_rule=partition_rule, auto_id=auto_id)
-        
-        partition_rule = params.partition_rule if params.partition_rule is not None else {}
+        Args:
+            index_name (str): the name of index
+            dimension (int): dimension of vector
+            index_type (str, optional): index type, one of {"flat", "hnsw"}. Defaults to "hnsw".
+            metric_type (str, optional): metric type, one of {"dotproduct", "euclidean"}. Defaults to "euclidean".
+            replicas (int, optional): dingoDB store replicas. Defaults to 3.
+            index_config (dict, optional): Advanced configuration options for the index. Defaults to None.
+            metadata_config (dict, optional): metadata. Defaults to None.
+            partition_rule (dict, optional): partition rule. Defaults to None.
+            operand (list, optional): operand. Defaults to None.
+            auto_id (bool, optional): isAutoIncrement or not isAutoIncrement. Defaults to True.
 
-        if partition_rule == {} and operand is not None and len(operand) != 0:
+        Raises:
+            RuntimeError: _description_
+
+        Returns:
+            bool: _description_
+        """
+        params = CheckCreateIndexParam(index_name=index_name, dimension=dimension, index_type=index_type,
+                                       metric_type=metric_type, replicas=replicas, index_config=index_config,
+                                       metadata_config=metadata_config, partition_rule=partition_rule, operand=operand,
+                                       auto_id=auto_id)
+
+        if params.partition_rule == {} and operand is not None and len(operand) != 0:
             details = []
             for item in operand:
                 details.append(
@@ -46,79 +84,86 @@ class DingoDB:
                     }
                 )
             partition_rule = {
-                "cols":[],
+                "cols": [],
                 "details": details,
                 "funcName": ""
             }
-        
-        if params.metric_type not in config.metric_type.keys():
-            raise Exception(f"metric_type  must in {list(config.metric_type.keys())}")
-        metric_type = config.metric_type[params.metric_type]
-
-        if params.index_type not in config.index_config.keys():
-            raise Exception(f"index_type  must in {list(config.index_config.keys())}")
-        vector_index_parameter = config.index_config[params.index_type]
-
-        if params.index_config is not None:
-            for key, value in params.index_config.items():
-                index_keys = vector_index_parameter[list(vector_index_parameter.keys())[0]].keys()
-                if key in index_keys:
-                    vector_index_parameter[list(vector_index_parameter.keys())[0]][key] = value
-                    if key == "efConstruction" and value > 500 or value < 100:
-                        assert value >= 0, "f{key} must > 0"
-                        warnings.warn(f"efConstruction: {value} suggestion in 100-500")
-                    if key == "maxElements" and value > 1000000000 or value < 50000:
-                        assert value >= 0, "f{key} must > 0"
-                        warnings.warn(f"maxElements:{value} suggestion in 50000-1000000000")
-                    if key == "nlinks" and value > 64 or value < 16:
-                        assert value >= 0, "f{key} must > 0"
-                        warnings.warn(f"nlinks:{value} suggestion in 16-64")
-                else:
-                    warnings.warn(f"index_config {key} not in {params.index_type}")
-        
-        vector_index_parameter[list(vector_index_parameter.keys())[0]]["dimension"] = params.dimension
-        vector_index_parameter[list(vector_index_parameter.keys())[0]]["metricType"] = metric_type
 
         index_definition = {
             "autoIncrement": 1,
-            "isAutoIncrement": "true" if auto_id else "false",
+            "isAutoIncrement": "true" if params.auto_id else "false",
             "indexParameter": {
                 "indexType": "INDEX_TYPE_VECTOR",
-                "vectorIndexParameter": vector_index_parameter
+                "vectorIndexParameter": params.index_config
             },
             "name": params.index_name,
-            "indexPartition": partition_rule,
+            "indexPartition": partition_rule if partition_rule is not None else params.partition_rule,
             "replica": params.replicas,
             "version": 0
         }
-        # print(index_definition)
+
         res = requests.post(f"{self.requestProto}{self.host[0]}{self.indexApi}", headers=self.headers,
                             data=json.dumps(index_definition))
         if res.status_code == 200:
             return True
         raise RuntimeError(res.json())
 
-    def update_index_max_element(self, index_name, max_element) -> bool:
+    def update_index_max_element(self, index_name: str, max_element: int) -> bool:
+        """
+        update_index_max_element change index max element
+
+        only for hnsw
+
+        Args:
+            index_name (str): the name of index
+            max_element (int): max element value
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            bool: True/False
+        """
         res = requests.put(f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}/{max_element}")
         if res.status_code == 200:
             return True
         raise RuntimeError(res.json())
     
-    def delete_index(self, index_name) -> bool:
+    def delete_index(self, index_name: str) -> bool:
+        """
+        delete_index del/drop index
+
+        Args:
+            index_name (str): the name of index
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            bool: True/False
+        """
         res = requests.delete(f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}")
         if res.status_code == 200:
             return True
         raise RuntimeError(res.json())
 
-    def vector_add(self, index_name, datas, vectors, ids=None) -> list:
-        datas = [{}] * len(vectors) if datas is None else datas
-        params = VectorAddParam(index_name=index_name, datas=datas, vectors=vectors, ids=ids)
-        if ids is None:
-            assert len(params.datas) == len(params.vectors), \
-                f"length datas:{len(params.datas)} vectors: {len(params.vectors)} is not equal"
-        else:
-            assert len(params.datas) == len(params.vectors) == len(params.ids), \
-                 f"length datas:{len(params.datas)} vectors: {len(params.vectors)} ids:{len(params.ids)} is not equal"
+    def vector_add(self, index_name: str, datas: list, vectors: list, ids: list = None) -> list:
+        """
+        vector_add add vector
+
+        Args:
+            index_name (str): the name of index
+            datas (list): metadata list 
+            vectors (list): vector list
+            ids (list, optional): id list. Defaults to None.
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: add vector info in dingoDB
+        """
+        params = CheckVectorAddParam(index_name=index_name, datas=datas, vectors=vectors, ids=ids)
 
         records = []
         for i, v in enumerate(params.vectors):
@@ -149,13 +194,34 @@ class DingoDB:
         raise RuntimeError(res.json())
 
     def get_index(self):
+        """
+        get_index get all index
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: all index list 
+        """
         res = requests.get(f"{self.requestProto}{self.host[0]}{self.indexApi}", headers=self.headers)
         if res.status_code == 200:
             indics = res.json()
             return indics
         raise RuntimeError(res.json())
 
-    def get_max_index_row(self, index_name):
+    def get_max_index_row(self, index_name: str):
+        """
+        get_max_index_row get max id in index
+
+        Args:
+            index_name (str): the name of in index 
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            int: max id value
+        """
         payload = {"isGetMin": "false"}
         res = requests.get(f"{self.requestProto}{self.host[0]}{self.vectorApi}{index_name}/id", params=payload,
                            headers=self.headers)
@@ -164,57 +230,48 @@ class DingoDB:
             return id
         raise RuntimeError(res.json())
 
-    def vector_search(self, index_name, xq, top_k=10, search_params=None) -> dict:
-        params = VectorSearchParam(index_name=index_name, xq=xq, top_k=top_k, search_params=search_params)
-        scalar_data = {}
-        use_scalar_filter = "false"
-        if params.search_params is not None and "meta_expr" in params.search_params.keys():
-            use_scalar_filter = "true"
-            scalar_data = dict(
-                (key, {"fieldType": "STRING", "fields": [{"data": value}]})
-                for key, value in params.search_params["meta_expr"].items()
-            )
-        
-        ef_search = 32 if search_params is None else search_params.get("efSearch", 32)
-        assert ef_search >= 0, f"efSearch must >= 0, but get {ef_search}"
+    def vector_search(self, index_name: str, xq: list, top_k: int = 10, search_params: dict = None) -> dict:
+        """
+        vector_search search vector
 
-        payload = {
-            "parameter": {
-                "search": {
-                    "hnswParam": {
-                        "efSearch": ef_search
-                        },
-                    "flat":
-                        {
-                        "parallelOnQueries": 0 if search_params is None else search_params.get("parallelOnQueries", 0)
-                        }
-                    },
-                "selectedKeys": [],
-                "topN": params.top_k,
-                "withScalarData": "true" if search_params is None else search_params.get("withScalarData", "true"),
-                "withoutVectorData": "false" if search_params is None else search_params.get("withoutVectorData",
-                                                                                             "false"),
-                "useScalarFilter": use_scalar_filter
-                },
-            "vector": {
-                "scalarData": scalar_data,
-                "vector": {
-                    "binaryValues": [],
-                    "dimension": len(params.xq),
-                    "floatValues": params.xq,
-                    "valueType": "FLOAT"
-                          }
-                      }
-               }
+        Args:
+            index_name (str): the name of the index 
+            xq (list): query vector
+            top_k (int, optional): top k search. Defaults to 10.
+            search_params (dict, optional): search params for index. Defaults to None.
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            dict: search results
+        """
+        params = CheckVectorSearchParam(index_name=index_name, xq=xq, top_k=top_k, search_params=search_params)
+        
         res = requests.post(f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}",
-                            headers=self.headers, data=json.dumps(payload))
+                            headers=self.headers, data=json.dumps(params.search_params))
         if res.status_code == 200:
             records = res.json()
             return records
         raise RuntimeError(res.json())
     
-    def vector_get(self, index_name, ids, scalar=True, vector=True) -> list:
-        params = VectorGetParam(index_name=index_name, ids=ids, scalar=scalar, vector=vector)
+    def vector_get(self, index_name: str, ids: list, scalar: bool = True, vector: bool = True) -> list:
+        """
+        vector_get query vector
+
+        Args:
+            index_name (str): the name of the index
+            ids (list): query id list 
+            scalar (bool, optional): res with or without scalar. Defaults to True.
+            vector (bool, optional): res with or without vector. Defaults to True.
+
+        Raises:
+            RuntimeError: _description_
+
+        Returns:
+            list: _description_
+        """
+        params = CheckVectorGetParam(index_name=index_name, ids=ids, scalar=scalar, vector=vector)
         payload = {
             "ids": params.ids,
             "keys": [],
@@ -229,8 +286,21 @@ class DingoDB:
         else:
             raise RuntimeError(res.json())
 
-    def vector_delete(self, index_name, ids):
-        params = VectorDeleteParam(index_name=index_name, ids=ids)
+    def vector_delete(self, index_name: str, ids: list):
+        """
+        vector_delete delete vector with ids
+
+        Args:
+            index_name (str): the name of the index
+            ids (list): id list 
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list : [True, False, ...]
+        """
+        params = CheckVectorDeleteParam(index_name=index_name, ids=ids)
         res = requests.delete(f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}",
                               headers=self.headers, data=json.dumps(params.ids))
         if res.status_code == 200:

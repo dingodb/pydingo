@@ -76,14 +76,14 @@ The following example Query vector with ids.
 [{'id': 2, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [0.27746424, 0.8018722, 0.95813936, 0.87593263, 0.35781726, 0.5009951], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}}}]
 ```
 
-### Detele Vector with ids
+### Detele vector with ids
 The following example Detele vector with ids.
 ```python
 >>> dingo_client.vector_delete("testdingo", [2])
 [True]
 ```
 
-### drop index
+### Drop index
 The following example Drop one index.
 ```python
 >>> dingo_client.delete_index("testdingo")
