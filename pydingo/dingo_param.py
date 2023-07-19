@@ -140,7 +140,7 @@ class CheckVectorSearchParam(BaseModel):
                                                                                              "false"),
                 "useScalarFilter": use_scalar_filter
                 },
-            "vector": {
+            "vectors": [{
                 "scalarData": scalar_data,
                 "vector": {
                     "binaryValues": [],
@@ -148,7 +148,7 @@ class CheckVectorSearchParam(BaseModel):
                     "floatValues": values.get("xq"),
                     "valueType": "FLOAT"
                             }
-                        }
+                        }]
                 }
         return payload
 
