@@ -107,6 +107,12 @@ class CheckVectorSearchParam(BaseModel):
     top_k: int = 10
     search_params: dict = None
 
+    @validator("xq", always=True)
+    def check_xq(cls, value):
+        if not isinstance(value[0], list):
+            value = [value]
+        return value
+    
     @validator("search_params", always=True)
     def check_search_params(cls, search_params, values):
         scalar_data = {}
@@ -144,11 +150,11 @@ class CheckVectorSearchParam(BaseModel):
                 "scalarData": scalar_data,
                 "vector": {
                     "binaryValues": [],
-                    "dimension": len(values.get("xq")),
-                    "floatValues": values.get("xq"),
+                    "dimension": len(xq),
+                    "floatValues": xq,
                     "valueType": "FLOAT"
                             }
-                        }]
+                        } for xq in values.get("xq")]
                 }
         return payload
 
