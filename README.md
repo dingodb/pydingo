@@ -1,7 +1,7 @@
 # python-dingodb
-The DingDB python sdk
+The DingoDB python sdk
 
-First, you have prepared the DingDB environment, see the docs at https://github.com/dingodb/dingo-deploy.git
+First, you have prepared the DingoDB environment, see the docs at https://github.com/dingodb/dingo-deploy.git
 
 For more information, see the docs at https://dingodb.readthedocs.io/en/latest/
 
