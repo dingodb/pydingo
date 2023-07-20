@@ -236,7 +236,7 @@ class DingoDB:
 
         Args:
             index_name (str): the name of the index 
-            xq (list): query vector
+            xq (list): query vector, List[float] or List[List[float]]
             top_k (int, optional): top k search. Defaults to 10.
             search_params (dict, optional): search params for index. Defaults to None.
 
@@ -244,7 +244,7 @@ class DingoDB:
             RuntimeError: return error
 
         Returns:
-            dict: search results
+            List[dict]: search results
         """
         params = CheckVectorSearchParam(index_name=index_name, xq=xq, top_k=top_k, search_params=search_params)
         

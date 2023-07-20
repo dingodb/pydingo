@@ -59,8 +59,8 @@ you can use autoIncrement id, The following example get max id
 ### Search Vector
 The following example Basic Search without metata.
 ```python
->>> dingo_client.vector_search("testdingo", [0.19151945,0.62210876,0.43772775,0.7853586,0.77997583,0.2725926], 10)
-{'vectorWithDistances': [{'id': 1, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}, 'aa1': {'fieldType': 'STRING', 'fields': [{'data': 'bb1'}]}}, 'distance': 0.0}, {'id': 2, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}}, 'distance': 0.5491189}]
+>>> dingo_client.vector_search("testdingo", [[0.19151945,0.62210876,0.43772775,0.7853586,0.77997583,0.2725926]], 10)
+[{'vectorWithDistances': [{'id': 1, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}, 'aa1': {'fieldType': 'STRING', 'fields': [{'data': 'bb1'}]}}, 'distance': 0.0}, {'id': 2, 'vector': {'dimension': 6, 'valueType': 'FLOAT', 'floatValues': [], 'binaryValues': []}, 'scalarData': {'a1': {'fieldType': 'STRING', 'fields': [{'data': 'b1'}]}}, 'distance': 0.5491189}]}]
 ```
 
 The following example Search with metata.
