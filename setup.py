@@ -5,9 +5,9 @@ import os
 
 import setuptools
 
-long_desc = """# Pydigno
+long_desc = """# dingodb
 
-Pydingo is a SDK for  vector datavase DingoDB .
+dingodb is a SDK for  vector database DingoDB, .
 """
 
 
@@ -17,9 +17,9 @@ def read(fname):
 
 
 setuptools.setup(
-    name="pydingo",
-    version=read("pydingo/__version__").strip(),
-    description="pydingo is dingodb sdk",
+    name="dingodb",
+    version=read("dingodb/__version__").strip(),
+    description="dingodb is dingodb sdk",
     license="Proprietary License",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
@@ -30,13 +30,13 @@ setuptools.setup(
     },
     author="DingoDB",
     author_email="dingodb@zetyun.com",
-    keywords="pydingo",
+    keywords="dingodb",
     packages=setuptools.find_packages(),
     install_requires=read("requirements.txt"),
     extras_require={
     },
     include_package_data=True,
-    python_requires=">=3.8",
+    python_requires=">=3.6",
     entry_points={
     },
     classifiers=[
@@ -49,6 +49,8 @@ setuptools.setup(
         "Intended Audience :: System Administrators",
         "License :: Other/Proprietary License",
         "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",

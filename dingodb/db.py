@@ -45,8 +45,9 @@ class DingoDB:
         else:
             raise RuntimeError(res.json())
 
-    def create_index(self,  index_name: str, dimension: int, index_type: str = "hnsw", metric_type: str = "euclidean", replicas: int = 3,
-                     index_config: dict = None, metadata_config: dict = None, partition_rule: dict = None, operand: list = None, auto_id: bool = True) -> bool:
+    def create_index(self,  index_name: str, dimension: int, index_type: str = "hnsw", metric_type: str = "euclidean",
+                     replicas: int = 3, index_config: dict = None, metadata_config: dict = None,
+                     partition_rule: dict = None, operand: list = None, auto_id: bool = True) -> bool:
         """
         create_index create index
 

@@ -1,4 +1,4 @@
-# pydingo
+# python-dingodb
 The DingDB python sdk
 
 First, you have prepared the DingDB environment, see the docs at https://github.com/dingodb/dingo-deploy.git
@@ -7,9 +7,9 @@ For more information, see the docs at https://dingodb.readthedocs.io/en/latest/
 
 ## Installation
 
-Install pydingo from pip:
+Install python-dingodb from pip:
 ```shell
-pip3 install pydingo
+pip3 install dingodb
 ```
 
 ## Usage
@@ -17,12 +17,12 @@ pip3 install pydingo
 ### Creating an index
 The following example creates an index without a metadata configuration. 
 ```python
->>> import pydingo
->>> dingo_client = pydingo.DingoDB("user", "password", ["172.20.3.20:13000"])
+>>> import dingodb
+>>> dingo_client = dingodb.DingoDB("user", "password", ["172.20.3.20:13000"])
 >>> dingo_client.create_index("testdingo", 6, index_type="flat")
 True
 ```
-pydingo provides flexible indexing parameters.
+dingodb provides flexible indexing parameters.
 ```python
 >>> help(dingo_client.create_index)
 create_index(index_name, dimension, index_type='hnsw', metric_type='euclidean', replicas=3, index_config=None, metadata_config=None, partition_rule=None, auto_id=True)
