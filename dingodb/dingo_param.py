@@ -118,7 +118,7 @@ class CheckVectorSearchParam(BaseModel):
         scalar_data = {}
         use_scalar_filter = "false"
         if search_params is not None and "meta_expr" in search_params.keys():
-            if search_params["meta_expr"] is not  None:
+            if search_params["meta_expr"] is not None:
                 use_scalar_filter = "true"
                 scalar_data = dict(
                     (key, {"fieldType": "STRING", "fields": [{"data": value}]})

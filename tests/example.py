@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
-import pydingo
+import dingodb
 import numpy as np
 
-x = pydingo.DingoDB("user", "password", ["172.20.3.20:13000"])
+x = dingodb.DingoDB("user", "password", ["172.20.3.20:13000"])
 
 
 # index_name
