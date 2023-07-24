@@ -3,7 +3,7 @@ import json
 import requests
 
 from .dingo_param import CheckClintParam, CheckCreateIndexParam, CheckVectorAddParam, CheckVectorSearchParam, \
-    CheckVectorGetParam, CheckVectorDeleteParam
+    CheckVectorGetParam, CheckVectorDeleteParam, CheckVectorScanParam
 
 
 class DingoDB:
@@ -25,6 +25,13 @@ class DingoDB:
         self.user = params.user
         self.password = params.password
         self.host = params.host
+        self.session = requests.Session()
+    
+    def __del__(self):
+        self.session.close()
+        
+    def close(self):
+        self.session.close()
 
     def describe_index_info(self, index_name: str) -> dict:
         """
@@ -39,7 +46,8 @@ class DingoDB:
         Returns:
             dict: index info
         """
-        res = requests.get(f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}", headers=self.headers)
+        res = self.session.get(f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}", headers=self.headers)
+        
         if res.status_code == 200:
             return res.json()
         else:
@@ -64,10 +72,10 @@ class DingoDB:
             auto_id (bool, optional): isAutoIncrement or not isAutoIncrement. Defaults to True.
 
         Raises:
-            RuntimeError: _description_
+            RuntimeError: return error
 
         Returns:
-            bool: _description_
+            bool: create table status
         """
         params = CheckCreateIndexParam(index_name=index_name, dimension=dimension, index_type=index_type,
                                        metric_type=metric_type, replicas=replicas, index_config=index_config,
@@ -102,12 +110,12 @@ class DingoDB:
             "replica": params.replicas,
             "version": 0
         }
-
-        res = requests.post(f"{self.requestProto}{self.host[0]}{self.indexApi}", headers=self.headers,
-                            data=json.dumps(index_definition))
+        res = self.session.post(f"{self.requestProto}{self.host[0]}{self.indexApi}", headers=self.headers,
+                                data=json.dumps(index_definition))
         if res.status_code == 200:
             return True
-        raise RuntimeError(res.json())
+        else:
+            raise RuntimeError(res.json())
 
     def update_index_max_element(self, index_name: str, max_element: int) -> bool:
         """
@@ -125,10 +133,12 @@ class DingoDB:
         Returns:
             bool: True/False
         """
-        res = requests.put(f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}/{max_element}")
+        
+        res = self.session.put(f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}/{max_element}")
         if res.status_code == 200:
             return True
-        raise RuntimeError(res.json())
+        else:
+            raise RuntimeError(res.json())
     
     def delete_index(self, index_name: str) -> bool:
         """
@@ -143,10 +153,11 @@ class DingoDB:
         Returns:
             bool: True/False
         """
-        res = requests.delete(f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}")
+        res = self.session.delete(f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}")
         if res.status_code == 200:
             return True
-        raise RuntimeError(res.json())
+        else:
+            raise RuntimeError(res.json())
 
     def vector_add(self, index_name: str, datas: list, vectors: list, ids: list = None) -> list:
         """
@@ -185,15 +196,75 @@ class DingoDB:
             if ids is not None:
                 record.update({"id": params.ids[i]})
             
-            records.append(record) 
-            
-        res = requests.put(f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}",
-                           headers=self.headers, data=json.dumps(records))
+            records.append(record)
+        res = self.session.put(f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}",
+                               headers=self.headers, data=json.dumps(records))
         if res.status_code == 200:
             records = res.json()
             return records
-        raise RuntimeError(res.json())
+        else:
+            raise RuntimeError(res.json())
+    
+    def vector_count(self, index_name: str):
+        """
+        vector_count count in index
 
+        Args:
+            index_name (str): the name of in index
+        
+        Returns:
+            int: count num
+        """
+        res = self.session.get(f"{self.requestProto}{self.host[0]}{self.vectorApi}{index_name}", headers=self.headers)
+        if res.status_code == 200:
+            records = res.json()
+            return records.get("currentCount") - records.get("deletedCount")
+        else:
+            raise RuntimeError(res.json())
+        
+    def vector_scan(self, index_name: str, start_id: int, max_count: int = 1000, is_reverse: bool = False,
+                    with_scalar_data: bool = True, with_table_data: bool = True, without_vector_data: bool = False,
+                    filter_scalar: list = None) -> list:
+        """
+        vector_scan scan with start_id
+
+        Args:
+            index_name (str): the name of in index
+            start_id (int): start id
+            max_count (int, optional): max scan count. Defaults to 1000.
+            is_reverse (bool, optional): whether or not reverse. Defaults to False.
+            with_scalar_data (bool, optional): whether  with scalar info. Defaults to True.
+            with_table_data (bool, optional): whether  with table info. Defaults to True.
+            without_vector_data (bool, optional): whether with vector info. Defaults to False.
+            filter_scalar (list, optional): scalar filter filed. Defaults to [].
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list:  scan info list
+        """
+        params = CheckVectorScanParam(index_name=index_name, start_id=start_id, max_count=max_count,
+                                      is_reverse=is_reverse, with_scalar_data=with_scalar_data,
+                                      with_table_data=with_table_data, without_vector_data=without_vector_data,
+                                      filter_scalar=filter_scalar)
+        payload = {
+            "isReverseScan": params.is_reverse,
+            "maxScanCount": params.max_count,
+            "selectedKeys": params.filter_scalar,
+            "startId": params.start_id,
+            "withScalarData": params.with_scalar_data,
+            "withTableData": params.with_table_data,
+            "withoutVectorData": params.without_vector_data
+        }
+        res = self.session.post(f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}/scan",
+                                headers=self.headers, data=json.dumps(payload))
+        if res.status_code == 200:
+            records = res.json()
+            return records
+        else:
+            raise RuntimeError(res.json())
+        
     def get_index(self):
         """
         get_index get all index
@@ -204,11 +275,13 @@ class DingoDB:
         Returns:
             list: all index list 
         """
-        res = requests.get(f"{self.requestProto}{self.host[0]}{self.indexApi}", headers=self.headers)
+
+        res = self.session.get(f"{self.requestProto}{self.host[0]}{self.indexApi}", headers=self.headers)
         if res.status_code == 200:
             indics = res.json()
             return indics
-        raise RuntimeError(res.json())
+        else:
+            raise RuntimeError(res.json())
 
     def get_max_index_row(self, index_name: str):
         """
@@ -224,12 +297,14 @@ class DingoDB:
             int: max id value
         """
         payload = {"isGetMin": "false"}
-        res = requests.get(f"{self.requestProto}{self.host[0]}{self.vectorApi}{index_name}/id", params=payload,
-                           headers=self.headers)
+
+        res = self.session.get(f"{self.requestProto}{self.host[0]}{self.vectorApi}{index_name}/id",
+                               params=payload, headers=self.headers)
         if res.status_code == 200:
-            id = res.json()
-            return id
-        raise RuntimeError(res.json())
+            max_id = res.json()
+            return max_id
+        else:
+            raise RuntimeError(res.json())
 
     def vector_search(self, index_name: str, xq: list, top_k: int = 10, search_params: dict = None) -> dict:
         """
@@ -249,12 +324,14 @@ class DingoDB:
         """
         params = CheckVectorSearchParam(index_name=index_name, xq=xq, top_k=top_k, search_params=search_params)
         
-        res = requests.post(f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}",
-                            headers=self.headers, data=json.dumps(params.search_params))
+        res = self.session.post(f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}",
+                                headers=self.headers, data=json.dumps(params.search_params))
+        
         if res.status_code == 200:
             records = res.json()
             return records
-        raise RuntimeError(res.json())
+        else:
+            raise RuntimeError(res.json())
     
     def vector_get(self, index_name: str, ids: list, scalar: bool = True, vector: bool = True) -> list:
         """
@@ -279,8 +356,10 @@ class DingoDB:
             "withScalarData": "true" if scalar else "false",
             "withoutVectorData": "false" if vector else "true"
         }
-        res = requests.post(f"{self.requestProto}{self.host[0]}{self.vectorApi}{ params.index_name}/get",
-                            headers=self.headers, data=json.dumps(payload))
+        
+        res = self.session.post(f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}/get",
+                                headers=self.headers, data=json.dumps(payload))
+        
         if res.status_code == 200:
             records = res.json()
             return records
@@ -302,8 +381,10 @@ class DingoDB:
             list : [True, False, ...]
         """
         params = CheckVectorDeleteParam(index_name=index_name, ids=ids)
-        res = requests.delete(f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}",
-                              headers=self.headers, data=json.dumps(params.ids))
+        
+        res = self.session.delete(f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}",
+                                  headers=self.headers, data=json.dumps(params.ids))
+        
         if res.status_code == 200:
             return res.json()
         else:
