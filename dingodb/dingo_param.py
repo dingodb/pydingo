@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional
+from typing import List
 import warnings
 
 from pydantic import BaseModel, validator
@@ -50,19 +50,19 @@ class CheckCreateIndexParam(BaseModel):
         vector_index_parameter = config.index_config[index_type]
         
         if value is not None:
+            index_keys = vector_index_parameter[list(vector_index_parameter.keys())[0]].keys()
             for key, v in value.items():
-                index_keys = vector_index_parameter[list(vector_index_parameter.keys())[0]].keys()
                 if key in index_keys:
                     vector_index_parameter[list(vector_index_parameter.keys())[0]][key] = v
-                    if key == "efConstruction" and v > 500 or v < 100:
+                    if key == "efConstruction" and (v > 500 or v < 100):
                         if v < 0:
                             raise Exception(f"{key} must >= 0")
                         warnings.warn(f"efConstruction: {v} suggestion in 100-500")
-                    if key == "maxElements" and v > 1000000000 or v < 50000:
+                    if key == "maxElements" and (v > 1000000000 or v < 50000):
                         if v < 0:
                             raise Exception(f"{key} must >= 0")
                         warnings.warn(f"maxElements:{v} suggestion in 50000-1000000000")
-                    if key == "nlinks" and v > 64 or v < 16:
+                    if key == "nlinks" and (v > 64 or v < 16):
                         if v < 0:
                             raise Exception(f"{key} must >= 0")
                         warnings.warn(f"nlinks:{v} suggestion in 16-64")
@@ -98,6 +98,34 @@ class CheckVectorAddParam(BaseModel):
         else:
             assert len(values.get('datas')) == len(values.get('vectors')) == len(value), \
                 f"length datas:{len(values.get('datas'))} vectors: {len(values.get('vectors'))} ids:{len(value)} is not equal"
+        return value
+
+
+class CheckVectorScanParam(BaseModel):
+    index_name: str
+    start_id: int
+    max_count: int = 1000
+    is_reverse: bool = False
+    with_scalar_data: bool = True
+    with_table_data: bool = True
+    without_vector_data: bool = False
+    filter_scalar: list = None
+    
+    @validator("*", always=True)
+    def check_input(cls, value, field):
+        if field.name == "start_id":
+            if not value > 0:
+                raise Exception("start_id must > 0")   
+        if field.name == "max_count":
+            if not value > 0:
+                raise Exception("max_count must > 0")
+        if field.name == "is_reverse" or field.name == "with_scalar_data" or field.name == "with_table_data" or \
+                field.name == "without_vector_data":
+            value = "true" if value else "false"
+        if field.name == "filter_scalar":
+            if value is None:
+                value = []
+
         return value
 
 
