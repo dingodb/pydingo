@@ -22,6 +22,7 @@ class CheckCreateIndexParam(BaseModel):
     partition_rule: dict = None
     operand: list = None
     auto_id: bool = True
+    start_id: int = 1
 
     @validator("index_type", always=True)
     def check_index_type(cls, value):

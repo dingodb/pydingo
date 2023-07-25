@@ -55,7 +55,8 @@ class DingoDB:
 
     def create_index(self,  index_name: str, dimension: int, index_type: str = "hnsw", metric_type: str = "euclidean",
                      replicas: int = 3, index_config: dict = None, metadata_config: dict = None,
-                     partition_rule: dict = None, operand: list = None, auto_id: bool = True) -> bool:
+                     partition_rule: dict = None, operand: list = None, auto_id: bool = True,
+                     start_id: int = 1) -> bool:
         """
         create_index create index
 
@@ -70,6 +71,7 @@ class DingoDB:
             partition_rule (dict, optional): partition rule. Defaults to None.
             operand (list, optional): operand. Defaults to None.
             auto_id (bool, optional): isAutoIncrement or not isAutoIncrement. Defaults to True.
+            start_id (int, optional): autoIncrement start id. Defaults to 1.
 
         Raises:
             RuntimeError: return error
@@ -80,7 +82,7 @@ class DingoDB:
         params = CheckCreateIndexParam(index_name=index_name, dimension=dimension, index_type=index_type,
                                        metric_type=metric_type, replicas=replicas, index_config=index_config,
                                        metadata_config=metadata_config, partition_rule=partition_rule, operand=operand,
-                                       auto_id=auto_id)
+                                       auto_id=auto_id, start_id=start_id)
 
         if params.partition_rule == {} and operand is not None and len(operand) != 0:
             details = []
@@ -99,7 +101,7 @@ class DingoDB:
             }
 
         index_definition = {
-            "autoIncrement": 1,
+            "autoIncrement": params.start_id,
             "isAutoIncrement": "true" if params.auto_id else "false",
             "indexParameter": {
                 "indexType": "INDEX_TYPE_VECTOR",
