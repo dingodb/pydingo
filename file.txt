@@ -1,0 +1,3 @@
+c:\users\jinju\pycharmprojects\dingo-autotest-pysdk\venv\lib\site-packages\pydingo-0.0.1-py3.9.egg
+C:\Users\jinju\PycharmProjects\dingo-autotest-pysdk\venv\Scripts\normalizer-script.py
+C:\Users\jinju\PycharmProjects\dingo-autotest-pysdk\venv\Scripts\normalizer.exe
