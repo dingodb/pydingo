@@ -1,3 +1,0 @@
-d:\software\python\lib\site-packages\pydingo-0.0.1-py3.9.egg
-D:\software\python\Scripts\normalizer-script.py
-D:\software\python\Scripts\normalizer.exe

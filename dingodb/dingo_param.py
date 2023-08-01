@@ -110,7 +110,7 @@ class CheckVectorScanParam(BaseModel):
     with_scalar_data: bool = True
     with_table_data: bool = True
     without_vector_data: bool = False
-    filter_scalar: list = None
+    fields: list = None
     
     @validator("*", always=True)
     def check_input(cls, value, field):
@@ -123,7 +123,7 @@ class CheckVectorScanParam(BaseModel):
         if field.name == "is_reverse" or field.name == "with_scalar_data" or field.name == "with_table_data" or \
                 field.name == "without_vector_data":
             value = "true" if value else "false"
-        if field.name == "filter_scalar":
+        if field.name == "fields":
             if value is None:
                 value = []
 

@@ -1,6 +1,7 @@
 metric_type = {
     "euclidean": "METRIC_TYPE_L2",
-    "dotproduct": "METRIC_TYPE_INNER_PRODUCT"
+    "dotproduct": "METRIC_TYPE_INNER_PRODUCT",
+    "cosine": "METRIC_TYPE_COSINE"
 }
 
 
