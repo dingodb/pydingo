@@ -53,7 +53,7 @@ class DingoDB:
         else:
             raise RuntimeError(res.json())
 
-    def create_index(self,  index_name: str, dimension: int, index_type: str = "hnsw", metric_type: str = "euclidean",
+    def create_index(self,  index_name: str, dimension: int, index_type: str = "hnsw", metric_type: str = "cosine",
                      replicas: int = 3, index_config: dict = None, metadata_config: dict = None,
                      partition_rule: dict = None, operand: list = None, auto_id: bool = True,
                      start_id: int = 1) -> bool:
@@ -64,7 +64,7 @@ class DingoDB:
             index_name (str): the name of index
             dimension (int): dimension of vector
             index_type (str, optional): index type, one of {"flat", "hnsw"}. Defaults to "hnsw".
-            metric_type (str, optional): metric type, one of {"dotproduct", "euclidean"}. Defaults to "euclidean".
+            metric_type (str, optional): metric type, one of {"dotproduct", "euclidean", "cosine"}. Defaults to "cosine"
             replicas (int, optional): dingoDB store replicas. Defaults to 3.
             index_config (dict, optional): Advanced configuration options for the index. Defaults to None.
             metadata_config (dict, optional): metadata. Defaults to None.
@@ -226,7 +226,7 @@ class DingoDB:
         
     def vector_scan(self, index_name: str, start_id: int, max_count: int = 1000, is_reverse: bool = False,
                     with_scalar_data: bool = True, with_table_data: bool = True, without_vector_data: bool = False,
-                    filter_scalar: list = None) -> list:
+                    fields: list = None) -> list:
         """
         vector_scan scan with start_id
 
@@ -238,7 +238,7 @@ class DingoDB:
             with_scalar_data (bool, optional): whether  with scalar info. Defaults to True.
             with_table_data (bool, optional): whether  with table info. Defaults to True.
             without_vector_data (bool, optional): whether with vector info. Defaults to False.
-            filter_scalar (list, optional): scalar filter filed. Defaults to [].
+            fields (list, optional): fields for return . Defaults to [].
 
         Raises:
             RuntimeError: return error
@@ -249,11 +249,11 @@ class DingoDB:
         params = CheckVectorScanParam(index_name=index_name, start_id=start_id, max_count=max_count,
                                       is_reverse=is_reverse, with_scalar_data=with_scalar_data,
                                       with_table_data=with_table_data, without_vector_data=without_vector_data,
-                                      filter_scalar=filter_scalar)
+                                      fields=fields)
         payload = {
             "isReverseScan": params.is_reverse,
             "maxScanCount": params.max_count,
-            "selectedKeys": params.filter_scalar,
+            "selectedKeys": params.fields,
             "startId": params.start_id,
             "withScalarData": params.with_scalar_data,
             "withTableData": params.with_table_data,

@@ -5,12 +5,18 @@ from dingodb import DingoDB
 test_config = {
     "flat_l2": ("flat", "euclidean", None, {"meta_expr": {"a1": "b1"}}), 
     "flat_ip": ("flat", "dotproduct", None, None), 
+    "flat_cosine": ("flat", "cosine", None, None),
     "hnsw_l2": ("hnsw", "euclidean", {
                             "efConstruction": 100,
                             "maxElements": 50000,
                             "nlinks": 32
                         }, {"efSearch": 10}), 
     "hnsw_ip": ("hnsw", "dotproduct", {
+                            "efConstruction": 300,
+                            "maxElements": 60000,
+                            "nlinks": 64
+                        }, {"efSearch": 20}),
+    "hnsw_cosine": ("hnsw", "cosine", {
                             "efConstruction": 300,
                             "maxElements": 60000,
                             "nlinks": 64
