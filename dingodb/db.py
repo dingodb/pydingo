@@ -101,7 +101,7 @@ class DingoDB:
             }
 
         index_definition = {
-            "autoIncrement": params.start_id,
+            "autoIncrement": params.start_id if params.auto_id else 0,
             "isAutoIncrement": "true" if params.auto_id else "false",
             "indexParameter": {
                 "indexType": "INDEX_TYPE_VECTOR",
