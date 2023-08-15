@@ -8,10 +8,15 @@ from google.protobuf.json_format import MessageToDict, ParseDict
 import grpc
 from grpc._cython import cygrpc
 
-from .grpc_dingo_param import (CheckClintParam, CheckCreateIndexParam,
-                               CheckVectorAddParam, CheckVectorDeleteParam,
-                               CheckVectorGetParam, CheckVectorScanParam,
-                               CheckVectorSearchParam)
+from .grpc_dingo_param import (
+    CheckClintParam,
+    CheckCreateIndexParam,
+    CheckVectorAddParam,
+    CheckVectorDeleteParam,
+    CheckVectorGetParam,
+    CheckVectorScanParam,
+    CheckVectorSearchParam,
+)
 
 
 class GrpcDingoDB:
@@ -118,6 +123,26 @@ class GrpcDingoDB:
 
         return vec_create_response.result().state
 
+    def delete_index(self, index_name: str) -> bool:
+        """
+        delete_index del/drop index
+
+        Args:
+            index_name (str): the name of index
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            bool: True/False
+        """
+        del_index_request = DeleteIndexRequest(
+            schema_name="dingo", index_name=index_name
+        )
+
+        del_index_response = self.index_stub.DeleteIndex.future(del_index_request)
+        return del_index_response.result().state
+
     def vector_add(
         self, index_name: str, datas: list, vectors: list, ids: list = None
     ) -> list:
@@ -197,6 +222,7 @@ class GrpcDingoDB:
         with_table_data: bool = True,
         with_vector_data: bool = True,
         fields: list = None,
+        filter_scalar: dict = None,
     ) -> list:
         """
         vector_scan scan with start_id
@@ -210,6 +236,7 @@ class GrpcDingoDB:
             with_table_data (bool, optional): whether  with table info. Defaults to True.
             with_vector_data (bool, optional): whether with vector info. Defaults to False.
             fields (list, optional): fields for return . Defaults to [].
+            filter_scalar (dict, optional): filter_scalar for return . Defaults to None.
 
         Raises:
             RuntimeError: return error
@@ -226,6 +253,7 @@ class GrpcDingoDB:
             with_table_data=with_table_data,
             with_vector_data=with_vector_data,
             fields=fields,
+            filter_scalar=filter_scalar,
         )
 
         vec_scan_request = VectorScanQueryRequest(
@@ -239,7 +267,16 @@ class GrpcDingoDB:
             with_table_data=params.with_table_data,
             selected_keys=params.fields,
         )
-
+        if params.filter_scalar:
+            scalar_data_grpc = VectorScalarData()
+            for key, value in params.filter_scalar.items():
+                entry = scalar_data_grpc.scalar_data[key]
+                entry.field_type = STRING
+                field = entry.fields.add()
+                field.string_data = value
+            vec_scan_request.use_scalar_filter = True
+            vec_scan_request.scalar_for_filter.CopyFrom(scalar_data_grpc)
+        print(MessageToDict(vec_scan_request))
         vec_scan_response = self.index_stub.VectorScanQuery.future(vec_scan_request)
 
         return [MessageToDict(vec) for vec in vec_scan_response.result().vectors]
@@ -255,12 +292,13 @@ class GrpcDingoDB:
             list: all index list
         """
 
-        # res = self.session.get(f"{self.requestProto}{self.host[0]}{self.indexApi}", headers=self.headers)
-        # if res.status_code == 200:
-        #     indics = res.json()
-        #     return indics
-        # else:
-        #     raise RuntimeError(res.json())
+        get_index_name_request = GetIndexNamesRequest(schema_name="dingo")
+
+        get_index_name_response = self.index_stub.GetIndexNames.future(
+            get_index_name_request
+        )
+
+        return get_index_name_response.result().names
 
     def get_max_index_row(self, index_name: str, get_min: bool = False):
         """
@@ -288,7 +326,12 @@ class GrpcDingoDB:
         return vec_max_id_response.result().id
 
     def vector_search(
-        self, index_name: str, xq: list, top_k: int = 10, search_params: dict = None
+        self,
+        index_name: str,
+        xq: list,
+        top_k: int = 10,
+        search_params: dict = None,
+        pre_filter: bool = True,
     ) -> list:
         """
         vector_search search vector
@@ -298,6 +341,7 @@ class GrpcDingoDB:
             xq (list): query vector, List[float] or List[List[float]]
             top_k (int, optional): top k search. Defaults to 10.
             search_params (dict, optional): search params for index. Defaults to None.
+            pre_filter (bool, optional): filter type for index, False is post-filter. Defaults to True.
 
         Raises:
             RuntimeError: return error
@@ -306,7 +350,11 @@ class GrpcDingoDB:
             List[dict]: search results
         """
         params = CheckVectorSearchParam(
-            index_name=index_name, xq=xq, top_k=top_k, search_params=search_params
+            index_name=index_name,
+            xq=xq,
+            top_k=top_k,
+            pre_filter=pre_filter,
+            search_params=search_params,
         )
 
         vec_search_response = self.index_stub.VectorSearch.future(params.search_params)

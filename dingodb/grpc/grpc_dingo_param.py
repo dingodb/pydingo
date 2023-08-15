@@ -123,6 +123,7 @@ class CheckVectorScanParam(BaseModel):
     with_table_data: bool = True
     with_vector_data: bool = True
     fields: list = None
+    filter_scalar: dict = None
 
     @validator("*", always=True)
     def check_input(cls, value, field):
@@ -144,6 +145,7 @@ class CheckVectorSearchParam(BaseModel):
     xq: list
     top_k: int = 10
     fields: list = None
+    pre_filter: bool = True
     search_params: dict = None
 
     @validator("xq", always=True)
@@ -179,6 +181,10 @@ class CheckVectorSearchParam(BaseModel):
         if search_params is not None and "meta_expr" in search_params.keys():
             if search_params["meta_expr"] is not None:
                 use_scalar_filter = True
+                parameter.vector_filter = SCALAR_FILTER
+                parameter.vector_filter_type = (
+                    QUERY_PRE if values.get("pre_filter") else QUERY_POST
+                )
 
         parameter.use_scalar_filter = use_scalar_filter
         # scalar_data_map = {}
