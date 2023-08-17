@@ -101,7 +101,6 @@ class GrpcDingoDB:
                         operand=[str(item)], operator="", part_name=""
                     )
                 )
-        print(MessageToDict(rule, including_default_value_fields=True))
         vec_create_request = CreateIndexRequest(
             schema_name="dingo",
             definition=IndexDefinition(
@@ -276,7 +275,6 @@ class GrpcDingoDB:
                 field.string_data = value
             vec_scan_request.use_scalar_filter = True
             vec_scan_request.scalar_for_filter.CopyFrom(scalar_data_grpc)
-        print(MessageToDict(vec_scan_request))
         vec_scan_response = self.index_stub.VectorScanQuery.future(vec_scan_request)
 
         return [MessageToDict(vec) for vec in vec_scan_response.result().vectors]

@@ -314,7 +314,6 @@ class DingoDB:
             "withTableData": params.with_table_data,
             "withoutVectorData": params.without_vector_data,
         }
-        print(payload)
         res = self.session.post(
             f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}/scan",
             headers=self.headers,
@@ -403,7 +402,6 @@ class DingoDB:
             pre_filter=pre_filter,
             search_params=search_params,
         )
-        print(json.dumps(params.search_params))
         res = self.session.post(
             f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}",
             headers=self.headers,
