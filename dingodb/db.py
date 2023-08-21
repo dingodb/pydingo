@@ -271,6 +271,7 @@ class DingoDB:
         without_vector_data: bool = False,
         fields: list = None,
         filter_scalar: dict = None,
+        end_id: int = 0
     ) -> list:
         """
         vector_scan scan with start_id
@@ -285,6 +286,7 @@ class DingoDB:
             without_vector_data (bool, optional): whether with vector info. Defaults to False.
             fields (list, optional): fields for return . Defaults to None.
             filter_scalar (dict, optional): filter_scalar for return . Defaults to None.
+            end_id (int, optional): if end_id=0, get all max_count . Defaults to 0.
 
         Raises:
             RuntimeError: return error
@@ -302,6 +304,7 @@ class DingoDB:
             without_vector_data=without_vector_data,
             fields=fields,
             filter_scalar=filter_scalar,
+            end_id=end_id
         )
         payload = {
             "isReverseScan": params.is_reverse,
@@ -313,6 +316,7 @@ class DingoDB:
             "withScalarData": params.with_scalar_data,
             "withTableData": params.with_table_data,
             "withoutVectorData": params.without_vector_data,
+            "endId": params.end_id
         }
         res = self.session.post(
             f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}/scan",

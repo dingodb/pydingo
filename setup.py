@@ -34,7 +34,6 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=read("requirements.txt"),
     extras_require={
-        "grpc": read("requirements-grpc.txt"),
     },
     include_package_data=True,
     python_requires=">=3.6",

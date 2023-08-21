@@ -123,6 +123,7 @@ class CheckVectorScanParam(BaseModel):
     without_vector_data: bool = False
     fields: list = None
     filter_scalar: dict = None
+    end_id: int = 0
 
     @validator("*", always=True)
     def check_input(cls, value, field):
