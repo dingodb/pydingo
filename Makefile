@@ -1,6 +1,3 @@
-unittest:
-	PYTHONPATH=`pwd` python3 -m pytest tests --cov=pymilvus -v
-
 version:
 	python3 setup.py --version
 	

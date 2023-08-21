@@ -17,6 +17,4 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-*pb2.py
-*pb2.pyi
 
