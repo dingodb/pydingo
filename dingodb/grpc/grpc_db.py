@@ -43,6 +43,52 @@ class GrpcDingoDB:
     def close(self):
         self._channel.close()
 
+    def describe_index_info(self, index_name: str) -> dict:
+        """
+        describe_index_info index info
+
+        Args:
+            index_name (str): the name the index
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            dict: index info
+        """
+
+        describe_index_request = GetIndexRequest(
+            schema_name="dingo", index_name=index_name
+        )
+
+        describe_index_response = self.meta_stub.GetIndex.future(describe_index_request)
+
+        return MessageToDict(
+            describe_index_response.result().definition,
+            including_default_value_fields=True,
+        )
+
+    def describe_index_info_all(self) -> dict:
+        """
+        describe_index_info index info
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            List[dict]: index info
+        """
+
+        describe_indexes_request = GetIndexesRequest(schema_name="dingo")
+
+        describe_indexes_response = self.meta_stub.GetIndexes.future(
+            describe_indexes_request
+        )
+        return [
+            MessageToDict(definition, including_default_value_fields=True)
+            for definition in describe_indexes_response.result().definitions
+        ]
+
     def create_index(
         self,
         index_name: str,
@@ -122,6 +168,58 @@ class GrpcDingoDB:
 
         return vec_create_response.result().state
 
+    def update_index_max_element(self, index_name: str, max_element: int) -> bool:
+        """
+        update_index_max_element change index max element
+
+        only for hnsw
+
+        Args:
+            index_name (str): the name of index
+            max_element (int): max element value
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            bool: True/False
+        """
+
+        update_index_max_element_request = UpdateMaxElementsRequest(
+            schema_name="dingo", index_name=index_name, max_elements=max_element
+        )
+
+        update_index_max_element_response = self.meta_stub.UpdateMaxElements.future(
+            update_index_max_element_request
+        )
+
+        return update_index_max_element_response.result().state
+
+    def update_index(self, index_name: str, definition: dict) -> bool:
+        """
+        update_index_max_element change index max element
+
+        only for hnsw
+
+        Args:
+            index_name (str): the name of index
+            max_element (int): max element value
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            bool: True/False
+        """
+        # "name", "version", "index_partition", "replica", "index_parameter", "with_auto_increment", "auto_increment"
+        update_index_request = UpdateIndexRequest(
+            schema_name="dingo", definition=ParseDict(definition, IndexDefinition())
+        )
+
+        update_index_response = self.meta_stub.UpdateIndex.future(update_index_request)
+
+        return update_index_response.result().state
+
     def delete_index(self, index_name: str) -> bool:
         """
         delete_index del/drop index
@@ -139,7 +237,7 @@ class GrpcDingoDB:
             schema_name="dingo", index_name=index_name
         )
 
-        del_index_response = self.index_stub.DeleteIndex.future(del_index_request)
+        del_index_response = self.meta_stub.DeleteIndex.future(del_index_request)
         return del_index_response.result().state
 
     def vector_add(
@@ -292,7 +390,7 @@ class GrpcDingoDB:
 
         get_index_name_request = GetIndexNamesRequest(schema_name="dingo")
 
-        get_index_name_response = self.index_stub.GetIndexNames.future(
+        get_index_name_response = self.meta_stub.GetIndexNames.future(
             get_index_name_request
         )
 
