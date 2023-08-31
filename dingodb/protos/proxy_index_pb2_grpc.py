@@ -49,6 +49,11 @@ class IndexServiceStub(object):
                 request_serializer=proxy__index__pb2.VectorGetRegionMetricsRequest.SerializeToString,
                 response_deserializer=proxy__index__pb2.VectorGetRegionMetricsResponse.FromString,
                 )
+        self.VectorCalcDistance = channel.unary_unary(
+                '/dingodb.pb.proxy.index.IndexService/VectorCalcDistance',
+                request_serializer=proxy__index__pb2.VectorCalcDistanceRequest.SerializeToString,
+                response_deserializer=proxy__index__pb2.VectorCalcDistanceResponse.FromString,
+                )
 
 
 class IndexServiceServicer(object):
@@ -96,6 +101,12 @@ class IndexServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def VectorCalcDistance(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_IndexServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -133,6 +144,11 @@ def add_IndexServiceServicer_to_server(servicer, server):
                     servicer.VectorGetRegionMetrics,
                     request_deserializer=proxy__index__pb2.VectorGetRegionMetricsRequest.FromString,
                     response_serializer=proxy__index__pb2.VectorGetRegionMetricsResponse.SerializeToString,
+            ),
+            'VectorCalcDistance': grpc.unary_unary_rpc_method_handler(
+                    servicer.VectorCalcDistance,
+                    request_deserializer=proxy__index__pb2.VectorCalcDistanceRequest.FromString,
+                    response_serializer=proxy__index__pb2.VectorCalcDistanceResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -260,5 +276,22 @@ class IndexService(object):
         return grpc.experimental.unary_unary(request, target, '/dingodb.pb.proxy.index.IndexService/VectorGetRegionMetrics',
             proxy__index__pb2.VectorGetRegionMetricsRequest.SerializeToString,
             proxy__index__pb2.VectorGetRegionMetricsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def VectorCalcDistance(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/dingodb.pb.proxy.index.IndexService/VectorCalcDistance',
+            proxy__index__pb2.VectorCalcDistanceRequest.SerializeToString,
+            proxy__index__pb2.VectorCalcDistanceResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

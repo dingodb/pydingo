@@ -63,10 +63,13 @@ class GrpcDingoDB:
 
         describe_index_response = self.meta_stub.GetIndex.future(describe_index_request)
 
-        return MessageToDict(
+        describe_info = MessageToDict(
             describe_index_response.result().definition,
             including_default_value_fields=True,
         )
+        describe_info.update({"autoIncrement": int(describe_info["autoIncrement"])})
+
+        return describe_info
 
     def describe_index_info_all(self) -> dict:
         """
@@ -84,10 +87,19 @@ class GrpcDingoDB:
         describe_indexes_response = self.meta_stub.GetIndexes.future(
             describe_indexes_request
         )
-        return [
-            MessageToDict(definition, including_default_value_fields=True)
-            for definition in describe_indexes_response.result().definitions
-        ]
+        return list(
+            map(
+                lambda definition: {
+                    **MessageToDict(definition, including_default_value_fields=True),
+                    "autoIncrement": int(
+                        MessageToDict(definition, including_default_value_fields=True)[
+                            "autoIncrement"
+                        ]
+                    ),
+                },
+                describe_indexes_response.result().definitions,
+            )
+        )
 
     def create_index(
         self,
@@ -284,10 +296,24 @@ class GrpcDingoDB:
 
         vec_add_response = self.index_stub.VectorAdd.future(vec_add_request)
 
-        return [
-            MessageToDict(vec, including_default_value_fields=True)
-            for vec in vec_add_response.result().vectors
-        ]
+        return list(
+            map(
+                lambda vec: {
+                    **MessageToDict(vec, including_default_value_fields=True),
+                    "id": int(
+                        MessageToDict(vec, including_default_value_fields=True)["id"]
+                    ),
+                    "scalarData": MessageToDict(
+                        vec, including_default_value_fields=True
+                    )["scalarData"]["scalarData"],
+                }
+                if MessageToDict(vec, including_default_value_fields=True)
+                and int(MessageToDict(vec, including_default_value_fields=True)["id"])
+                != 0
+                else None,
+                vec_add_response.result().vectors,
+            )
+        )
 
     def vector_count(self, index_name: str):
         """
@@ -320,6 +346,7 @@ class GrpcDingoDB:
         with_vector_data: bool = True,
         fields: list = None,
         filter_scalar: dict = None,
+        end_id: int = 0,
     ) -> list:
         """
         vector_scan scan with start_id
@@ -331,9 +358,10 @@ class GrpcDingoDB:
             is_reverse (bool, optional): whether reverse. Defaults to False.
             with_scalar_data (bool, optional): whether  with scalar info. Defaults to True.
             with_table_data (bool, optional): whether  with table info. Defaults to True.
-            with_vector_data (bool, optional): whether with vector info. Defaults to False.
+            with_vector_data (bool, optional): whether with vector info. Defaults to True.
             fields (list, optional): fields for return . Defaults to [].
             filter_scalar (dict, optional): filter_scalar for return . Defaults to None.
+            end_id (int, optional): if end_id=0, get all max_count . Defaults to 0.
 
         Raises:
             RuntimeError: return error
@@ -351,11 +379,13 @@ class GrpcDingoDB:
             with_vector_data=with_vector_data,
             fields=fields,
             filter_scalar=filter_scalar,
+            end_id=end_id,
         )
 
         vec_scan_request = VectorScanQueryRequest(
             schema_name="dingo",
             index_name=params.index_name,
+            vector_id_end=params.end_id,
             max_scan_count=params.max_count,
             vector_id_start=params.start_id,
             is_reverse_scan=params.is_reverse,
@@ -375,7 +405,20 @@ class GrpcDingoDB:
             vec_scan_request.scalar_for_filter.CopyFrom(scalar_data_grpc)
         vec_scan_response = self.index_stub.VectorScanQuery.future(vec_scan_request)
 
-        return [MessageToDict(vec) for vec in vec_scan_response.result().vectors]
+        return list(
+            map(
+                lambda vec: {
+                    **MessageToDict(vec, including_default_value_fields=True),
+                    "id": int(
+                        MessageToDict(vec, including_default_value_fields=True)["id"]
+                    ),
+                    "scalarData": MessageToDict(
+                        vec, including_default_value_fields=True
+                    )["scalarData"]["scalarData"],
+                },
+                vec_scan_response.result().vectors,
+            )
+        )
 
     def get_index(self):
         """
@@ -454,11 +497,22 @@ class GrpcDingoDB:
         )
 
         vec_search_response = self.index_stub.VectorSearch.future(params.search_params)
+        search_res = []
+        for vec in vec_search_response.result().batch_results:
+            res_info = []
+            msg_dict = MessageToDict(vec, including_default_value_fields=True)
+            for vec_info in msg_dict["vectorWithDistances"]:
+                vec_info["vectorWithId"]["id"] = int(vec_info["vectorWithId"]["id"])
+                vec_info["vectorWithId"]["scalarData"] = vec_info["vectorWithId"][
+                    "scalarData"
+                ]["scalarData"]
+                vec_info.update(vec_info["vectorWithId"])
+                vec_info.pop("vectorWithId")
+                res_info.append(vec_info)
+            msg_dict["vectorWithDistances"] = res_info
+            search_res.append(msg_dict)
 
-        return [
-            MessageToDict(vec, including_default_value_fields=True)
-            for vec in vec_search_response.result().batch_results
-        ]
+        return search_res
 
     def vector_get(
         self, index_name: str, ids: list, scalar: bool = True, vector: bool = True
@@ -492,7 +546,26 @@ class GrpcDingoDB:
 
         vec_get_response = self.index_stub.VectorGet.future(vec_get_request)
 
-        return [MessageToDict(vec) for vec in vec_get_response.result().vectors]
+        # for vec in vec_get_response.result().vectors:
+        #     print(MessageToDict(vec, including_default_value_fields=True))
+        return list(
+            map(
+                lambda vec: {
+                    **MessageToDict(vec, including_default_value_fields=True),
+                    "id": int(
+                        MessageToDict(vec, including_default_value_fields=True)["id"]
+                    ),
+                    "scalarData": MessageToDict(
+                        vec, including_default_value_fields=True
+                    )["scalarData"]["scalarData"],
+                }
+                if MessageToDict(vec, including_default_value_fields=True)
+                and int(MessageToDict(vec, including_default_value_fields=True)["id"])
+                != 0
+                else None,
+                vec_get_response.result().vectors,
+            )
+        )
 
     def vector_delete(self, index_name: str, ids: list):
         """
@@ -511,7 +584,7 @@ class GrpcDingoDB:
         params = CheckVectorDeleteParam(index_name=index_name, ids=ids)
 
         vec_del_request = VectorDeleteRequest(
-            schema_name="dingo", index_name=params.index_name, ids=ids
+            schema_name="dingo", index_name=params.index_name, ids=params.ids
         )
 
         vec_del_response = self.index_stub.VectorDelete.future(vec_del_request)

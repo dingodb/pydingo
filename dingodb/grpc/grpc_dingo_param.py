@@ -111,6 +111,9 @@ class CheckVectorAddParam(BaseModel):
             assert (
                 len(values.get("datas")) == len(values.get("vectors")) == len(value)
             ), f"length datas:{len(values.get('datas'))} vectors: {len(values.get('vectors'))} ids:{len(value)} is not equal"
+            for id in value:
+                if id <= 0:
+                    raise Exception("id must > 0")
         return value
 
 
@@ -124,9 +127,13 @@ class CheckVectorScanParam(BaseModel):
     with_vector_data: bool = True
     fields: list = None
     filter_scalar: dict = None
+    end_id: int = 0
 
     @validator("*", always=True)
     def check_input(cls, value, field):
+        if field.name == "end_id":
+            if not value >= 0:
+                raise Exception("end_id must >= 0")
         if field.name == "start_id":
             if not value > 0:
                 raise Exception("start_id must > 0")
@@ -227,7 +234,28 @@ class CheckVectorGetParam(BaseModel):
     scalar: bool = True
     vector: bool = True
 
+    @validator("ids", always=True)
+    def check_ids(cls, value):
+        id_list = []
+        for id in value:
+            if id <= 0:
+                raise Exception("id must > 0")
+            else:
+                id_list.append(id)
+
+        return id_list
+
 
 class CheckVectorDeleteParam(BaseModel):
     index_name: str
     ids: List[int]
+
+    @validator("ids", always=True)
+    def check_ids(cls, value):
+        id_list = []
+        for id in value:
+            if id <= 0:
+                raise Exception("id must > 0")
+            else:
+                id_list.append(id)
+        return id_list

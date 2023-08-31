@@ -139,3 +139,35 @@ class GetIndexNamesResponse(_message.Message):
     NAMES_FIELD_NUMBER: _ClassVar[int]
     names: _containers.RepeatedScalarFieldContainer[str]
     def __init__(self, names: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class GetIndexMetricsRequest(_message.Message):
+    __slots__ = ["schema_name", "index_name"]
+    SCHEMA_NAME_FIELD_NUMBER: _ClassVar[int]
+    INDEX_NAME_FIELD_NUMBER: _ClassVar[int]
+    schema_name: str
+    index_name: str
+    def __init__(self, schema_name: _Optional[str] = ..., index_name: _Optional[str] = ...) -> None: ...
+
+class GetIndexMetricsResponse(_message.Message):
+    __slots__ = ["rows_count", "min_key", "max_key", "part_count", "index_type", "current_count", "deleted_count", "max_id", "min_id", "memory_bytes"]
+    ROWS_COUNT_FIELD_NUMBER: _ClassVar[int]
+    MIN_KEY_FIELD_NUMBER: _ClassVar[int]
+    MAX_KEY_FIELD_NUMBER: _ClassVar[int]
+    PART_COUNT_FIELD_NUMBER: _ClassVar[int]
+    INDEX_TYPE_FIELD_NUMBER: _ClassVar[int]
+    CURRENT_COUNT_FIELD_NUMBER: _ClassVar[int]
+    DELETED_COUNT_FIELD_NUMBER: _ClassVar[int]
+    MAX_ID_FIELD_NUMBER: _ClassVar[int]
+    MIN_ID_FIELD_NUMBER: _ClassVar[int]
+    MEMORY_BYTES_FIELD_NUMBER: _ClassVar[int]
+    rows_count: int
+    min_key: bytes
+    max_key: bytes
+    part_count: int
+    index_type: _proxy_common_pb2.VectorIndexType
+    current_count: int
+    deleted_count: int
+    max_id: int
+    min_id: int
+    memory_bytes: int
+    def __init__(self, rows_count: _Optional[int] = ..., min_key: _Optional[bytes] = ..., max_key: _Optional[bytes] = ..., part_count: _Optional[int] = ..., index_type: _Optional[_Union[_proxy_common_pb2.VectorIndexType, str]] = ..., current_count: _Optional[int] = ..., deleted_count: _Optional[int] = ..., max_id: _Optional[int] = ..., min_id: _Optional[int] = ..., memory_bytes: _Optional[int] = ...) -> None: ...
