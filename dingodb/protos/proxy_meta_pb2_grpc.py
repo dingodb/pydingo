@@ -49,6 +49,11 @@ class MetaServiceStub(object):
                 request_serializer=proxy__meta__pb2.GetIndexNamesRequest.SerializeToString,
                 response_deserializer=proxy__meta__pb2.GetIndexNamesResponse.FromString,
                 )
+        self.GetIndexMetrics = channel.unary_unary(
+                '/dingodb.pb.proxy.meta.MetaService/GetIndexMetrics',
+                request_serializer=proxy__meta__pb2.GetIndexMetricsRequest.SerializeToString,
+                response_deserializer=proxy__meta__pb2.GetIndexMetricsResponse.FromString,
+                )
 
 
 class MetaServiceServicer(object):
@@ -96,6 +101,12 @@ class MetaServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetIndexMetrics(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_MetaServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -133,6 +144,11 @@ def add_MetaServiceServicer_to_server(servicer, server):
                     servicer.GetIndexNames,
                     request_deserializer=proxy__meta__pb2.GetIndexNamesRequest.FromString,
                     response_serializer=proxy__meta__pb2.GetIndexNamesResponse.SerializeToString,
+            ),
+            'GetIndexMetrics': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetIndexMetrics,
+                    request_deserializer=proxy__meta__pb2.GetIndexMetricsRequest.FromString,
+                    response_serializer=proxy__meta__pb2.GetIndexMetricsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -260,5 +276,22 @@ class MetaService(object):
         return grpc.experimental.unary_unary(request, target, '/dingodb.pb.proxy.meta.MetaService/GetIndexNames',
             proxy__meta__pb2.GetIndexNamesRequest.SerializeToString,
             proxy__meta__pb2.GetIndexNamesResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetIndexMetrics(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/dingodb.pb.proxy.meta.MetaService/GetIndexMetrics',
+            proxy__meta__pb2.GetIndexMetricsRequest.SerializeToString,
+            proxy__meta__pb2.GetIndexMetricsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -268,10 +268,10 @@ class DingoDB:
         is_reverse: bool = False,
         with_scalar_data: bool = True,
         with_table_data: bool = True,
-        without_vector_data: bool = False,
+        with_vector_data: bool = True,
         fields: list = None,
         filter_scalar: dict = None,
-        end_id: int = 0
+        end_id: int = 0,
     ) -> list:
         """
         vector_scan scan with start_id
@@ -283,7 +283,7 @@ class DingoDB:
             is_reverse (bool, optional): whether or not reverse. Defaults to False.
             with_scalar_data (bool, optional): whether  with scalar info. Defaults to True.
             with_table_data (bool, optional): whether  with table info. Defaults to True.
-            without_vector_data (bool, optional): whether with vector info. Defaults to False.
+            with_vector_data (bool, optional): whether with vector info. Defaults to True.
             fields (list, optional): fields for return . Defaults to None.
             filter_scalar (dict, optional): filter_scalar for return . Defaults to None.
             end_id (int, optional): if end_id=0, get all max_count . Defaults to 0.
@@ -301,10 +301,10 @@ class DingoDB:
             is_reverse=is_reverse,
             with_scalar_data=with_scalar_data,
             with_table_data=with_table_data,
-            without_vector_data=without_vector_data,
+            with_vector_data=with_vector_data,
             fields=fields,
             filter_scalar=filter_scalar,
-            end_id=end_id
+            end_id=end_id,
         )
         payload = {
             "isReverseScan": params.is_reverse,
@@ -315,8 +315,8 @@ class DingoDB:
             "startId": params.start_id,
             "withScalarData": params.with_scalar_data,
             "withTableData": params.with_table_data,
-            "withoutVectorData": params.without_vector_data,
-            "endId": params.end_id
+            "withoutVectorData": params.with_vector_data,
+            "endId": params.end_id,
         }
         res = self.session.post(
             f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}/scan",

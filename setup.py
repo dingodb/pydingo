@@ -36,7 +36,7 @@ setuptools.setup(
     extras_require={
     },
     include_package_data=True,
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     entry_points={
     },
     classifiers=[
@@ -49,7 +49,6 @@ setuptools.setup(
         "Intended Audience :: System Administrators",
         "License :: Other/Proprietary License",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
