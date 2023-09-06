@@ -266,9 +266,9 @@ class DingoDB:
         start_id: int,
         max_count: int = 1000,
         is_reverse: bool = False,
-        with_scalar_data: bool = True,
-        with_table_data: bool = True,
-        with_vector_data: bool = True,
+        without_scalar_data: bool = False,
+        without_table_data: bool = False,
+        without_vector_data: bool = False,
         fields: list = None,
         filter_scalar: dict = None,
         end_id: int = 0,
@@ -281,9 +281,9 @@ class DingoDB:
             start_id (int): start id
             max_count (int, optional): max scan count. Defaults to 1000.
             is_reverse (bool, optional): whether or not reverse. Defaults to False.
-            with_scalar_data (bool, optional): whether  with scalar info. Defaults to True.
-            with_table_data (bool, optional): whether  with table info. Defaults to True.
-            with_vector_data (bool, optional): whether with vector info. Defaults to True.
+            without_scalar_data (bool, optional): whether  with scalar info. Defaults to False.
+            without_table_data (bool, optional): whether  with table info. Defaults to False.
+            without_vector_data (bool, optional): whether with vector info. Defaults to False.
             fields (list, optional): fields for return . Defaults to None.
             filter_scalar (dict, optional): filter_scalar for return . Defaults to None.
             end_id (int, optional): if end_id=0, get all max_count . Defaults to 0.
@@ -299,9 +299,9 @@ class DingoDB:
             start_id=start_id,
             max_count=max_count,
             is_reverse=is_reverse,
-            with_scalar_data=with_scalar_data,
-            with_table_data=with_table_data,
-            with_vector_data=with_vector_data,
+            without_scalar_data=without_scalar_data,
+            without_table_data=without_table_data,
+            without_vector_data=without_vector_data,
             fields=fields,
             filter_scalar=filter_scalar,
             end_id=end_id,
@@ -313,9 +313,9 @@ class DingoDB:
             "useScalarFilter": "true" if params.filter_scalar else "false",
             "selectedKeys": params.fields,
             "startId": params.start_id,
-            "withScalarData": params.with_scalar_data,
-            "withTableData": params.with_table_data,
-            "withoutVectorData": params.with_vector_data,
+            "withScalarData": params.without_scalar_data,
+            "withTableData": params.without_table_data,
+            "withoutVectorData": params.without_vector_data,
             "endId": params.end_id,
         }
         res = self.session.post(
@@ -442,7 +442,7 @@ class DingoDB:
         payload = {
             "ids": params.ids,
             "keys": [],
-            "withScalarData": "true" if scalar else "false",
+            "withoutScalarData": "false" if scalar else "true",
             "withoutVectorData": "false" if vector else "true",
         }
 

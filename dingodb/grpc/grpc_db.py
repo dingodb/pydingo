@@ -341,9 +341,9 @@ class GrpcDingoDB:
         start_id: int,
         max_count: int = 1000,
         is_reverse: bool = False,
-        with_scalar_data: bool = True,
-        with_table_data: bool = True,
-        with_vector_data: bool = True,
+        without_scalar_data: bool = False,
+        without_table_data: bool = False,
+        without_vector_data: bool = False,
         fields: list = None,
         filter_scalar: dict = None,
         end_id: int = 0,
@@ -356,9 +356,9 @@ class GrpcDingoDB:
             start_id (int): start id
             max_count (int, optional): max scan count. Defaults to 1000.
             is_reverse (bool, optional): whether reverse. Defaults to False.
-            with_scalar_data (bool, optional): whether  with scalar info. Defaults to True.
-            with_table_data (bool, optional): whether  with table info. Defaults to True.
-            with_vector_data (bool, optional): whether with vector info. Defaults to True.
+            without_scalar_data (bool, optional): whether  with scalar info. Defaults to False.
+            without_table_data (bool, optional): whether  with table info. Defaults to False.
+            without_vector_data (bool, optional): whether with vector info. Defaults to False.
             fields (list, optional): fields for return . Defaults to [].
             filter_scalar (dict, optional): filter_scalar for return . Defaults to None.
             end_id (int, optional): if end_id=0, get all max_count . Defaults to 0.
@@ -374,9 +374,9 @@ class GrpcDingoDB:
             start_id=start_id,
             max_count=max_count,
             is_reverse=is_reverse,
-            with_scalar_data=with_scalar_data,
-            with_table_data=with_table_data,
-            with_vector_data=with_vector_data,
+            without_scalar_data=without_scalar_data,
+            without_table_data=without_table_data,
+            without_vector_data=without_vector_data,
             fields=fields,
             filter_scalar=filter_scalar,
             end_id=end_id,
@@ -389,9 +389,9 @@ class GrpcDingoDB:
             max_scan_count=params.max_count,
             vector_id_start=params.start_id,
             is_reverse_scan=params.is_reverse,
-            without_vector_data=not params.with_vector_data,
-            with_scalar_data=params.with_scalar_data,
-            with_table_data=params.with_table_data,
+            without_vector_data=params.without_vector_data,
+            without_scalar_data=params.without_scalar_data,
+            without_table_data=params.without_table_data,
             selected_keys=params.fields,
         )
         if params.filter_scalar:
@@ -540,8 +540,8 @@ class GrpcDingoDB:
             schema_name="dingo",
             index_name=params.index_name,
             vector_ids=params.ids,
-            with_out_vector_data=not vector,
-            with_scalar_data=scalar,
+            without_vector_data=not vector,
+            without_scalar_data=not scalar,
         )
 
         vec_get_response = self.index_stub.VectorGet.future(vec_get_request)
