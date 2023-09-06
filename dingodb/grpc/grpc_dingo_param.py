@@ -197,7 +197,7 @@ class CheckVectorSearchParam(BaseModel):
             if search_params is None
             else search_params.get("withVectorData", True)
         )
-        parameter.without_vector_data = ~with_vector_data
+        parameter.without_vector_data = False
 
         
         with_scalar_data = (
@@ -205,7 +205,7 @@ class CheckVectorSearchParam(BaseModel):
             if search_params is None 
             else search_params.get("withScalarData", True)
         )
-        parameter.without_scalar_data = ~with_scalar_data
+        parameter.without_scalar_data = False
 
         vec_search_request = VectorSearchRequest(
             schema_name="dingo", index_name=values.get("index_name")
