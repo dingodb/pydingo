@@ -121,46 +121,48 @@ class CheckVectorScanParam(BaseModel):
     start_id: int
     max_count: int = 1000
     is_reverse: bool = False
-    with_scalar_data: bool = True
-    with_table_data: bool = True
-    with_vector_data: bool = True
+    without_scalar_data: bool = False
+    without_table_data: bool = False
+    without_vector_data: bool = False
     fields: list = None
     filter_scalar: dict = None
     end_id: int = 0
 
-    @validator("*", always=True)
-    def check_input(cls, value, field):
-        if field.name == "end_id":
-            if not value >= 0:
-                raise Exception("end_id must >= 0")
-        if field.name == "start_id":
-            if not value > 0:
-                raise Exception("start_id must > 0")
-        if field.name == "max_count":
-            if not value > 0:
-                raise Exception("max_count must > 0")
-        if (
-            field.name == "is_reverse"
-            or field.name == "with_scalar_data"
-            or field.name == "with_table_data"
-        ):
-            value = "true" if value else "false"
-        if field.name == "with_vector_data":
-            value = "false" if value else "true"
-        if field.name == "fields":
-            if value is None:
-                value = []
-        if field.name == "filter_scalar":
-            if value is None:
-                value = {}
-            else:
-                scalar_data = dict(
-                    (key, {"fieldType": "STRING", "fields": [{"data": value}]})
-                    for key, value in value.items()
-                )
-                value = scalar_data
-
+    @validator("end_id", pre=True, always=True)
+    def check_true_positive_values(cls, value):
+        if not value >= 0:
+            raise ValueError(f"{field.name} must >= 0")
         return value
+
+    @validator("start_id", "max_count", pre=True, always=True)
+    def check_positive_values(cls, value, field):
+        if not value > 0:
+            raise ValueError(f"{field.name} must > 0")
+        return value
+
+    @validator("is_reverse", "without_scalar_data", "without_table_data", pre=True, always=True)
+    def check_boolean_fields(cls, value):
+        return "true" if value else "false"
+    
+    @validator("without_vector_data", pre=True, always=True)
+    def check_without_vector_data(cls, value):
+        return "false" if value else "true"
+
+    @validator("fields", pre=True, always=True)
+    def check_fields(cls, value):
+        return value or []
+
+    @validator("filter_scalar", pre=True, always=True)
+    def check_filter_scalar(cls, value):
+        if value is None:
+            return {}
+        else:
+            scalar_data = dict(
+                (key, {"fieldType": "STRING", "fields": [{"data": value}]})
+                for key, value in value.items()
+            )
+            value = scalar_data
+            return value
 
 
 class CheckVectorSearchParam(BaseModel):
@@ -203,9 +205,9 @@ class CheckVectorSearchParam(BaseModel):
                 },
                 "selectedKeys": [],
                 "topN": values.get("top_k"),
-                "withScalarData": "true"
+                "withoutScalarData": "false"
                 if search_params is None
-                else search_params.get("withScalarData", "true"),
+                else search_params.get("withoutScalarData", "false"),
                 "withoutVectorData": "false"
                 if search_params is None
                 else search_params.get("withoutVectorData", "false"),
