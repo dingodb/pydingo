@@ -192,9 +192,9 @@ class CheckVectorSearchParam(BaseModel):
             selected_keys=values.get("fields"), top_n=values.get("top_k")
         )
         parameter.without_vector_data = (
-            False
+            True
             if search_params is None
-            else search_params.get("withoutVectorData", False)
+            else search_params.get("withVectorData", True)
         )
         parameter.without_scalar_data = (
             True if search_params is None else search_params.get("withScalarData", True)
