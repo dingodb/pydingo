@@ -193,8 +193,17 @@ class CheckVectorSearchParam(BaseModel):
         ef_search = 32 if search_params is None else search_params.get("efSearch", 32)
         assert ef_search >= 0, f"efSearch must >= 0, but get {ef_search}"
 
-        input_withScalar_data = search_params.get("withScalarData", "true")
-        input_withVector_data = search_params.get("withVectorData", "true")
+
+        with_Scalar_data = "false"
+        with_vector_data = "false"
+        if search_params is not None:
+            if search_params.get("withScalarData") is not None:
+                with_Scalar_data = search_params.get("withScalarData")
+                with_Scalar_data = "false" if with_Scalar_data is None else with_Scalar_data
+            
+            if search_params.get("withVectorData") is not None:
+                with_vector_data = search_params.get("withVectorData")
+                with_vector_data = "false" if with_vector_data is None else with_vector_data
 
         payload = {
             "parameter": {
@@ -208,8 +217,8 @@ class CheckVectorSearchParam(BaseModel):
                 },
                 "selectedKeys": [],
                 "topN": values.get("top_k"),
-                "withoutScalarData": "true" if search_params is None else ~ input_withScalar_data,
-                "withoutVectorData": "true" if search_params is None else ~ input_withVector_data,
+                "withoutScalarData": with_vector_data,
+                "withoutVectorData": with_vector_data,
                 "useScalarFilter": use_scalar_filter,
                 "vectorFilter": "SCALAR_FILTER",
                 "vectorFilterType": "QUERY_PRE"
