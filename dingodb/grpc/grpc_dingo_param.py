@@ -141,14 +141,10 @@ class CheckVectorScanParam(BaseModel):
             raise ValueError(f"{field.name} must > 0")
         return value
 
-    @validator("is_reverse", "without_scalar_data", "without_table_data", pre=True, always=True)
+    @validator("is_reverse", "without_vector_data"", without_scalar_data", "without_table_data", pre=True, always=True)
     def check_boolean_fields(cls, value):
         return "true" if value else "false"
     
-    @validator("without_vector_data", pre=True, always=True)
-    def check_without_vector_data(cls, value):
-        return "false" if value else "true"
-
     @validator("fields", pre=True, always=True)
     def check_fields(cls, value):
         return value or []
