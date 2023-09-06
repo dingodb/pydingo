@@ -328,12 +328,12 @@ class SearchDiskAnnParam(_message.Message):
     def __init__(self) -> None: ...
 
 class VectorSearchParameter(_message.Message):
-    __slots__ = ["top_n", "with_out_vector_data", "with_scalar_data", "selected_keys", "with_table_data", "flat", "ivf_flat", "ivf_pq", "hnsw", "diskann", "use_scalar_filter", "vector_filter", "vector_filter_type", "vector_coprocessor", "vector_ids"]
+    __slots__ = ["top_n", "without_vector_data", "without_scalar_data", "selected_keys", "without_table_data", "flat", "ivf_flat", "ivf_pq", "hnsw", "diskann", "use_scalar_filter", "vector_filter", "vector_filter_type", "vector_coprocessor", "vector_ids"]
     TOP_N_FIELD_NUMBER: _ClassVar[int]
-    WITH_OUT_VECTOR_DATA_FIELD_NUMBER: _ClassVar[int]
-    WITH_SCALAR_DATA_FIELD_NUMBER: _ClassVar[int]
+    WITHOUT_VECTOR_DATA_FIELD_NUMBER: _ClassVar[int]
+    WITHOUT_SCALAR_DATA_FIELD_NUMBER: _ClassVar[int]
     SELECTED_KEYS_FIELD_NUMBER: _ClassVar[int]
-    WITH_TABLE_DATA_FIELD_NUMBER: _ClassVar[int]
+    WITHOUT_TABLE_DATA_FIELD_NUMBER: _ClassVar[int]
     FLAT_FIELD_NUMBER: _ClassVar[int]
     IVF_FLAT_FIELD_NUMBER: _ClassVar[int]
     IVF_PQ_FIELD_NUMBER: _ClassVar[int]
@@ -345,10 +345,10 @@ class VectorSearchParameter(_message.Message):
     VECTOR_COPROCESSOR_FIELD_NUMBER: _ClassVar[int]
     VECTOR_IDS_FIELD_NUMBER: _ClassVar[int]
     top_n: int
-    with_out_vector_data: bool
-    with_scalar_data: bool
+    without_vector_data: bool
+    without_scalar_data: bool
     selected_keys: _containers.RepeatedScalarFieldContainer[str]
-    with_table_data: bool
+    without_table_data: bool
     flat: SearchFlatParam
     ivf_flat: SearchIvfFlatParam
     ivf_pq: SearchIvfPqParam
@@ -359,7 +359,7 @@ class VectorSearchParameter(_message.Message):
     vector_filter_type: VectorFilterType
     vector_coprocessor: VectorCoprocessor
     vector_ids: _containers.RepeatedScalarFieldContainer[int]
-    def __init__(self, top_n: _Optional[int] = ..., with_out_vector_data: bool = ..., with_scalar_data: bool = ..., selected_keys: _Optional[_Iterable[str]] = ..., with_table_data: bool = ..., flat: _Optional[_Union[SearchFlatParam, _Mapping]] = ..., ivf_flat: _Optional[_Union[SearchIvfFlatParam, _Mapping]] = ..., ivf_pq: _Optional[_Union[SearchIvfPqParam, _Mapping]] = ..., hnsw: _Optional[_Union[SearchHNSWParam, _Mapping]] = ..., diskann: _Optional[_Union[SearchDiskAnnParam, _Mapping]] = ..., use_scalar_filter: bool = ..., vector_filter: _Optional[_Union[VectorFilter, str]] = ..., vector_filter_type: _Optional[_Union[VectorFilterType, str]] = ..., vector_coprocessor: _Optional[_Union[VectorCoprocessor, _Mapping]] = ..., vector_ids: _Optional[_Iterable[int]] = ...) -> None: ...
+    def __init__(self, top_n: _Optional[int] = ..., without_vector_data: bool = ..., without_scalar_data: bool = ..., selected_keys: _Optional[_Iterable[str]] = ..., without_table_data: bool = ..., flat: _Optional[_Union[SearchFlatParam, _Mapping]] = ..., ivf_flat: _Optional[_Union[SearchIvfFlatParam, _Mapping]] = ..., ivf_pq: _Optional[_Union[SearchIvfPqParam, _Mapping]] = ..., hnsw: _Optional[_Union[SearchHNSWParam, _Mapping]] = ..., diskann: _Optional[_Union[SearchDiskAnnParam, _Mapping]] = ..., use_scalar_filter: bool = ..., vector_filter: _Optional[_Union[VectorFilter, str]] = ..., vector_filter_type: _Optional[_Union[VectorFilterType, str]] = ..., vector_coprocessor: _Optional[_Union[VectorCoprocessor, _Mapping]] = ..., vector_ids: _Optional[_Iterable[int]] = ...) -> None: ...
 
 class VectorCoprocessor(_message.Message):
     __slots__ = ["schema_version", "original_schema", "selection_columns", "expression"]
