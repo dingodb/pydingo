@@ -6,9 +6,11 @@ package:
 
 make_proto:
 	git submodule update --init
-	./proto_make.sh
+	git submodule update --remote
+	bash ./proto_make.sh
 
 install:
 	git submodule update --init
-	./proto_make.sh
+	git submodule update --remote
+	bash ./proto_make.sh
 	pip install -e .

@@ -3,7 +3,7 @@
 OUTDIR=dingodb/protos/
 PROTO_DIR="dingodb/protos/dingo-proto/proto"
 
-python -m pip install "grpcio-tools==$(python3 -c 'import grpc; print(grpc.__version__)')"
+python -m pip install "grpcio-tools==$(python -c 'import grpc; print(grpc.__version__)')"
 
 python -m grpc_tools.protoc -I ${PROTO_DIR} --python_out=${OUTDIR} --pyi_out=${OUTDIR} --grpc_python_out=${OUTDIR}  ${PROTO_DIR}/*.proto
 

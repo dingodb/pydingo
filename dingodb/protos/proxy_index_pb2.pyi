@@ -37,22 +37,22 @@ class VectorAddResponse(_message.Message):
     def __init__(self, vectors: _Optional[_Iterable[_Union[_proxy_common_pb2.VectorWithId, _Mapping]]] = ...) -> None: ...
 
 class VectorGetRequest(_message.Message):
-    __slots__ = ["schema_name", "index_name", "vector_ids", "with_out_vector_data", "with_scalar_data", "selected_keys", "with_table_data"]
+    __slots__ = ["schema_name", "index_name", "vector_ids", "without_vector_data", "without_scalar_data", "selected_keys", "without_table_data"]
     SCHEMA_NAME_FIELD_NUMBER: _ClassVar[int]
     INDEX_NAME_FIELD_NUMBER: _ClassVar[int]
     VECTOR_IDS_FIELD_NUMBER: _ClassVar[int]
-    WITH_OUT_VECTOR_DATA_FIELD_NUMBER: _ClassVar[int]
-    WITH_SCALAR_DATA_FIELD_NUMBER: _ClassVar[int]
+    WITHOUT_VECTOR_DATA_FIELD_NUMBER: _ClassVar[int]
+    WITHOUT_SCALAR_DATA_FIELD_NUMBER: _ClassVar[int]
     SELECTED_KEYS_FIELD_NUMBER: _ClassVar[int]
-    WITH_TABLE_DATA_FIELD_NUMBER: _ClassVar[int]
+    WITHOUT_TABLE_DATA_FIELD_NUMBER: _ClassVar[int]
     schema_name: str
     index_name: str
     vector_ids: _containers.RepeatedScalarFieldContainer[int]
-    with_out_vector_data: bool
-    with_scalar_data: bool
+    without_vector_data: bool
+    without_scalar_data: bool
     selected_keys: _containers.RepeatedScalarFieldContainer[str]
-    with_table_data: bool
-    def __init__(self, schema_name: _Optional[str] = ..., index_name: _Optional[str] = ..., vector_ids: _Optional[_Iterable[int]] = ..., with_out_vector_data: bool = ..., with_scalar_data: bool = ..., selected_keys: _Optional[_Iterable[str]] = ..., with_table_data: bool = ...) -> None: ...
+    without_table_data: bool
+    def __init__(self, schema_name: _Optional[str] = ..., index_name: _Optional[str] = ..., vector_ids: _Optional[_Iterable[int]] = ..., without_vector_data: bool = ..., without_scalar_data: bool = ..., selected_keys: _Optional[_Iterable[str]] = ..., without_table_data: bool = ...) -> None: ...
 
 class VectorGetResponse(_message.Message):
     __slots__ = ["vectors"]
@@ -117,7 +117,7 @@ class VectorGetBorderIdResponse(_message.Message):
     def __init__(self, id: _Optional[int] = ...) -> None: ...
 
 class VectorScanQueryRequest(_message.Message):
-    __slots__ = ["schema_name", "index_name", "vector_id_start", "is_reverse_scan", "max_scan_count", "vector_id_end", "without_vector_data", "with_scalar_data", "selected_keys", "with_table_data", "use_scalar_filter", "scalar_for_filter"]
+    __slots__ = ["schema_name", "index_name", "vector_id_start", "is_reverse_scan", "max_scan_count", "vector_id_end", "without_vector_data", "without_scalar_data", "selected_keys", "without_table_data", "use_scalar_filter", "scalar_for_filter"]
     SCHEMA_NAME_FIELD_NUMBER: _ClassVar[int]
     INDEX_NAME_FIELD_NUMBER: _ClassVar[int]
     VECTOR_ID_START_FIELD_NUMBER: _ClassVar[int]
@@ -125,9 +125,9 @@ class VectorScanQueryRequest(_message.Message):
     MAX_SCAN_COUNT_FIELD_NUMBER: _ClassVar[int]
     VECTOR_ID_END_FIELD_NUMBER: _ClassVar[int]
     WITHOUT_VECTOR_DATA_FIELD_NUMBER: _ClassVar[int]
-    WITH_SCALAR_DATA_FIELD_NUMBER: _ClassVar[int]
+    WITHOUT_SCALAR_DATA_FIELD_NUMBER: _ClassVar[int]
     SELECTED_KEYS_FIELD_NUMBER: _ClassVar[int]
-    WITH_TABLE_DATA_FIELD_NUMBER: _ClassVar[int]
+    WITHOUT_TABLE_DATA_FIELD_NUMBER: _ClassVar[int]
     USE_SCALAR_FILTER_FIELD_NUMBER: _ClassVar[int]
     SCALAR_FOR_FILTER_FIELD_NUMBER: _ClassVar[int]
     schema_name: str
@@ -137,12 +137,12 @@ class VectorScanQueryRequest(_message.Message):
     max_scan_count: int
     vector_id_end: int
     without_vector_data: bool
-    with_scalar_data: bool
+    without_scalar_data: bool
     selected_keys: _containers.RepeatedScalarFieldContainer[str]
-    with_table_data: bool
+    without_table_data: bool
     use_scalar_filter: bool
     scalar_for_filter: _proxy_common_pb2.VectorScalarData
-    def __init__(self, schema_name: _Optional[str] = ..., index_name: _Optional[str] = ..., vector_id_start: _Optional[int] = ..., is_reverse_scan: bool = ..., max_scan_count: _Optional[int] = ..., vector_id_end: _Optional[int] = ..., without_vector_data: bool = ..., with_scalar_data: bool = ..., selected_keys: _Optional[_Iterable[str]] = ..., with_table_data: bool = ..., use_scalar_filter: bool = ..., scalar_for_filter: _Optional[_Union[_proxy_common_pb2.VectorScalarData, _Mapping]] = ...) -> None: ...
+    def __init__(self, schema_name: _Optional[str] = ..., index_name: _Optional[str] = ..., vector_id_start: _Optional[int] = ..., is_reverse_scan: bool = ..., max_scan_count: _Optional[int] = ..., vector_id_end: _Optional[int] = ..., without_vector_data: bool = ..., without_scalar_data: bool = ..., selected_keys: _Optional[_Iterable[str]] = ..., without_table_data: bool = ..., use_scalar_filter: bool = ..., scalar_for_filter: _Optional[_Union[_proxy_common_pb2.VectorScalarData, _Mapping]] = ...) -> None: ...
 
 class VectorScanQueryResponse(_message.Message):
     __slots__ = ["vectors"]

@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 import proxy_common_pb2 as proxy__common__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11proxy_index.proto\x12\x16\x64ingodb.pb.proxy.index\x1a\x12proxy_common.proto\"\x9f\x01\n\x10VectorAddRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x36\n\x07vectors\x18\x03 \x03(\x0b\x32%.dingodb.pb.proxy.common.VectorWithId\x12\x17\n\x0freplace_deleted\x18\x04 \x01(\x08\x12\x11\n\tis_update\x18\x05 \x01(\x08\"K\n\x11VectorAddResponse\x12\x36\n\x07vectors\x18\x01 \x03(\x0b\x32%.dingodb.pb.proxy.common.VectorWithId\"\xb7\x01\n\x10VectorGetRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x12\n\nvector_ids\x18\x03 \x03(\x04\x12\x1c\n\x14with_out_vector_data\x18\x04 \x01(\x08\x12\x18\n\x10with_scalar_data\x18\x05 \x01(\x08\x12\x15\n\rselected_keys\x18\x06 \x03(\t\x12\x17\n\x0fwith_table_data\x18\x07 \x01(\x08\"K\n\x11VectorGetResponse\x12\x36\n\x07vectors\x18\x01 \x03(\x0b\x32%.dingodb.pb.proxy.common.VectorWithId\"\xb9\x01\n\x13VectorSearchRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x36\n\x07vectors\x18\x03 \x03(\x0b\x32%.dingodb.pb.proxy.common.VectorWithId\x12\x41\n\tparameter\x18\x04 \x01(\x0b\x32..dingodb.pb.proxy.common.VectorSearchParameter\"f\n\x18VectorWithDistanceResult\x12J\n\x15vector_with_distances\x18\x01 \x03(\x0b\x32+.dingodb.pb.proxy.common.VectorWithDistance\"_\n\x14VectorSearchResponse\x12G\n\rbatch_results\x18\x01 \x03(\x0b\x32\x30.dingodb.pb.proxy.index.VectorWithDistanceResult\"K\n\x13VectorDeleteRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x0b\n\x03ids\x18\x03 \x03(\x04\"*\n\x14VectorDeleteResponse\x12\x12\n\nkey_states\x18\x01 \x03(\x08\"T\n\x18VectorGetBorderIdRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x0f\n\x07get_min\x18\x03 \x01(\x08\"\'\n\x19VectorGetBorderIdResponse\x12\n\n\x02id\x18\x01 \x01(\x04\"\xea\x02\n\x16VectorScanQueryRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x17\n\x0fvector_id_start\x18\x03 \x01(\x04\x12\x17\n\x0fis_reverse_scan\x18\x04 \x01(\x08\x12\x16\n\x0emax_scan_count\x18\x05 \x01(\x04\x12\x15\n\rvector_id_end\x18\x06 \x01(\x04\x12\x1b\n\x13without_vector_data\x18\x0b \x01(\x08\x12\x18\n\x10with_scalar_data\x18\x0c \x01(\x08\x12\x15\n\rselected_keys\x18\r \x03(\t\x12\x17\n\x0fwith_table_data\x18\x0e \x01(\x08\x12\x19\n\x11use_scalar_filter\x18\x14 \x01(\x08\x12\x44\n\x11scalar_for_filter\x18\x15 \x01(\x0b\x32).dingodb.pb.proxy.common.VectorScalarData\"Q\n\x17VectorScanQueryResponse\x12\x36\n\x07vectors\x18\x01 \x03(\x0b\x32%.dingodb.pb.proxy.common.VectorWithId\"H\n\x1dVectorGetRegionMetricsRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\"^\n\x1eVectorGetRegionMetricsResponse\x12<\n\x07metrics\x18\x01 \x01(\x0b\x32+.dingodb.pb.proxy.common.VectorIndexMetrics\",\n\x0eVectorDistance\x12\x1a\n\x12internal_distances\x18\x01 \x03(\x02\"\xe2\x02\n\x19VectorCalcDistanceRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x11\n\tvector_id\x18\x03 \x01(\x04\x12=\n\x0e\x61lgorithm_type\x18\x04 \x01(\x0e\x32%.dingodb.pb.proxy.index.AlgorithmType\x12\x38\n\x0bmetric_type\x18\x05 \x01(\x0e\x32#.dingodb.pb.proxy.common.MetricType\x12\x38\n\x0fop_left_vectors\x18\x06 \x03(\x0b\x32\x1f.dingodb.pb.proxy.common.Vector\x12\x39\n\x10op_right_vectors\x18\x07 \x03(\x0b\x32\x1f.dingodb.pb.proxy.common.Vector\x12\x1b\n\x13is_return_normalize\x18\x08 \x01(\x08\"\xf5\x01\n\x1aVectorCalcDistanceResponse\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x38\n\x0fop_left_vectors\x18\x03 \x03(\x0b\x32\x1f.dingodb.pb.proxy.common.Vector\x12\x39\n\x10op_right_vectors\x18\x04 \x03(\x0b\x32\x1f.dingodb.pb.proxy.common.Vector\x12\x39\n\tdistances\x18\x05 \x03(\x0b\x32&.dingodb.pb.proxy.index.VectorDistance*O\n\rAlgorithmType\x12\x12\n\x0e\x41LGORITHM_NONE\x10\x00\x12\x13\n\x0f\x41LGORITHM_FAISS\x10\x01\x12\x15\n\x11\x41LGORITHM_HNSWLIB\x10\x02\x32\x9d\x07\n\x0cIndexService\x12`\n\tVectorAdd\x12(.dingodb.pb.proxy.index.VectorAddRequest\x1a).dingodb.pb.proxy.index.VectorAddResponse\x12`\n\tVectorGet\x12(.dingodb.pb.proxy.index.VectorGetRequest\x1a).dingodb.pb.proxy.index.VectorGetResponse\x12i\n\x0cVectorSearch\x12+.dingodb.pb.proxy.index.VectorSearchRequest\x1a,.dingodb.pb.proxy.index.VectorSearchResponse\x12i\n\x0cVectorDelete\x12+.dingodb.pb.proxy.index.VectorDeleteRequest\x1a,.dingodb.pb.proxy.index.VectorDeleteResponse\x12x\n\x11VectorGetBorderId\x12\x30.dingodb.pb.proxy.index.VectorGetBorderIdRequest\x1a\x31.dingodb.pb.proxy.index.VectorGetBorderIdResponse\x12r\n\x0fVectorScanQuery\x12..dingodb.pb.proxy.index.VectorScanQueryRequest\x1a/.dingodb.pb.proxy.index.VectorScanQueryResponse\x12\x87\x01\n\x16VectorGetRegionMetrics\x12\x35.dingodb.pb.proxy.index.VectorGetRegionMetricsRequest\x1a\x36.dingodb.pb.proxy.index.VectorGetRegionMetricsResponse\x12{\n\x12VectorCalcDistance\x12\x31.dingodb.pb.proxy.index.VectorCalcDistanceRequest\x1a\x32.dingodb.pb.proxy.index.VectorCalcDistanceResponseB\x1b\n\x16io.dingodb.proxy.index\x88\x01\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11proxy_index.proto\x12\x16\x64ingodb.pb.proxy.index\x1a\x12proxy_common.proto\"\x9f\x01\n\x10VectorAddRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x36\n\x07vectors\x18\x03 \x03(\x0b\x32%.dingodb.pb.proxy.common.VectorWithId\x12\x17\n\x0freplace_deleted\x18\x04 \x01(\x08\x12\x11\n\tis_update\x18\x05 \x01(\x08\"K\n\x11VectorAddResponse\x12\x36\n\x07vectors\x18\x01 \x03(\x0b\x32%.dingodb.pb.proxy.common.VectorWithId\"\xbc\x01\n\x10VectorGetRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x12\n\nvector_ids\x18\x03 \x03(\x04\x12\x1b\n\x13without_vector_data\x18\x04 \x01(\x08\x12\x1b\n\x13without_scalar_data\x18\x05 \x01(\x08\x12\x15\n\rselected_keys\x18\x06 \x03(\t\x12\x1a\n\x12without_table_data\x18\x07 \x01(\x08\"K\n\x11VectorGetResponse\x12\x36\n\x07vectors\x18\x01 \x03(\x0b\x32%.dingodb.pb.proxy.common.VectorWithId\"\xb9\x01\n\x13VectorSearchRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x36\n\x07vectors\x18\x03 \x03(\x0b\x32%.dingodb.pb.proxy.common.VectorWithId\x12\x41\n\tparameter\x18\x04 \x01(\x0b\x32..dingodb.pb.proxy.common.VectorSearchParameter\"f\n\x18VectorWithDistanceResult\x12J\n\x15vector_with_distances\x18\x01 \x03(\x0b\x32+.dingodb.pb.proxy.common.VectorWithDistance\"_\n\x14VectorSearchResponse\x12G\n\rbatch_results\x18\x01 \x03(\x0b\x32\x30.dingodb.pb.proxy.index.VectorWithDistanceResult\"K\n\x13VectorDeleteRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x0b\n\x03ids\x18\x03 \x03(\x04\"*\n\x14VectorDeleteResponse\x12\x12\n\nkey_states\x18\x01 \x03(\x08\"T\n\x18VectorGetBorderIdRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x0f\n\x07get_min\x18\x03 \x01(\x08\"\'\n\x19VectorGetBorderIdResponse\x12\n\n\x02id\x18\x01 \x01(\x04\"\xf0\x02\n\x16VectorScanQueryRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x17\n\x0fvector_id_start\x18\x03 \x01(\x04\x12\x17\n\x0fis_reverse_scan\x18\x04 \x01(\x08\x12\x16\n\x0emax_scan_count\x18\x05 \x01(\x04\x12\x15\n\rvector_id_end\x18\x06 \x01(\x04\x12\x1b\n\x13without_vector_data\x18\x0b \x01(\x08\x12\x1b\n\x13without_scalar_data\x18\x0c \x01(\x08\x12\x15\n\rselected_keys\x18\r \x03(\t\x12\x1a\n\x12without_table_data\x18\x0e \x01(\x08\x12\x19\n\x11use_scalar_filter\x18\x14 \x01(\x08\x12\x44\n\x11scalar_for_filter\x18\x15 \x01(\x0b\x32).dingodb.pb.proxy.common.VectorScalarData\"Q\n\x17VectorScanQueryResponse\x12\x36\n\x07vectors\x18\x01 \x03(\x0b\x32%.dingodb.pb.proxy.common.VectorWithId\"H\n\x1dVectorGetRegionMetricsRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\"^\n\x1eVectorGetRegionMetricsResponse\x12<\n\x07metrics\x18\x01 \x01(\x0b\x32+.dingodb.pb.proxy.common.VectorIndexMetrics\",\n\x0eVectorDistance\x12\x1a\n\x12internal_distances\x18\x01 \x03(\x02\"\xe2\x02\n\x19VectorCalcDistanceRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x11\n\tvector_id\x18\x03 \x01(\x04\x12=\n\x0e\x61lgorithm_type\x18\x04 \x01(\x0e\x32%.dingodb.pb.proxy.index.AlgorithmType\x12\x38\n\x0bmetric_type\x18\x05 \x01(\x0e\x32#.dingodb.pb.proxy.common.MetricType\x12\x38\n\x0fop_left_vectors\x18\x06 \x03(\x0b\x32\x1f.dingodb.pb.proxy.common.Vector\x12\x39\n\x10op_right_vectors\x18\x07 \x03(\x0b\x32\x1f.dingodb.pb.proxy.common.Vector\x12\x1b\n\x13is_return_normalize\x18\x08 \x01(\x08\"\xf5\x01\n\x1aVectorCalcDistanceResponse\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x38\n\x0fop_left_vectors\x18\x03 \x03(\x0b\x32\x1f.dingodb.pb.proxy.common.Vector\x12\x39\n\x10op_right_vectors\x18\x04 \x03(\x0b\x32\x1f.dingodb.pb.proxy.common.Vector\x12\x39\n\tdistances\x18\x05 \x03(\x0b\x32&.dingodb.pb.proxy.index.VectorDistance*O\n\rAlgorithmType\x12\x12\n\x0e\x41LGORITHM_NONE\x10\x00\x12\x13\n\x0f\x41LGORITHM_FAISS\x10\x01\x12\x15\n\x11\x41LGORITHM_HNSWLIB\x10\x02\x32\x9d\x07\n\x0cIndexService\x12`\n\tVectorAdd\x12(.dingodb.pb.proxy.index.VectorAddRequest\x1a).dingodb.pb.proxy.index.VectorAddResponse\x12`\n\tVectorGet\x12(.dingodb.pb.proxy.index.VectorGetRequest\x1a).dingodb.pb.proxy.index.VectorGetResponse\x12i\n\x0cVectorSearch\x12+.dingodb.pb.proxy.index.VectorSearchRequest\x1a,.dingodb.pb.proxy.index.VectorSearchResponse\x12i\n\x0cVectorDelete\x12+.dingodb.pb.proxy.index.VectorDeleteRequest\x1a,.dingodb.pb.proxy.index.VectorDeleteResponse\x12x\n\x11VectorGetBorderId\x12\x30.dingodb.pb.proxy.index.VectorGetBorderIdRequest\x1a\x31.dingodb.pb.proxy.index.VectorGetBorderIdResponse\x12r\n\x0fVectorScanQuery\x12..dingodb.pb.proxy.index.VectorScanQueryRequest\x1a/.dingodb.pb.proxy.index.VectorScanQueryResponse\x12\x87\x01\n\x16VectorGetRegionMetrics\x12\x35.dingodb.pb.proxy.index.VectorGetRegionMetricsRequest\x1a\x36.dingodb.pb.proxy.index.VectorGetRegionMetricsResponse\x12{\n\x12VectorCalcDistance\x12\x31.dingodb.pb.proxy.index.VectorCalcDistanceRequest\x1a\x32.dingodb.pb.proxy.index.VectorCalcDistanceResponseB\x1b\n\x16io.dingodb.proxy.index\x88\x01\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,44 +23,44 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\026io.dingodb.proxy.index\210\001\001'
-  _globals['_ALGORITHMTYPE']._serialized_start=2473
-  _globals['_ALGORITHMTYPE']._serialized_end=2552
+  _globals['_ALGORITHMTYPE']._serialized_start=2484
+  _globals['_ALGORITHMTYPE']._serialized_end=2563
   _globals['_VECTORADDREQUEST']._serialized_start=66
   _globals['_VECTORADDREQUEST']._serialized_end=225
   _globals['_VECTORADDRESPONSE']._serialized_start=227
   _globals['_VECTORADDRESPONSE']._serialized_end=302
   _globals['_VECTORGETREQUEST']._serialized_start=305
-  _globals['_VECTORGETREQUEST']._serialized_end=488
-  _globals['_VECTORGETRESPONSE']._serialized_start=490
-  _globals['_VECTORGETRESPONSE']._serialized_end=565
-  _globals['_VECTORSEARCHREQUEST']._serialized_start=568
-  _globals['_VECTORSEARCHREQUEST']._serialized_end=753
-  _globals['_VECTORWITHDISTANCERESULT']._serialized_start=755
-  _globals['_VECTORWITHDISTANCERESULT']._serialized_end=857
-  _globals['_VECTORSEARCHRESPONSE']._serialized_start=859
-  _globals['_VECTORSEARCHRESPONSE']._serialized_end=954
-  _globals['_VECTORDELETEREQUEST']._serialized_start=956
-  _globals['_VECTORDELETEREQUEST']._serialized_end=1031
-  _globals['_VECTORDELETERESPONSE']._serialized_start=1033
-  _globals['_VECTORDELETERESPONSE']._serialized_end=1075
-  _globals['_VECTORGETBORDERIDREQUEST']._serialized_start=1077
-  _globals['_VECTORGETBORDERIDREQUEST']._serialized_end=1161
-  _globals['_VECTORGETBORDERIDRESPONSE']._serialized_start=1163
-  _globals['_VECTORGETBORDERIDRESPONSE']._serialized_end=1202
-  _globals['_VECTORSCANQUERYREQUEST']._serialized_start=1205
-  _globals['_VECTORSCANQUERYREQUEST']._serialized_end=1567
-  _globals['_VECTORSCANQUERYRESPONSE']._serialized_start=1569
-  _globals['_VECTORSCANQUERYRESPONSE']._serialized_end=1650
-  _globals['_VECTORGETREGIONMETRICSREQUEST']._serialized_start=1652
-  _globals['_VECTORGETREGIONMETRICSREQUEST']._serialized_end=1724
-  _globals['_VECTORGETREGIONMETRICSRESPONSE']._serialized_start=1726
-  _globals['_VECTORGETREGIONMETRICSRESPONSE']._serialized_end=1820
-  _globals['_VECTORDISTANCE']._serialized_start=1822
-  _globals['_VECTORDISTANCE']._serialized_end=1866
-  _globals['_VECTORCALCDISTANCEREQUEST']._serialized_start=1869
-  _globals['_VECTORCALCDISTANCEREQUEST']._serialized_end=2223
-  _globals['_VECTORCALCDISTANCERESPONSE']._serialized_start=2226
-  _globals['_VECTORCALCDISTANCERESPONSE']._serialized_end=2471
-  _globals['_INDEXSERVICE']._serialized_start=2555
-  _globals['_INDEXSERVICE']._serialized_end=3480
+  _globals['_VECTORGETREQUEST']._serialized_end=493
+  _globals['_VECTORGETRESPONSE']._serialized_start=495
+  _globals['_VECTORGETRESPONSE']._serialized_end=570
+  _globals['_VECTORSEARCHREQUEST']._serialized_start=573
+  _globals['_VECTORSEARCHREQUEST']._serialized_end=758
+  _globals['_VECTORWITHDISTANCERESULT']._serialized_start=760
+  _globals['_VECTORWITHDISTANCERESULT']._serialized_end=862
+  _globals['_VECTORSEARCHRESPONSE']._serialized_start=864
+  _globals['_VECTORSEARCHRESPONSE']._serialized_end=959
+  _globals['_VECTORDELETEREQUEST']._serialized_start=961
+  _globals['_VECTORDELETEREQUEST']._serialized_end=1036
+  _globals['_VECTORDELETERESPONSE']._serialized_start=1038
+  _globals['_VECTORDELETERESPONSE']._serialized_end=1080
+  _globals['_VECTORGETBORDERIDREQUEST']._serialized_start=1082
+  _globals['_VECTORGETBORDERIDREQUEST']._serialized_end=1166
+  _globals['_VECTORGETBORDERIDRESPONSE']._serialized_start=1168
+  _globals['_VECTORGETBORDERIDRESPONSE']._serialized_end=1207
+  _globals['_VECTORSCANQUERYREQUEST']._serialized_start=1210
+  _globals['_VECTORSCANQUERYREQUEST']._serialized_end=1578
+  _globals['_VECTORSCANQUERYRESPONSE']._serialized_start=1580
+  _globals['_VECTORSCANQUERYRESPONSE']._serialized_end=1661
+  _globals['_VECTORGETREGIONMETRICSREQUEST']._serialized_start=1663
+  _globals['_VECTORGETREGIONMETRICSREQUEST']._serialized_end=1735
+  _globals['_VECTORGETREGIONMETRICSRESPONSE']._serialized_start=1737
+  _globals['_VECTORGETREGIONMETRICSRESPONSE']._serialized_end=1831
+  _globals['_VECTORDISTANCE']._serialized_start=1833
+  _globals['_VECTORDISTANCE']._serialized_end=1877
+  _globals['_VECTORCALCDISTANCEREQUEST']._serialized_start=1880
+  _globals['_VECTORCALCDISTANCEREQUEST']._serialized_end=2234
+  _globals['_VECTORCALCDISTANCERESPONSE']._serialized_start=2237
+  _globals['_VECTORCALCDISTANCERESPONSE']._serialized_end=2482
+  _globals['_INDEXSERVICE']._serialized_start=2566
+  _globals['_INDEXSERVICE']._serialized_end=3491
 # @@protoc_insertion_point(module_scope)
