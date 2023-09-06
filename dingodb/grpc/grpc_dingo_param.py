@@ -196,8 +196,10 @@ class CheckVectorSearchParam(BaseModel):
             if search_params is None
             else search_params.get("withVectorData", True)
         )
+
+        input_with_Scalar_data = search_params.get("withScalarData", False)
         parameter.without_scalar_data = (
-            True if search_params is None else search_params.get("withScalarData", True)
+            True if search_params is None else ~input_with_Scalar_data
         )
 
         vec_search_request = VectorSearchRequest(
