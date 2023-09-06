@@ -146,7 +146,7 @@ class CheckVectorScanParam(BaseModel):
     
     @validator("without_vector_data", pre=True, always=True)
     def check_without_vector_data(cls, value):
-        return "false" if value else "true"
+        return "true" if value else "false"
 
     @validator("fields", pre=True, always=True)
     def check_fields(cls, value):
