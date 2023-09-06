@@ -205,12 +205,12 @@ class CheckVectorSearchParam(BaseModel):
                 },
                 "selectedKeys": [],
                 "topN": values.get("top_k"),
-                "withoutScalarData": "false"
+                "withoutScalarData": "true"
                 if search_params is None
-                else search_params.get("withoutScalarData", "false"),
-                "withoutVectorData": "false"
+                else search_params.get("withScalarData", "false"),
+                "withoutVectorData": "True"
                 if search_params is None
-                else search_params.get("withoutVectorData", "false"),
+                else search_params.get("withVectorData", "false"),
                 "useScalarFilter": use_scalar_filter,
                 "vectorFilter": "SCALAR_FILTER",
                 "vectorFilterType": "QUERY_PRE"
