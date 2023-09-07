@@ -130,7 +130,7 @@ class CheckVectorScanParam(BaseModel):
     end_id: int = 0
 
     @validator("end_id", pre=True, always=True)
-    def check_true_positive_values(cls, value):
+    def check_true_positive_values(cls, value, field):
         if not value >= 0:
             raise ValueError(f"{field.name} must >= 0")
         return value
@@ -141,7 +141,7 @@ class CheckVectorScanParam(BaseModel):
             raise ValueError(f"{field.name} must > 0")
         return value
 
-    @validator("is_reverse", "without_vector_data"", without_scalar_data", "without_table_data", pre=True, always=True)
+    @validator("is_reverse", "without_vector_data", "without_scalar_data", "without_table_data", pre=True, always=True)
     def check_boolean_fields(cls, value):
         return "true" if value else "false"
     
@@ -154,11 +154,11 @@ class CheckVectorScanParam(BaseModel):
         if value is None:
             return {}
         else:
-            scalar_data = dict(
-                (key, {"fieldType": "STRING", "fields": [{"data": value}]})
-                for key, value in value.items()
-            )
-            value = scalar_data
+            # scalar_data = dict(
+            #     (key, {"fieldType": "STRING", "fields": [{"data": value}]})
+            #     for key, value in value.items()
+            # )
+            # value = scalar_data
             return value
 
 
