@@ -129,7 +129,7 @@ class CheckVectorScanParam(BaseModel):
     end_id: int = 0
 
     @validator("end_id", pre=True, always=True)
-    def check_true_positive_values(cls, value):
+    def check_true_positive_values(cls, value, field):
         if not value >= 0:
             raise ValueError(f"{field.name} must >= 0")
         return value
