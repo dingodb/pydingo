@@ -154,11 +154,6 @@ class CheckVectorScanParam(BaseModel):
         if value is None:
             return {}
         else:
-            # scalar_data = dict(
-            #     (key, {"fieldType": "STRING", "fields": [{"data": value}]})
-            #     for key, value in value.items()
-            # )
-            # value = scalar_data
             return value
 
 
