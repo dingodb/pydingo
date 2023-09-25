@@ -41,6 +41,16 @@ class DingoDB:
     def close(self):
         self.session.close()
 
+    def make_response(self, res, deal="default"):
+        res_json = res.json()
+        if res_json.get("status") == 200:
+            if deal == "vector_count":
+                res_data = res_json.get("data")
+                return res_data.get("currentCount") - res_data.get("deletedCount")
+            return res_json.get("data")
+        else:
+            raise RuntimeError(res_json)
+
     def describe_index_info(self, index_name: str) -> dict:
         """
         describe_index_info index info
@@ -58,11 +68,7 @@ class DingoDB:
             f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}",
             headers=self.headers,
         )
-
-        if res.status_code == 200:
-            return res.json()
-        else:
-            raise RuntimeError(res.json())
+        return self.make_response(res)
 
     def create_index(
         self,
@@ -139,10 +145,8 @@ class DingoDB:
             headers=self.headers,
             data=json.dumps(index_definition),
         )
-        if res.status_code == 200:
-            return True
-        else:
-            raise RuntimeError(res.json())
+
+        return self.make_response(res)
 
     def update_index_max_element(self, index_name: str, max_element: int) -> bool:
         """
@@ -164,10 +168,7 @@ class DingoDB:
         res = self.session.put(
             f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}/{max_element}"
         )
-        if res.status_code == 200:
-            return True
-        else:
-            raise RuntimeError(res.json())
+        return self.make_response(res)
 
     def delete_index(self, index_name: str) -> bool:
         """
@@ -185,10 +186,7 @@ class DingoDB:
         res = self.session.delete(
             f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}"
         )
-        if res.status_code == 200:
-            return True
-        else:
-            raise RuntimeError(res.json())
+        return self.make_response(res)
 
     def vector_add(
         self, index_name: str, datas: list, vectors: list, ids: list = None
@@ -234,11 +232,8 @@ class DingoDB:
             headers=self.headers,
             data=json.dumps(records),
         )
-        if res.status_code == 200:
-            records = res.json()
-            return records
-        else:
-            raise RuntimeError(res.json())
+
+        return self.make_response(res)
 
     def vector_count(self, index_name: str):
         """
@@ -254,11 +249,8 @@ class DingoDB:
             f"{self.requestProto}{self.host[0]}{self.vectorApi}{index_name}",
             headers=self.headers,
         )
-        if res.status_code == 200:
-            records = res.json()
-            return records.get("currentCount") - records.get("deletedCount")
-        else:
-            raise RuntimeError(res.json())
+
+        return self.make_response(res, deal="vector_count")
 
     def vector_scan(
         self,
@@ -323,11 +315,8 @@ class DingoDB:
             headers=self.headers,
             data=json.dumps(payload),
         )
-        if res.status_code == 200:
-            records = res.json()
-            return records
-        else:
-            raise RuntimeError(res.json())
+
+        return self.make_response(res)
 
     def get_index(self):
         """
@@ -343,11 +332,8 @@ class DingoDB:
         res = self.session.get(
             f"{self.requestProto}{self.host[0]}{self.indexApi}", headers=self.headers
         )
-        if res.status_code == 200:
-            indics = res.json()
-            return indics
-        else:
-            raise RuntimeError(res.json())
+
+        return self.make_response(res)
 
     def get_max_index_row(self, index_name: str):
         """
@@ -369,11 +355,8 @@ class DingoDB:
             params=payload,
             headers=self.headers,
         )
-        if res.status_code == 200:
-            max_id = res.json()
-            return max_id
-        else:
-            raise RuntimeError(res.json())
+
+        return self.make_response(res)
 
     def vector_search(
         self,
@@ -412,11 +395,7 @@ class DingoDB:
             data=json.dumps(params.search_params),
         )
 
-        if res.status_code == 200:
-            records = res.json()
-            return records
-        else:
-            raise RuntimeError(res.json())
+        return self.make_response(res)
 
     def vector_get(
         self, index_name: str, ids: list, scalar: bool = True, vector: bool = True
@@ -452,11 +431,7 @@ class DingoDB:
             data=json.dumps(payload),
         )
 
-        if res.status_code == 200:
-            records = res.json()
-            return records
-        else:
-            raise RuntimeError(res.json())
+        return self.make_response(res)
 
     def vector_delete(self, index_name: str, ids: list):
         """
@@ -479,8 +454,4 @@ class DingoDB:
             headers=self.headers,
             data=json.dumps(params.ids),
         )
-
-        if res.status_code == 200:
-            return res.json()
-        else:
-            raise RuntimeError(res.json())
+        return self.make_response(res)
