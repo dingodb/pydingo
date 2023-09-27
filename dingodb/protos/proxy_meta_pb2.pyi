@@ -1,4 +1,5 @@
 import proxy_common_pb2 as _proxy_common_pb2
+import proxy_error_pb2 as _proxy_error_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -53,10 +54,12 @@ class CreateIndexRequest(_message.Message):
     def __init__(self, schema_name: _Optional[str] = ..., definition: _Optional[_Union[IndexDefinition, _Mapping]] = ...) -> None: ...
 
 class CreateIndexResponse(_message.Message):
-    __slots__ = ["state"]
+    __slots__ = ["error", "state"]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
+    error: _proxy_error_pb2.Error
     state: bool
-    def __init__(self, state: bool = ...) -> None: ...
+    def __init__(self, error: _Optional[_Union[_proxy_error_pb2.Error, _Mapping]] = ..., state: bool = ...) -> None: ...
 
 class UpdateIndexRequest(_message.Message):
     __slots__ = ["schema_name", "definition"]
@@ -67,10 +70,12 @@ class UpdateIndexRequest(_message.Message):
     def __init__(self, schema_name: _Optional[str] = ..., definition: _Optional[_Union[IndexDefinition, _Mapping]] = ...) -> None: ...
 
 class UpdateIndexResponse(_message.Message):
-    __slots__ = ["state"]
+    __slots__ = ["error", "state"]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
+    error: _proxy_error_pb2.Error
     state: bool
-    def __init__(self, state: bool = ...) -> None: ...
+    def __init__(self, error: _Optional[_Union[_proxy_error_pb2.Error, _Mapping]] = ..., state: bool = ...) -> None: ...
 
 class UpdateMaxElementsRequest(_message.Message):
     __slots__ = ["schema_name", "index_name", "max_elements"]
@@ -83,10 +88,12 @@ class UpdateMaxElementsRequest(_message.Message):
     def __init__(self, schema_name: _Optional[str] = ..., index_name: _Optional[str] = ..., max_elements: _Optional[int] = ...) -> None: ...
 
 class UpdateMaxElementsResponse(_message.Message):
-    __slots__ = ["state"]
+    __slots__ = ["error", "state"]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
+    error: _proxy_error_pb2.Error
     state: bool
-    def __init__(self, state: bool = ...) -> None: ...
+    def __init__(self, error: _Optional[_Union[_proxy_error_pb2.Error, _Mapping]] = ..., state: bool = ...) -> None: ...
 
 class DeleteIndexRequest(_message.Message):
     __slots__ = ["schema_name", "index_name"]
@@ -97,10 +104,12 @@ class DeleteIndexRequest(_message.Message):
     def __init__(self, schema_name: _Optional[str] = ..., index_name: _Optional[str] = ...) -> None: ...
 
 class DeleteIndexResponse(_message.Message):
-    __slots__ = ["state"]
+    __slots__ = ["error", "state"]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
+    error: _proxy_error_pb2.Error
     state: bool
-    def __init__(self, state: bool = ...) -> None: ...
+    def __init__(self, error: _Optional[_Union[_proxy_error_pb2.Error, _Mapping]] = ..., state: bool = ...) -> None: ...
 
 class GetIndexRequest(_message.Message):
     __slots__ = ["schema_name", "index_name"]
@@ -111,10 +120,12 @@ class GetIndexRequest(_message.Message):
     def __init__(self, schema_name: _Optional[str] = ..., index_name: _Optional[str] = ...) -> None: ...
 
 class GetIndexResponse(_message.Message):
-    __slots__ = ["definition"]
+    __slots__ = ["error", "definition"]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
     DEFINITION_FIELD_NUMBER: _ClassVar[int]
+    error: _proxy_error_pb2.Error
     definition: IndexDefinition
-    def __init__(self, definition: _Optional[_Union[IndexDefinition, _Mapping]] = ...) -> None: ...
+    def __init__(self, error: _Optional[_Union[_proxy_error_pb2.Error, _Mapping]] = ..., definition: _Optional[_Union[IndexDefinition, _Mapping]] = ...) -> None: ...
 
 class GetIndexesRequest(_message.Message):
     __slots__ = ["schema_name"]
@@ -123,10 +134,12 @@ class GetIndexesRequest(_message.Message):
     def __init__(self, schema_name: _Optional[str] = ...) -> None: ...
 
 class GetIndexesResponse(_message.Message):
-    __slots__ = ["definitions"]
+    __slots__ = ["error", "definitions"]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
     DEFINITIONS_FIELD_NUMBER: _ClassVar[int]
+    error: _proxy_error_pb2.Error
     definitions: _containers.RepeatedCompositeFieldContainer[IndexDefinition]
-    def __init__(self, definitions: _Optional[_Iterable[_Union[IndexDefinition, _Mapping]]] = ...) -> None: ...
+    def __init__(self, error: _Optional[_Union[_proxy_error_pb2.Error, _Mapping]] = ..., definitions: _Optional[_Iterable[_Union[IndexDefinition, _Mapping]]] = ...) -> None: ...
 
 class GetIndexNamesRequest(_message.Message):
     __slots__ = ["schema_name"]
@@ -135,10 +148,12 @@ class GetIndexNamesRequest(_message.Message):
     def __init__(self, schema_name: _Optional[str] = ...) -> None: ...
 
 class GetIndexNamesResponse(_message.Message):
-    __slots__ = ["names"]
+    __slots__ = ["error", "names"]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
     NAMES_FIELD_NUMBER: _ClassVar[int]
+    error: _proxy_error_pb2.Error
     names: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, names: _Optional[_Iterable[str]] = ...) -> None: ...
+    def __init__(self, error: _Optional[_Union[_proxy_error_pb2.Error, _Mapping]] = ..., names: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class GetIndexMetricsRequest(_message.Message):
     __slots__ = ["schema_name", "index_name"]
@@ -149,7 +164,8 @@ class GetIndexMetricsRequest(_message.Message):
     def __init__(self, schema_name: _Optional[str] = ..., index_name: _Optional[str] = ...) -> None: ...
 
 class GetIndexMetricsResponse(_message.Message):
-    __slots__ = ["rows_count", "min_key", "max_key", "part_count", "index_type", "current_count", "deleted_count", "max_id", "min_id", "memory_bytes"]
+    __slots__ = ["error", "rows_count", "min_key", "max_key", "part_count", "index_type", "current_count", "deleted_count", "max_id", "min_id", "memory_bytes"]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
     ROWS_COUNT_FIELD_NUMBER: _ClassVar[int]
     MIN_KEY_FIELD_NUMBER: _ClassVar[int]
     MAX_KEY_FIELD_NUMBER: _ClassVar[int]
@@ -160,6 +176,7 @@ class GetIndexMetricsResponse(_message.Message):
     MAX_ID_FIELD_NUMBER: _ClassVar[int]
     MIN_ID_FIELD_NUMBER: _ClassVar[int]
     MEMORY_BYTES_FIELD_NUMBER: _ClassVar[int]
+    error: _proxy_error_pb2.Error
     rows_count: int
     min_key: bytes
     max_key: bytes
@@ -170,4 +187,4 @@ class GetIndexMetricsResponse(_message.Message):
     max_id: int
     min_id: int
     memory_bytes: int
-    def __init__(self, rows_count: _Optional[int] = ..., min_key: _Optional[bytes] = ..., max_key: _Optional[bytes] = ..., part_count: _Optional[int] = ..., index_type: _Optional[_Union[_proxy_common_pb2.VectorIndexType, str]] = ..., current_count: _Optional[int] = ..., deleted_count: _Optional[int] = ..., max_id: _Optional[int] = ..., min_id: _Optional[int] = ..., memory_bytes: _Optional[int] = ...) -> None: ...
+    def __init__(self, error: _Optional[_Union[_proxy_error_pb2.Error, _Mapping]] = ..., rows_count: _Optional[int] = ..., min_key: _Optional[bytes] = ..., max_key: _Optional[bytes] = ..., part_count: _Optional[int] = ..., index_type: _Optional[_Union[_proxy_common_pb2.VectorIndexType, str]] = ..., current_count: _Optional[int] = ..., deleted_count: _Optional[int] = ..., max_id: _Optional[int] = ..., min_id: _Optional[int] = ..., memory_bytes: _Optional[int] = ...) -> None: ...

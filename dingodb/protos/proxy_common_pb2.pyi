@@ -153,25 +153,43 @@ class VectorTableData(_message.Message):
 
 class VectorWithId(_message.Message):
     __slots__ = ["id", "vector", "scalar_data", "table_data"]
+    class ScalarDataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: ScalarValue
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[ScalarValue, _Mapping]] = ...) -> None: ...
     ID_FIELD_NUMBER: _ClassVar[int]
     VECTOR_FIELD_NUMBER: _ClassVar[int]
     SCALAR_DATA_FIELD_NUMBER: _ClassVar[int]
     TABLE_DATA_FIELD_NUMBER: _ClassVar[int]
     id: int
     vector: Vector
-    scalar_data: VectorScalarData
+    scalar_data: _containers.MessageMap[str, ScalarValue]
     table_data: VectorTableData
-    def __init__(self, id: _Optional[int] = ..., vector: _Optional[_Union[Vector, _Mapping]] = ..., scalar_data: _Optional[_Union[VectorScalarData, _Mapping]] = ..., table_data: _Optional[_Union[VectorTableData, _Mapping]] = ...) -> None: ...
+    def __init__(self, id: _Optional[int] = ..., vector: _Optional[_Union[Vector, _Mapping]] = ..., scalar_data: _Optional[_Mapping[str, ScalarValue]] = ..., table_data: _Optional[_Union[VectorTableData, _Mapping]] = ...) -> None: ...
 
 class VectorWithDistance(_message.Message):
-    __slots__ = ["vector_with_id", "distance", "metric_type"]
-    VECTOR_WITH_ID_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["id", "vector", "scalar_data", "distance", "metric_type"]
+    class ScalarDataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: ScalarValue
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[ScalarValue, _Mapping]] = ...) -> None: ...
+    ID_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_FIELD_NUMBER: _ClassVar[int]
+    SCALAR_DATA_FIELD_NUMBER: _ClassVar[int]
     DISTANCE_FIELD_NUMBER: _ClassVar[int]
     METRIC_TYPE_FIELD_NUMBER: _ClassVar[int]
-    vector_with_id: VectorWithId
+    id: int
+    vector: Vector
+    scalar_data: _containers.MessageMap[str, ScalarValue]
     distance: float
     metric_type: MetricType
-    def __init__(self, vector_with_id: _Optional[_Union[VectorWithId, _Mapping]] = ..., distance: _Optional[float] = ..., metric_type: _Optional[_Union[MetricType, str]] = ...) -> None: ...
+    def __init__(self, id: _Optional[int] = ..., vector: _Optional[_Union[Vector, _Mapping]] = ..., scalar_data: _Optional[_Mapping[str, ScalarValue]] = ..., distance: _Optional[float] = ..., metric_type: _Optional[_Union[MetricType, str]] = ...) -> None: ...
 
 class IndexParameter(_message.Message):
     __slots__ = ["index_type", "vector_index_parameter", "scalar_index_parameter"]

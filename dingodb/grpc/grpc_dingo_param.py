@@ -217,14 +217,12 @@ class CheckVectorSearchParam(BaseModel):
                 vector=Vector(dimension=len(xq), float_values=xq, value_type=FLOAT)
             )
             if use_scalar_filter:
-                scalar_data_grpc = VectorScalarData()
                 for key, value in search_params["meta_expr"].items():
-                    entry = scalar_data_grpc.scalar_data[key]
+                    entry = vec_with_id.scalar_data[key]
                     entry.field_type = STRING
                     field = entry.fields.add()
                     field.string_data = value
 
-                vec_with_id.scalar_data.CopyFrom(scalar_data_grpc)
             vec_search_request.vectors.append(vec_with_id)
 
         ef_search = 32 if search_params is None else search_params.get("efSearch", 32)

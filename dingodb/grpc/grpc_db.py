@@ -3,7 +3,6 @@ from dingodb.protos.proxy_index_pb2 import *
 from dingodb.protos.proxy_index_pb2_grpc import *
 from dingodb.protos.proxy_meta_pb2 import *
 from dingodb.protos.proxy_meta_pb2_grpc import *
-from google.protobuf.json_format import MessageToDict, ParseDict
 
 import grpc
 from grpc._cython import cygrpc
@@ -17,6 +16,8 @@ from .grpc_dingo_param import (
     CheckVectorScanParam,
     CheckVectorSearchParam,
 )
+
+from .json_format import MessageToDict, MessageToJson, ParseDict
 
 
 class GrpcDingoDB:
@@ -63,13 +64,14 @@ class GrpcDingoDB:
 
         describe_index_response = self.meta_stub.GetIndex.future(describe_index_request)
 
-        describe_info = MessageToDict(
-            describe_index_response.result().definition,
-            including_default_value_fields=True,
-        )
-        describe_info.update({"autoIncrement": int(describe_info["autoIncrement"])})
-
-        return describe_info
+        if describe_index_response.result().error.errcode == 0:
+            describe_info = MessageToDict(
+                describe_index_response.result().definition,
+                including_default_value_fields=True,
+            )
+            return describe_info
+        else:
+            raise RuntimeError(describe_index_response.result().error.errmsg)
 
     def describe_index_info_all(self) -> dict:
         """
@@ -87,19 +89,13 @@ class GrpcDingoDB:
         describe_indexes_response = self.meta_stub.GetIndexes.future(
             describe_indexes_request
         )
-        return list(
-            map(
-                lambda definition: {
-                    **MessageToDict(definition, including_default_value_fields=True),
-                    "autoIncrement": int(
-                        MessageToDict(definition, including_default_value_fields=True)[
-                            "autoIncrement"
-                        ]
-                    ),
-                },
-                describe_indexes_response.result().definitions,
-            )
-        )
+        if describe_indexes_response.result().error.errcode == 0:
+            return [
+                MessageToDict(definition, including_default_value_fields=True)
+                for definition in describe_indexes_response.result().definitions
+            ]
+        else:
+            raise RuntimeError(describe_indexes_response.result().error.errmsg)
 
     def create_index(
         self,
@@ -178,7 +174,10 @@ class GrpcDingoDB:
         )
         vec_create_response = self.meta_stub.CreateIndex.future(vec_create_request)
 
-        return vec_create_response.result().state
+        if vec_create_response.result().error.errcode == 0:
+            return vec_create_response.result().state
+        else:
+            raise RuntimeError(vec_create_response.result().error.errmsg)
 
     def update_index_max_element(self, index_name: str, max_element: int) -> bool:
         """
@@ -204,8 +203,10 @@ class GrpcDingoDB:
         update_index_max_element_response = self.meta_stub.UpdateMaxElements.future(
             update_index_max_element_request
         )
-
-        return update_index_max_element_response.result().state
+        if update_index_max_element_response.result().error.errcode == 0:
+            return update_index_max_element_response.result().state
+        else:
+            raise RuntimeError(update_index_max_element_response.result().error.errmsg)
 
     def update_index(self, index_name: str, definition: dict) -> bool:
         """
@@ -230,7 +231,10 @@ class GrpcDingoDB:
 
         update_index_response = self.meta_stub.UpdateIndex.future(update_index_request)
 
-        return update_index_response.result().state
+        if update_index_response.result().error.errcode == 0:
+            return update_index_response.result().state
+        else:
+            raise RuntimeError(update_index_response.result().error.errmsg)
 
     def delete_index(self, index_name: str) -> bool:
         """
@@ -250,13 +254,14 @@ class GrpcDingoDB:
         )
 
         del_index_response = self.meta_stub.DeleteIndex.future(del_index_request)
-        return del_index_response.result().state
+        if del_index_response.result().error.errcode == 0:
+            return del_index_response.result().state
+        else:
+            raise RuntimeError(del_index_response.result().error.errmsg)
 
     def convert_message_to_dict(self, vec):
         message_dict = MessageToDict(vec, including_default_value_fields=True)
-        if message_dict and int(message_dict["id"]) != 0:
-            message_dict["id"] = int(message_dict["id"])
-            message_dict["scalarData"] = message_dict["scalarData"]["scalarData"]
+        if message_dict and message_dict["id"] != 0:
             return message_dict
         else:
             return None
@@ -288,9 +293,8 @@ class GrpcDingoDB:
         )
         for i, v in enumerate(params.vectors):
             vec_grpc = VectorWithId()
-            scalar_data_grpc = VectorScalarData()
             for key, value in params.datas[i].items():
-                entry = scalar_data_grpc.scalar_data[key]
+                entry = vec_grpc.scalar_data[key]
                 entry.field_type = STRING
                 field = entry.fields.add()
                 field.string_data = value
@@ -298,18 +302,20 @@ class GrpcDingoDB:
             vec_grpc.vector.CopyFrom(
                 Vector(dimension=len(v), float_values=v, value_type=FLOAT)
             )
-            vec_grpc.scalar_data.CopyFrom(scalar_data_grpc)
             if ids is not None:
                 vec_grpc.id = params.ids[i]
             vec_add_request.vectors.append(vec_grpc)
 
         vec_add_response = self.index_stub.VectorAdd.future(vec_add_request)
 
-        add_res = list(
-            self.convert_message_to_dict(vec)
-            for vec in vec_add_response.result().vectors
-        )
-        return add_res
+        if vec_add_response.result().error.errcode == 0:
+            add_res = list(
+                self.convert_message_to_dict(vec)
+                for vec in vec_add_response.result().vectors
+            )
+            return add_res
+        else:
+            raise RuntimeError(vec_add_response.result().error.errmsg)
 
     def vector_count(self, index_name: str):
         """
@@ -321,15 +327,38 @@ class GrpcDingoDB:
         Returns:
             int: count num
         """
-        vec_count_request = VectorGetRegionMetricsRequest(
+        vec_count_request = VectorCountRequest(
             schema_name="dingo", index_name=index_name
         )
-        vec_count_response = self.index_stub.VectorGetRegionMetrics.future(
-            vec_count_request
-        )
-        records = MessageToDict(vec_count_response.result().metrics)
+        vec_count_response = self.index_stub.VectorCount.future(vec_count_request)
 
-        return int(records.get("currentCount", 0)) - int(records.get("deletedCount", 0))
+        if vec_count_response.result().error.errcode == 0:
+            return vec_count_response.result().count
+        else:
+            raise RuntimeError(vec_count_response.result().error.errmsg)
+
+    def vector_metrics(self, index_name: str):
+        """
+        vector_metrics metrics in index
+
+        Args:
+            index_name (str): the name of in index
+
+        Returns:
+            dict: metrics
+        """
+        vec_metrics_request = VectorGetRegionMetricsRequest(
+            schema_name="dingo", index_name=index_name
+        )
+        vec_metrics_response = self.index_stub.VectorGetRegionMetrics.future(
+            vec_metrics_request
+        )
+
+        if vec_metrics_response.result().error.errcode == 0:
+            records = MessageToDict(vec_metrics_response.result().metrics)
+            return records
+        else:
+            raise RuntimeError(vec_metrics_response.result().error.errmsg)
 
     def vector_scan(
         self,
@@ -405,8 +434,10 @@ class GrpcDingoDB:
             self.convert_message_to_dict(vec)
             for vec in vec_scan_response.result().vectors
         )
-
-        return scan_res
+        if vec_scan_response.result().error.errcode == 0:
+            return scan_res
+        else:
+            raise RuntimeError(vec_scan_response.result().error.errmsg)
 
     def get_index(self):
         """
@@ -424,8 +455,10 @@ class GrpcDingoDB:
         get_index_name_response = self.meta_stub.GetIndexNames.future(
             get_index_name_request
         )
-
-        return get_index_name_response.result().names
+        if get_index_name_response.result().error.errcode == 0:
+            return get_index_name_response.result().names
+        else:
+            raise RuntimeError(get_index_name_response.result().error.errmsg)
 
     def get_max_index_row(self, index_name: str, get_min: bool = False):
         """
@@ -449,8 +482,10 @@ class GrpcDingoDB:
         vec_max_id_response = self.index_stub.VectorGetBorderId.future(
             vec_max_id_request
         )
-
-        return vec_max_id_response.result().id
+        if vec_max_id_response.result().error.errcode == 0:
+            return vec_max_id_response.result().id
+        else:
+            raise RuntimeError(vec_max_id_response.result().error.errmsg)
 
     def vector_search(
         self,
@@ -485,22 +520,13 @@ class GrpcDingoDB:
         )
 
         vec_search_response = self.index_stub.VectorSearch.future(params.search_params)
-        search_res = []
-        for vec in vec_search_response.result().batch_results:
-            res_info = []
-            msg_dict = MessageToDict(vec, including_default_value_fields=True)
-            for vec_info in msg_dict["vectorWithDistances"]:
-                vec_info["vectorWithId"]["id"] = int(vec_info["vectorWithId"]["id"])
-                vec_info["vectorWithId"]["scalarData"] = vec_info["vectorWithId"][
-                    "scalarData"
-                ]["scalarData"]
-                vec_info.update(vec_info["vectorWithId"])
-                vec_info.pop("vectorWithId")
-                res_info.append(vec_info)
-            msg_dict["vectorWithDistances"] = res_info
-            search_res.append(msg_dict)
-
-        return search_res
+        if vec_search_response.result().error.errcode == 0:
+            return [
+                MessageToDict(vec, including_default_value_fields=True)
+                for vec in vec_search_response.result().batch_results
+            ]
+        else:
+            raise RuntimeError(vec_search_response.result().error.errmsg)
 
     def vector_get(
         self, index_name: str, ids: list, scalar: bool = True, vector: bool = True
@@ -534,12 +560,14 @@ class GrpcDingoDB:
 
         vec_get_response = self.index_stub.VectorGet.future(vec_get_request)
 
-        get_res = list(
-            self.convert_message_to_dict(vec)
-            for vec in vec_get_response.result().vectors
-        )
-
-        return get_res
+        if vec_get_response.result().error.errcode == 0:
+            get_res = list(
+                self.convert_message_to_dict(vec)
+                for vec in vec_get_response.result().vectors
+            )
+            return get_res
+        else:
+            raise RuntimeError(vec_get_response.result().error.errmsg)
 
     def vector_delete(self, index_name: str, ids: list):
         """
@@ -562,4 +590,7 @@ class GrpcDingoDB:
         )
 
         vec_del_response = self.index_stub.VectorDelete.future(vec_del_request)
-        return vec_del_response.result().key_states
+        if vec_del_response.result().error.errcode == 0:
+            return vec_del_response.result().key_states
+        else:
+            raise RuntimeError(vec_del_response.result().error.errmsg)
