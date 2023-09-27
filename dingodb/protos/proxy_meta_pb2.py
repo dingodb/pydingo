@@ -12,9 +12,10 @@ _sym_db = _symbol_database.Default()
 
 
 import proxy_common_pb2 as proxy__common__pb2
+import proxy_error_pb2 as proxy__error__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10proxy_meta.proto\x12\x15\x64ingodb.pb.proxy.meta\x1a\x12proxy_common.proto\"Q\n\x19PartitionDetailDefinition\x12\x11\n\tpart_name\x18\x01 \x01(\t\x12\x10\n\x08operator\x18\x02 \x01(\t\x12\x0f\n\x07operand\x18\x03 \x03(\t\"v\n\rPartitionRule\x12\x11\n\tfunc_name\x18\x01 \x01(\t\x12\x0f\n\x07\x63olumns\x18\x02 \x03(\t\x12\x41\n\x07\x64\x65tails\x18\x03 \x03(\x0b\x32\x30.dingodb.pb.proxy.meta.PartitionDetailDefinition\"\xf7\x01\n\x0fIndexDefinition\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07version\x18\x02 \x01(\r\x12=\n\x0findex_partition\x18\x03 \x01(\x0b\x32$.dingodb.pb.proxy.meta.PartitionRule\x12\x0f\n\x07replica\x18\x04 \x01(\r\x12@\n\x0findex_parameter\x18\x05 \x01(\x0b\x32\'.dingodb.pb.proxy.common.IndexParameter\x12\x1b\n\x13with_auto_increment\x18\x06 \x01(\x08\x12\x16\n\x0e\x61uto_increment\x18\x07 \x01(\x04\"e\n\x12\x43reateIndexRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12:\n\ndefinition\x18\x02 \x01(\x0b\x32&.dingodb.pb.proxy.meta.IndexDefinition\"$\n\x13\x43reateIndexResponse\x12\r\n\x05state\x18\x01 \x01(\x08\"e\n\x12UpdateIndexRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12:\n\ndefinition\x18\x02 \x01(\x0b\x32&.dingodb.pb.proxy.meta.IndexDefinition\"$\n\x13UpdateIndexResponse\x12\r\n\x05state\x18\x01 \x01(\x08\"Y\n\x18UpdateMaxElementsRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x14\n\x0cmax_elements\x18\x03 \x01(\x05\"*\n\x19UpdateMaxElementsResponse\x12\r\n\x05state\x18\x01 \x01(\x08\"=\n\x12\x44\x65leteIndexRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\"$\n\x13\x44\x65leteIndexResponse\x12\r\n\x05state\x18\x01 \x01(\x08\":\n\x0fGetIndexRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\"N\n\x10GetIndexResponse\x12:\n\ndefinition\x18\x01 \x01(\x0b\x32&.dingodb.pb.proxy.meta.IndexDefinition\"(\n\x11GetIndexesRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\"Q\n\x12GetIndexesResponse\x12;\n\x0b\x64\x65\x66initions\x18\x01 \x03(\x0b\x32&.dingodb.pb.proxy.meta.IndexDefinition\"+\n\x14GetIndexNamesRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\"&\n\x15GetIndexNamesResponse\x12\r\n\x05names\x18\x01 \x03(\t\"A\n\x16GetIndexMetricsRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\"\x85\x02\n\x17GetIndexMetricsResponse\x12\x12\n\nrows_count\x18\x01 \x01(\x04\x12\x0f\n\x07min_key\x18\x02 \x01(\x0c\x12\x0f\n\x07max_key\x18\x03 \x01(\x0c\x12\x12\n\npart_count\x18\x04 \x01(\x04\x12<\n\nindex_type\x18\x05 \x01(\x0e\x32(.dingodb.pb.proxy.common.VectorIndexType\x12\x15\n\rcurrent_count\x18\x06 \x01(\x04\x12\x15\n\rdeleted_count\x18\x07 \x01(\x04\x12\x0e\n\x06max_id\x18\x08 \x01(\x04\x12\x0e\n\x06min_id\x18\t \x01(\x04\x12\x14\n\x0cmemory_bytes\x18\n \x01(\x04\x32\xd5\x06\n\x0bMetaService\x12\x64\n\x0b\x43reateIndex\x12).dingodb.pb.proxy.meta.CreateIndexRequest\x1a*.dingodb.pb.proxy.meta.CreateIndexResponse\x12\x64\n\x0bUpdateIndex\x12).dingodb.pb.proxy.meta.UpdateIndexRequest\x1a*.dingodb.pb.proxy.meta.UpdateIndexResponse\x12v\n\x11UpdateMaxElements\x12/.dingodb.pb.proxy.meta.UpdateMaxElementsRequest\x1a\x30.dingodb.pb.proxy.meta.UpdateMaxElementsResponse\x12\x64\n\x0b\x44\x65leteIndex\x12).dingodb.pb.proxy.meta.DeleteIndexRequest\x1a*.dingodb.pb.proxy.meta.DeleteIndexResponse\x12[\n\x08GetIndex\x12&.dingodb.pb.proxy.meta.GetIndexRequest\x1a\'.dingodb.pb.proxy.meta.GetIndexResponse\x12\x61\n\nGetIndexes\x12(.dingodb.pb.proxy.meta.GetIndexesRequest\x1a).dingodb.pb.proxy.meta.GetIndexesResponse\x12j\n\rGetIndexNames\x12+.dingodb.pb.proxy.meta.GetIndexNamesRequest\x1a,.dingodb.pb.proxy.meta.GetIndexNamesResponse\x12p\n\x0fGetIndexMetrics\x12-.dingodb.pb.proxy.meta.GetIndexMetricsRequest\x1a..dingodb.pb.proxy.meta.GetIndexMetricsResponseB\x1a\n\x15io.dingodb.proxy.meta\x88\x01\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10proxy_meta.proto\x12\x15\x64ingodb.pb.proxy.meta\x1a\x12proxy_common.proto\x1a\x11proxy_error.proto\"Q\n\x19PartitionDetailDefinition\x12\x11\n\tpart_name\x18\x01 \x01(\t\x12\x10\n\x08operator\x18\x02 \x01(\t\x12\x0f\n\x07operand\x18\x03 \x03(\t\"v\n\rPartitionRule\x12\x11\n\tfunc_name\x18\x01 \x01(\t\x12\x0f\n\x07\x63olumns\x18\x02 \x03(\t\x12\x41\n\x07\x64\x65tails\x18\x03 \x03(\x0b\x32\x30.dingodb.pb.proxy.meta.PartitionDetailDefinition\"\xf7\x01\n\x0fIndexDefinition\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07version\x18\x02 \x01(\r\x12=\n\x0findex_partition\x18\x03 \x01(\x0b\x32$.dingodb.pb.proxy.meta.PartitionRule\x12\x0f\n\x07replica\x18\x04 \x01(\r\x12@\n\x0findex_parameter\x18\x05 \x01(\x0b\x32\'.dingodb.pb.proxy.common.IndexParameter\x12\x1b\n\x13with_auto_increment\x18\x06 \x01(\x08\x12\x16\n\x0e\x61uto_increment\x18\x07 \x01(\x04\"e\n\x12\x43reateIndexRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12:\n\ndefinition\x18\x02 \x01(\x0b\x32&.dingodb.pb.proxy.meta.IndexDefinition\"R\n\x13\x43reateIndexResponse\x12,\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1d.dingodb.pb.proxy.error.Error\x12\r\n\x05state\x18\x02 \x01(\x08\"e\n\x12UpdateIndexRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12:\n\ndefinition\x18\x02 \x01(\x0b\x32&.dingodb.pb.proxy.meta.IndexDefinition\"R\n\x13UpdateIndexResponse\x12,\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1d.dingodb.pb.proxy.error.Error\x12\r\n\x05state\x18\x02 \x01(\x08\"Y\n\x18UpdateMaxElementsRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\x12\x14\n\x0cmax_elements\x18\x03 \x01(\x05\"X\n\x19UpdateMaxElementsResponse\x12,\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1d.dingodb.pb.proxy.error.Error\x12\r\n\x05state\x18\x02 \x01(\x08\"=\n\x12\x44\x65leteIndexRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\"R\n\x13\x44\x65leteIndexResponse\x12,\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1d.dingodb.pb.proxy.error.Error\x12\r\n\x05state\x18\x02 \x01(\x08\":\n\x0fGetIndexRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\"|\n\x10GetIndexResponse\x12,\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1d.dingodb.pb.proxy.error.Error\x12:\n\ndefinition\x18\x02 \x01(\x0b\x32&.dingodb.pb.proxy.meta.IndexDefinition\"(\n\x11GetIndexesRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\"\x7f\n\x12GetIndexesResponse\x12,\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1d.dingodb.pb.proxy.error.Error\x12;\n\x0b\x64\x65\x66initions\x18\x02 \x03(\x0b\x32&.dingodb.pb.proxy.meta.IndexDefinition\"+\n\x14GetIndexNamesRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\"T\n\x15GetIndexNamesResponse\x12,\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1d.dingodb.pb.proxy.error.Error\x12\r\n\x05names\x18\x02 \x03(\t\"A\n\x16GetIndexMetricsRequest\x12\x13\n\x0bschema_name\x18\x01 \x01(\t\x12\x12\n\nindex_name\x18\x02 \x01(\t\"\xb3\x02\n\x17GetIndexMetricsResponse\x12,\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1d.dingodb.pb.proxy.error.Error\x12\x12\n\nrows_count\x18\x02 \x01(\x04\x12\x0f\n\x07min_key\x18\x03 \x01(\x0c\x12\x0f\n\x07max_key\x18\x04 \x01(\x0c\x12\x12\n\npart_count\x18\x05 \x01(\x04\x12<\n\nindex_type\x18\x06 \x01(\x0e\x32(.dingodb.pb.proxy.common.VectorIndexType\x12\x15\n\rcurrent_count\x18\x07 \x01(\x04\x12\x15\n\rdeleted_count\x18\x08 \x01(\x04\x12\x0e\n\x06max_id\x18\t \x01(\x04\x12\x0e\n\x06min_id\x18\n \x01(\x04\x12\x14\n\x0cmemory_bytes\x18\x0b \x01(\x04\x32\xd5\x06\n\x0bMetaService\x12\x64\n\x0b\x43reateIndex\x12).dingodb.pb.proxy.meta.CreateIndexRequest\x1a*.dingodb.pb.proxy.meta.CreateIndexResponse\x12\x64\n\x0bUpdateIndex\x12).dingodb.pb.proxy.meta.UpdateIndexRequest\x1a*.dingodb.pb.proxy.meta.UpdateIndexResponse\x12v\n\x11UpdateMaxElements\x12/.dingodb.pb.proxy.meta.UpdateMaxElementsRequest\x1a\x30.dingodb.pb.proxy.meta.UpdateMaxElementsResponse\x12\x64\n\x0b\x44\x65leteIndex\x12).dingodb.pb.proxy.meta.DeleteIndexRequest\x1a*.dingodb.pb.proxy.meta.DeleteIndexResponse\x12[\n\x08GetIndex\x12&.dingodb.pb.proxy.meta.GetIndexRequest\x1a\'.dingodb.pb.proxy.meta.GetIndexResponse\x12\x61\n\nGetIndexes\x12(.dingodb.pb.proxy.meta.GetIndexesRequest\x1a).dingodb.pb.proxy.meta.GetIndexesResponse\x12j\n\rGetIndexNames\x12+.dingodb.pb.proxy.meta.GetIndexNamesRequest\x1a,.dingodb.pb.proxy.meta.GetIndexNamesResponse\x12p\n\x0fGetIndexMetrics\x12-.dingodb.pb.proxy.meta.GetIndexMetricsRequest\x1a..dingodb.pb.proxy.meta.GetIndexMetricsResponseB\x1a\n\x15io.dingodb.proxy.meta\x88\x01\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,44 +24,44 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\025io.dingodb.proxy.meta\210\001\001'
-  _globals['_PARTITIONDETAILDEFINITION']._serialized_start=63
-  _globals['_PARTITIONDETAILDEFINITION']._serialized_end=144
-  _globals['_PARTITIONRULE']._serialized_start=146
-  _globals['_PARTITIONRULE']._serialized_end=264
-  _globals['_INDEXDEFINITION']._serialized_start=267
-  _globals['_INDEXDEFINITION']._serialized_end=514
-  _globals['_CREATEINDEXREQUEST']._serialized_start=516
-  _globals['_CREATEINDEXREQUEST']._serialized_end=617
-  _globals['_CREATEINDEXRESPONSE']._serialized_start=619
-  _globals['_CREATEINDEXRESPONSE']._serialized_end=655
-  _globals['_UPDATEINDEXREQUEST']._serialized_start=657
-  _globals['_UPDATEINDEXREQUEST']._serialized_end=758
-  _globals['_UPDATEINDEXRESPONSE']._serialized_start=760
-  _globals['_UPDATEINDEXRESPONSE']._serialized_end=796
-  _globals['_UPDATEMAXELEMENTSREQUEST']._serialized_start=798
-  _globals['_UPDATEMAXELEMENTSREQUEST']._serialized_end=887
-  _globals['_UPDATEMAXELEMENTSRESPONSE']._serialized_start=889
-  _globals['_UPDATEMAXELEMENTSRESPONSE']._serialized_end=931
-  _globals['_DELETEINDEXREQUEST']._serialized_start=933
-  _globals['_DELETEINDEXREQUEST']._serialized_end=994
-  _globals['_DELETEINDEXRESPONSE']._serialized_start=996
-  _globals['_DELETEINDEXRESPONSE']._serialized_end=1032
-  _globals['_GETINDEXREQUEST']._serialized_start=1034
-  _globals['_GETINDEXREQUEST']._serialized_end=1092
-  _globals['_GETINDEXRESPONSE']._serialized_start=1094
-  _globals['_GETINDEXRESPONSE']._serialized_end=1172
-  _globals['_GETINDEXESREQUEST']._serialized_start=1174
-  _globals['_GETINDEXESREQUEST']._serialized_end=1214
-  _globals['_GETINDEXESRESPONSE']._serialized_start=1216
-  _globals['_GETINDEXESRESPONSE']._serialized_end=1297
-  _globals['_GETINDEXNAMESREQUEST']._serialized_start=1299
-  _globals['_GETINDEXNAMESREQUEST']._serialized_end=1342
-  _globals['_GETINDEXNAMESRESPONSE']._serialized_start=1344
-  _globals['_GETINDEXNAMESRESPONSE']._serialized_end=1382
-  _globals['_GETINDEXMETRICSREQUEST']._serialized_start=1384
-  _globals['_GETINDEXMETRICSREQUEST']._serialized_end=1449
-  _globals['_GETINDEXMETRICSRESPONSE']._serialized_start=1452
-  _globals['_GETINDEXMETRICSRESPONSE']._serialized_end=1713
-  _globals['_METASERVICE']._serialized_start=1716
-  _globals['_METASERVICE']._serialized_end=2569
+  _globals['_PARTITIONDETAILDEFINITION']._serialized_start=82
+  _globals['_PARTITIONDETAILDEFINITION']._serialized_end=163
+  _globals['_PARTITIONRULE']._serialized_start=165
+  _globals['_PARTITIONRULE']._serialized_end=283
+  _globals['_INDEXDEFINITION']._serialized_start=286
+  _globals['_INDEXDEFINITION']._serialized_end=533
+  _globals['_CREATEINDEXREQUEST']._serialized_start=535
+  _globals['_CREATEINDEXREQUEST']._serialized_end=636
+  _globals['_CREATEINDEXRESPONSE']._serialized_start=638
+  _globals['_CREATEINDEXRESPONSE']._serialized_end=720
+  _globals['_UPDATEINDEXREQUEST']._serialized_start=722
+  _globals['_UPDATEINDEXREQUEST']._serialized_end=823
+  _globals['_UPDATEINDEXRESPONSE']._serialized_start=825
+  _globals['_UPDATEINDEXRESPONSE']._serialized_end=907
+  _globals['_UPDATEMAXELEMENTSREQUEST']._serialized_start=909
+  _globals['_UPDATEMAXELEMENTSREQUEST']._serialized_end=998
+  _globals['_UPDATEMAXELEMENTSRESPONSE']._serialized_start=1000
+  _globals['_UPDATEMAXELEMENTSRESPONSE']._serialized_end=1088
+  _globals['_DELETEINDEXREQUEST']._serialized_start=1090
+  _globals['_DELETEINDEXREQUEST']._serialized_end=1151
+  _globals['_DELETEINDEXRESPONSE']._serialized_start=1153
+  _globals['_DELETEINDEXRESPONSE']._serialized_end=1235
+  _globals['_GETINDEXREQUEST']._serialized_start=1237
+  _globals['_GETINDEXREQUEST']._serialized_end=1295
+  _globals['_GETINDEXRESPONSE']._serialized_start=1297
+  _globals['_GETINDEXRESPONSE']._serialized_end=1421
+  _globals['_GETINDEXESREQUEST']._serialized_start=1423
+  _globals['_GETINDEXESREQUEST']._serialized_end=1463
+  _globals['_GETINDEXESRESPONSE']._serialized_start=1465
+  _globals['_GETINDEXESRESPONSE']._serialized_end=1592
+  _globals['_GETINDEXNAMESREQUEST']._serialized_start=1594
+  _globals['_GETINDEXNAMESREQUEST']._serialized_end=1637
+  _globals['_GETINDEXNAMESRESPONSE']._serialized_start=1639
+  _globals['_GETINDEXNAMESRESPONSE']._serialized_end=1723
+  _globals['_GETINDEXMETRICSREQUEST']._serialized_start=1725
+  _globals['_GETINDEXMETRICSREQUEST']._serialized_end=1790
+  _globals['_GETINDEXMETRICSRESPONSE']._serialized_start=1793
+  _globals['_GETINDEXMETRICSRESPONSE']._serialized_end=2100
+  _globals['_METASERVICE']._serialized_start=2103
+  _globals['_METASERVICE']._serialized_end=2956
 # @@protoc_insertion_point(module_scope)

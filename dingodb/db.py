@@ -44,9 +44,6 @@ class DingoDB:
     def make_response(self, res, deal="default"):
         res_json = res.json()
         if res_json.get("status") == 200:
-            if deal == "vector_count":
-                res_data = res_json.get("data")
-                return res_data.get("currentCount") - res_data.get("deletedCount")
             return res_json.get("data")
         else:
             raise RuntimeError(res_json)
@@ -246,11 +243,28 @@ class DingoDB:
             int: count num
         """
         res = self.session.get(
+            f"{self.requestProto}{self.host[0]}{self.vectorApi}{index_name}/count",
+            headers=self.headers,
+        )
+
+        return self.make_response(res)
+
+    def vector_metrics(self, index_name: str):
+        """
+        vector_metrics metrics in index
+
+        Args:
+            index_name (str): the name of in index
+
+        Returns:
+            dict: metrics info
+        """
+        res = self.session.get(
             f"{self.requestProto}{self.host[0]}{self.vectorApi}{index_name}",
             headers=self.headers,
         )
 
-        return self.make_response(res, deal="vector_count")
+        return self.make_response(res)
 
     def vector_scan(
         self,
