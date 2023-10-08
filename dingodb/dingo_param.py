@@ -177,6 +177,12 @@ class CheckVectorSearchParam(BaseModel):
         if not isinstance(value[0], list):
             value = [value]
         return value
+    
+    @validator("top_k", pre=True, always=True)
+    def check_top_k(cls, value, field):
+        if not value > 0:
+            raise ValueError(f"{field.name} must > 0")
+        return value
 
     @validator("search_params", always=True)
     def check_search_params(cls, search_params, values):

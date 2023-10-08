@@ -17,8 +17,8 @@ from .dingo_param import (
 class DingoDB:
     headers = {"Content-Type": "application/json"}
     requestProto = "http://"
-    indexApi = "/index/api/dingo/"
-    vectorApi = "/vector/api/dingo/"
+    indexApi = "/index/api/DINGO/"
+    vectorApi = "/vector/api/DINGO/"
 
     def __init__(self, user: str, password: str, host: list) -> None:
         """
