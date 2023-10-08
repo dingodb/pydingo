@@ -26,6 +26,7 @@ class GrpcDingoDB:
         self._get_channel(host, timeout)
         self.index_stub = IndexServiceStub(self._channel)
         self.meta_stub = MetaServiceStub(self._channel)
+        self.schema_name = "DINGO"
 
     def _get_channel(self, host, timeout):
         self.opts = [
@@ -59,7 +60,7 @@ class GrpcDingoDB:
         """
 
         describe_index_request = GetIndexRequest(
-            schema_name="dingo", index_name=index_name
+            schema_name=self.schema_name, index_name=index_name
         )
 
         describe_index_response = self.meta_stub.GetIndex.future(describe_index_request)
@@ -84,7 +85,7 @@ class GrpcDingoDB:
             List[dict]: index info
         """
 
-        describe_indexes_request = GetIndexesRequest(schema_name="dingo")
+        describe_indexes_request = GetIndexesRequest(schema_name=self.schema_name)
 
         describe_indexes_response = self.meta_stub.GetIndexes.future(
             describe_indexes_request
@@ -156,7 +157,7 @@ class GrpcDingoDB:
                     )
                 )
         vec_create_request = CreateIndexRequest(
-            schema_name="dingo",
+            schema_name=self.schema_name,
             definition=IndexDefinition(
                 auto_increment=params.start_id if params.auto_id else 0,
                 name=params.index_name,
@@ -197,7 +198,7 @@ class GrpcDingoDB:
         """
 
         update_index_max_element_request = UpdateMaxElementsRequest(
-            schema_name="dingo", index_name=index_name, max_elements=max_element
+            schema_name=self.schema_name, index_name=index_name, max_elements=max_element
         )
 
         update_index_max_element_response = self.meta_stub.UpdateMaxElements.future(
@@ -226,7 +227,7 @@ class GrpcDingoDB:
         """
         # "name", "version", "index_partition", "replica", "index_parameter", "with_auto_increment", "auto_increment"
         update_index_request = UpdateIndexRequest(
-            schema_name="dingo", definition=ParseDict(definition, IndexDefinition())
+            schema_name=self.schema_name, definition=ParseDict(definition, IndexDefinition())
         )
 
         update_index_response = self.meta_stub.UpdateIndex.future(update_index_request)
@@ -250,7 +251,7 @@ class GrpcDingoDB:
             bool: True/False
         """
         del_index_request = DeleteIndexRequest(
-            schema_name="dingo", index_name=index_name
+            schema_name=self.schema_name, index_name=index_name
         )
 
         del_index_response = self.meta_stub.DeleteIndex.future(del_index_request)
@@ -289,7 +290,7 @@ class GrpcDingoDB:
         )
 
         vec_add_request = VectorAddRequest(
-            schema_name="dingo", index_name=params.index_name
+            schema_name=self.schema_name, index_name=params.index_name
         )
         for i, v in enumerate(params.vectors):
             vec_grpc = VectorWithId()
@@ -328,7 +329,7 @@ class GrpcDingoDB:
             int: count num
         """
         vec_count_request = VectorCountRequest(
-            schema_name="dingo", index_name=index_name
+            schema_name=self.schema_name, index_name=index_name
         )
         vec_count_response = self.index_stub.VectorCount.future(vec_count_request)
 
@@ -348,7 +349,7 @@ class GrpcDingoDB:
             dict: metrics
         """
         vec_metrics_request = VectorGetRegionMetricsRequest(
-            schema_name="dingo", index_name=index_name
+            schema_name=self.schema_name, index_name=index_name
         )
         vec_metrics_response = self.index_stub.VectorGetRegionMetrics.future(
             vec_metrics_request
@@ -408,7 +409,7 @@ class GrpcDingoDB:
         )
 
         vec_scan_request = VectorScanQueryRequest(
-            schema_name="dingo",
+            schema_name=self.schema_name,
             index_name=params.index_name,
             vector_id_end=params.end_id,
             max_scan_count=params.max_count,
@@ -450,7 +451,7 @@ class GrpcDingoDB:
             list: all index list
         """
 
-        get_index_name_request = GetIndexNamesRequest(schema_name="dingo")
+        get_index_name_request = GetIndexNamesRequest(schema_name=self.schema_name)
 
         get_index_name_response = self.meta_stub.GetIndexNames.future(
             get_index_name_request
@@ -476,7 +477,7 @@ class GrpcDingoDB:
             int: max id value
         """
         vec_max_id_request = VectorGetBorderIdRequest(
-            schema_name="dingo", index_name=index_name, get_min=get_min
+            schema_name=self.schema_name, index_name=index_name, get_min=get_min
         )
 
         vec_max_id_response = self.index_stub.VectorGetBorderId.future(
@@ -551,7 +552,7 @@ class GrpcDingoDB:
         )
 
         vec_get_request = VectorGetRequest(
-            schema_name="dingo",
+            schema_name=self.schema_name,
             index_name=params.index_name,
             vector_ids=params.ids,
             without_vector_data=not vector,
@@ -586,7 +587,7 @@ class GrpcDingoDB:
         params = CheckVectorDeleteParam(index_name=index_name, ids=ids)
 
         vec_del_request = VectorDeleteRequest(
-            schema_name="dingo", index_name=params.index_name, ids=params.ids
+            schema_name=self.schema_name, index_name=params.index_name, ids=params.ids
         )
 
         vec_del_response = self.index_stub.VectorDelete.future(vec_del_request)
