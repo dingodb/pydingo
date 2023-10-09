@@ -44,6 +44,8 @@ class DingoDB:
     def make_response(self, res, deal="default"):
         res_json = res.json()
         if res_json.get("status") == 200:
+            if res_json.get("message") != 'OK':
+                return res_json
             return res_json.get("data")
         else:
             raise RuntimeError(res_json)

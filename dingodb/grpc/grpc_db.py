@@ -314,6 +314,8 @@ class GrpcDingoDB:
                 self.convert_message_to_dict(vec)
                 for vec in vec_add_response.result().vectors
             )
+            if vec_add_response.result().error.errmsg:
+                return {"message": vec_add_response.result().error.errmsg, "data": add_res}
             return add_res
         else:
             raise RuntimeError(vec_add_response.result().error.errmsg)
