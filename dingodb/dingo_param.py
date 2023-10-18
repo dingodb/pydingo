@@ -12,6 +12,83 @@ class CheckClintParam(BaseModel):
     host: List[str]
 
 
+class CheckUpdateIndexParam(BaseModel):
+    index_name: str
+    dimension: int = None
+    index_type: str = None
+    metric_type: str = None
+    replicas: int = None
+    index_config: dict = None
+    auto_id: bool = None
+    start_id: int = None
+    index_info: dict = None
+
+    @validator("index_info", always=True)
+    def check_index_config(cls, value, values):
+        index_param = {
+            v["vectorIndexType"]: list(v.keys())[0]
+            for k, v in config.index_config.items()
+        }
+        index_param_type = {
+            k: v["vectorIndexType"] for k, v in config.index_config.items()
+        }
+        index_type = values.get("index_type")
+        metric_type = values.get("metric_type")
+        dimension = values.get("dimension")
+        replicas = values.get("replicas")
+        index_config = values.get("index_config")
+        auto_id = values.get("auto_id")
+        start_id = values.get("start_id")
+        ori_index_type = value["indexParameter"]["vectorIndexParameter"][
+            "vectorIndexType"
+        ]
+        ori_index_params = value["indexParameter"]["vectorIndexParameter"][
+            index_param[ori_index_type]
+        ]
+
+        if replicas is not None:
+            value["replica"] = replicas
+
+        if start_id is not None:
+            value["autoIncrement"] = start_id
+
+        if auto_id is not None:
+            value["isAutoIncrement"] = "true" if auto_id else "false"
+        else:
+            value["isAutoIncrement"] = "true" if value["isAutoIncrement"] else "false"
+
+        if dimension is not None:
+            ori_index_params["dimension"] = dimension
+        if metric_type is not None:
+            ori_index_params["metricType"] = config.metric_type[metric_type]
+
+        if index_config:
+            if "efConstruction" in index_config:
+                ori_index_params["efConstruction"] = index_config["efConstruction"]
+            if "maxElements" in index_config:
+                ori_index_params["maxElements"] = index_config["maxElements"]
+            if "nlinks" in index_config:
+                ori_index_params["nlinks"] = index_config["nlinks"]
+
+        if index_type is not None:
+            value["indexParameter"]["vectorIndexParameter"][
+                "vectorIndexType"
+            ] = index_param_type[index_type]
+
+            if index_param_type[index_type] != ori_index_type and index_type == "hnsw":
+                if "efConstruction" not in ori_index_params:
+                    ori_index_params["efConstruction"] = 200
+                if "maxElements" not in ori_index_params:
+                    ori_index_params["maxElements"] = 50000
+                if "nlinks" not in ori_index_params:
+                    ori_index_params["nlinks"] = 32
+
+            value["indexParameter"]["vectorIndexParameter"][
+                index_param[index_param_type[index_type]]
+            ] = ori_index_params
+        return value
+
+
 class CheckCreateIndexParam(BaseModel):
     index_name: str
     dimension: int
@@ -140,10 +217,12 @@ class CheckVectorScanParam(BaseModel):
             raise ValueError(f"{field.name} must > 0")
         return value
 
-    @validator("is_reverse", "without_scalar_data", "without_table_data", pre=True, always=True)
+    @validator(
+        "is_reverse", "without_scalar_data", "without_table_data", pre=True, always=True
+    )
     def check_boolean_fields(cls, value):
         return "true" if value else "false"
-    
+
     @validator("without_vector_data", pre=True, always=True)
     def check_without_vector_data(cls, value):
         return "true" if value else "false"
@@ -177,7 +256,7 @@ class CheckVectorSearchParam(BaseModel):
         if not isinstance(value[0], list):
             value = [value]
         return value
-    
+
     @validator("top_k", pre=True, always=True)
     def check_top_k(cls, value, field):
         if not value > 0:
@@ -199,17 +278,20 @@ class CheckVectorSearchParam(BaseModel):
         ef_search = 32 if search_params is None else search_params.get("efSearch", 32)
         assert ef_search >= 0, f"efSearch must >= 0, but get {ef_search}"
 
-
         with_Scalar_data = "false"
         with_vector_data = "false"
         if search_params is not None:
             if search_params.get("withScalarData") is not None:
                 with_Scalar_data = search_params.get("withScalarData")
-                with_Scalar_data = "false" if with_Scalar_data is None else with_Scalar_data
-            
+                with_Scalar_data = (
+                    "false" if with_Scalar_data is None else with_Scalar_data
+                )
+
             if search_params.get("withVectorData") is not None:
                 with_vector_data = search_params.get("withVectorData")
-                with_vector_data = "false" if with_vector_data is None else with_vector_data
+                with_vector_data = (
+                    "false" if with_vector_data is None else with_vector_data
+                )
 
         payload = {
             "parameter": {

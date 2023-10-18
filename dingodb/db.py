@@ -11,6 +11,7 @@ from .dingo_param import (
     CheckVectorGetParam,
     CheckVectorScanParam,
     CheckVectorSearchParam,
+    CheckUpdateIndexParam,
 )
 
 
@@ -168,7 +169,51 @@ class DingoDB:
             f"{self.requestProto}{self.host[0]}{self.indexApi}{index_name}/{max_element}"
         )
         return self.make_response(res)
+    
+    def modify_index_config(self, 
+        index_name: str,
+        dimension: int = None,
+        index_type: str = None,
+        metric_type: str = None,
+        replicas: int = None,
+        index_config: dict = None,
+        auto_id: bool = None,
+        start_id: int = None,):
+        """
+        modify_index_config modify index config
 
+        Args:
+            index_name (str): the name of index
+            dimension (int): dimension of vector
+            index_type (str, optional): index type, one of {"flat", "hnsw"}. Defaults to "hnsw".
+            metric_type (str, optional): metric type, one of {"dotproduct", "euclidean", "cosine"}. Defaults to "cosine"
+            replicas (int, optional): dingoDB store replicas. Defaults to 3.
+            index_config (dict, optional): Advanced configuration options for the index. Defaults to None.
+            metadata_config (dict, optional): metadata. Defaults to None.
+            auto_id (bool, optional): isAutoIncrement or not isAutoIncrement. Defaults to True.
+            start_id (int, optional): autoIncrement start id. Defaults to 1.
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            bool: modify table status
+        """
+        index_info = self.describe_index_info(index_name)
+        params = CheckUpdateIndexParam(index_name=index_name, dimension=dimension, index_type=index_type, metric_type=metric_type, replicas=replicas,index_config=index_config, auto_id=auto_id,start_id=start_id, index_info=index_info)
+        del_index = self.delete_index(index_name)
+        res = self.session.post(
+            f"{self.requestProto}{self.host[0]}{self.indexApi}",
+            headers=self.headers,
+            data=json.dumps(params.index_info),
+        )
+        res_json = res.json()
+        if del_index and res_json.get("status") == 200:
+            index_info = self.describe_index_info(index_name)
+            return index_info
+        else: 
+            raise Exception(f"modify failed {del_index} {res_json}")
+        
     def delete_index(self, index_name: str) -> bool:
         """
         delete_index del/drop index
