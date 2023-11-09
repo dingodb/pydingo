@@ -12,83 +12,6 @@ class CheckClintParam(BaseModel):
     host: List[str]
 
 
-class CheckUpdateIndexParam(BaseModel):
-    index_name: str
-    dimension: int = None
-    index_type: str = None
-    metric_type: str = None
-    replicas: int = None
-    index_config: dict = None
-    auto_id: bool = None
-    start_id: int = None
-    index_info: dict = None
-
-    @validator("index_info", always=True)
-    def check_index_config(cls, value, values):
-        index_param = {
-            v["vectorIndexType"]: list(v.keys())[0]
-            for k, v in config.index_config.items()
-        }
-        index_param_type = {
-            k: v["vectorIndexType"] for k, v in config.index_config.items()
-        }
-        index_type = values.get("index_type")
-        metric_type = values.get("metric_type")
-        dimension = values.get("dimension")
-        replicas = values.get("replicas")
-        index_config = values.get("index_config")
-        auto_id = values.get("auto_id")
-        start_id = values.get("start_id")
-        ori_index_type = value["indexParameter"]["vectorIndexParameter"][
-            "vectorIndexType"
-        ]
-        ori_index_params = value["indexParameter"]["vectorIndexParameter"][
-            index_param[ori_index_type]
-        ]
-
-        if replicas is not None:
-            value["replica"] = replicas
-
-        if start_id is not None:
-            value["autoIncrement"] = start_id
-
-        if auto_id is not None:
-            value["isAutoIncrement"] = "true" if auto_id else "false"
-        else:
-            value["isAutoIncrement"] = "true" if value["isAutoIncrement"] else "false"
-
-        if dimension is not None:
-            ori_index_params["dimension"] = dimension
-        if metric_type is not None:
-            ori_index_params["metricType"] = config.metric_type[metric_type]
-
-        if index_config:
-            if "efConstruction" in index_config:
-                ori_index_params["efConstruction"] = index_config["efConstruction"]
-            if "maxElements" in index_config:
-                ori_index_params["maxElements"] = index_config["maxElements"]
-            if "nlinks" in index_config:
-                ori_index_params["nlinks"] = index_config["nlinks"]
-
-        if index_type is not None:
-            value["indexParameter"]["vectorIndexParameter"][
-                "vectorIndexType"
-            ] = index_param_type[index_type]
-
-            if index_param_type[index_type] != ori_index_type and index_type == "hnsw":
-                if "efConstruction" not in ori_index_params:
-                    ori_index_params["efConstruction"] = 200
-                if "maxElements" not in ori_index_params:
-                    ori_index_params["maxElements"] = 50000
-                if "nlinks" not in ori_index_params:
-                    ori_index_params["nlinks"] = 32
-
-            value["indexParameter"]["vectorIndexParameter"][
-                index_param[index_param_type[index_type]]
-            ] = ori_index_params
-        return value
-
-
 class CheckCreateIndexParam(BaseModel):
     index_name: str
     dimension: int
@@ -137,18 +60,40 @@ class CheckCreateIndexParam(BaseModel):
                     vector_index_parameter[list(vector_index_parameter.keys())[0]][
                         key
                     ] = v
-                    if key == "efConstruction" and (v > 500 or v < 100):
+                    if key == "efConstruction":
                         if v < 0:
                             raise Exception(f"{key} must >= 0")
-                        warnings.warn(f"efConstruction: {v} suggestion in 100-500")
-                    if key == "maxElements" and (v > 1000000000 or v < 50000):
+                        if v > 500 or v < 100:
+                            warnings.warn(f"efConstruction: {v} suggestion in 100-500")
+                    if key == "maxElements":
                         if v < 0:
                             raise Exception(f"{key} must >= 0")
-                        warnings.warn(f"maxElements:{v} suggestion in 50000-1000000000")
-                    if key == "nlinks" and (v > 64 or v < 16):
+                        if v > 1000000000 or v < 50000:
+                            warnings.warn(
+                                f"maxElements:{v} suggestion in 50000-1000000000"
+                            )
+                    if key == "nlinks":
                         if v < 0:
                             raise Exception(f"{key} must >= 0")
-                        warnings.warn(f"nlinks:{v} suggestion in 16-64")
+                        if v > 64 or v < 16:
+                            warnings.warn(f"nlinks:{v} suggestion in 16-64")
+
+                    if key == "nsubvector":
+                        if v <= 0:
+                            raise Exception(f"{key} must > 0")
+                        if v > 256 or v < 4:
+                            warnings.warn(f"nsubvector:{v} suggestion in 4-256")
+                    if key == "ncentroids":
+                        if v <= 0:
+                            raise Exception(f"{key} must > 0")
+                        if v > 4096 or v < 4:
+                            warnings.warn(f"ncentroids:{v} suggestion in 4-4096")
+                    if key == "bucketInitSize":
+                        if v <= 0:
+                            raise Exception(f"{key} must > 0")
+                    if key == "bucketMaxSize":
+                        if v <= 0:
+                            raise Exception(f"{key} must > 0")
                 else:
                     warnings.warn(f"index_config {key} not in {index_type}")
 
@@ -278,6 +223,13 @@ class CheckVectorSearchParam(BaseModel):
         ef_search = 32 if search_params is None else search_params.get("efSearch", 32)
         assert ef_search >= 0, f"efSearch must >= 0, but get {ef_search}"
 
+        nprobe = 16 if search_params is None else search_params.get("nprobe", 16)
+        assert nprobe > 0, f"nprobe must > 0, but get {nprobe}"
+        recallNum = (
+            100 if search_params is None else search_params.get("recallNum", 100)
+        )
+        assert recallNum > 0, f"recallNum must > 0, but get {recallNum}"
+
         with_Scalar_data = "false"
         with_vector_data = "false"
         if search_params is not None:
@@ -292,15 +244,19 @@ class CheckVectorSearchParam(BaseModel):
                 with_vector_data = (
                     "false" if with_vector_data is None else with_vector_data
                 )
-
+        parallel = (
+            0 if search_params is None else search_params.get("parallelOnQueries", 0)
+        )
         payload = {
             "parameter": {
                 "search": {
                     "hnswParam": {"efSearch": ef_search},
-                    "flat": {
-                        "parallelOnQueries": 0
-                        if search_params is None
-                        else search_params.get("parallelOnQueries", 0)
+                    "flat": {"parallelOnQueries": parallel},
+                    "ivfFlatParam": {"nprobe": nprobe, "parallelOnQueries": parallel},
+                    "ivfPqParam": {
+                        "nprobe": nprobe,
+                        "parallelOnQueries": parallel,
+                        "recallNum": recallNum,
                     },
                 },
                 "selectedKeys": [],

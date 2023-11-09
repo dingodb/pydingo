@@ -61,18 +61,41 @@ class CheckCreateIndexParam(BaseModel):
                     vector_index_parameter[list(vector_index_parameter.keys())[1]][
                         key
                     ] = v
-                    if key == "efConstruction" and (v > 500 or v < 100):
+                    if key == "efConstruction":
                         if v < 0:
                             raise Exception(f"{key} must >= 0")
-                        warnings.warn(f"efConstruction: {v} suggestion in 100-500")
-                    if key == "maxElements" and (v > 1000000000 or v < 50000):
+                        if v > 500 or v < 100:
+                            warnings.warn(f"efConstruction: {v} suggestion in 100-500")
+                    if key == "maxElements":
                         if v < 0:
                             raise Exception(f"{key} must >= 0")
-                        warnings.warn(f"maxElements:{v} suggestion in 50000-1000000000")
-                    if key == "nlinks" and (v > 64 or v < 16):
+                        if v > 1000000000 or v < 50000:
+                            warnings.warn(
+                                f"maxElements:{v} suggestion in 50000-1000000000"
+                            )
+                    if key == "nlinks":
                         if v < 0:
                             raise Exception(f"{key} must >= 0")
-                        warnings.warn(f"nlinks:{v} suggestion in 16-64")
+                        if v > 64 or v < 16:
+                            warnings.warn(f"nlinks:{v} suggestion in 16-64")
+
+                    if key == "nsubvector":
+                        if v <= 0:
+                            raise Exception(f"{key} must > 0")
+                        if v > 256 or v < 4:
+                            warnings.warn(f"nsubvector:{v} suggestion in 4-256")
+                    if key == "ncentroids":
+                        if v <= 0:
+                            raise Exception(f"{key} must > 0")
+                        if v > 4096 or v < 4:
+                            warnings.warn(f"ncentroids:{v} suggestion in 4-4096")
+                    if key == "bucketInitSize":
+                        if v <= 0:
+                            raise Exception(f"{key} must > 0")
+                    if key == "bucketMaxSize":
+                        if v <= 0:
+                            raise Exception(f"{key} must > 0")
+
                 else:
                     warnings.warn(f"index_config {key} not in {index_type}")
 
@@ -141,10 +164,17 @@ class CheckVectorScanParam(BaseModel):
             raise ValueError(f"{field.name} must > 0")
         return value
 
-    @validator("is_reverse", "without_vector_data", "without_scalar_data", "without_table_data", pre=True, always=True)
+    @validator(
+        "is_reverse",
+        "without_vector_data",
+        "without_scalar_data",
+        "without_table_data",
+        pre=True,
+        always=True,
+    )
     def check_boolean_fields(cls, value):
         return "true" if value else "false"
-    
+
     @validator("fields", pre=True, always=True)
     def check_fields(cls, value):
         return value or []
@@ -160,6 +190,7 @@ class CheckVectorScanParam(BaseModel):
 class CheckVectorSearchParam(BaseModel):
     index_name: str
     xq: list
+    index_type: str
     top_k: int = 10
     fields: list = None
     pre_filter: bool = True
@@ -170,7 +201,7 @@ class CheckVectorSearchParam(BaseModel):
         if not isinstance(value[0], list):
             value = [value]
         return value
-    
+
     @validator("top_k", pre=True, always=True)
     def check_top_k(cls, value, field):
         if not value > 0:
@@ -190,19 +221,14 @@ class CheckVectorSearchParam(BaseModel):
         )
 
         with_vector_data = (
-            True
-            if search_params is None
-            else search_params.get("withVectorData", True)
+            True if search_params is None else search_params.get("withVectorData", True)
         )
-        parameter.without_vector_data = False
+        parameter.without_vector_data = not with_vector_data
 
-        
         with_scalar_data = (
-            True 
-            if search_params is None 
-            else search_params.get("withScalarData", True)
+            True if search_params is None else search_params.get("withScalarData", True)
         )
-        parameter.without_scalar_data = False
+        parameter.without_scalar_data = not with_scalar_data
 
         vec_search_request = VectorSearchRequest(
             schema_name="dingo", index_name=values.get("index_name")
@@ -231,16 +257,44 @@ class CheckVectorSearchParam(BaseModel):
 
             vec_search_request.vectors.append(vec_with_id)
 
-        ef_search = 32 if search_params is None else search_params.get("efSearch", 32)
-        assert ef_search >= 0, f"efSearch must >= 0, but get {ef_search}"
-
-        parameter.hnsw.CopyFrom(SearchHNSWParam(efSearch=ef_search))
-        if search_params and "parallelOnQueries" in search_params.keys():
+        nprobe = 16 if search_params is None else search_params.get("nprobe", 16)
+        assert nprobe > 0, f"nprobe must > 0, but get {nprobe}"
+        recallNum = (
+            100 if search_params is None else search_params.get("recallNum", 100)
+        )
+        assert recallNum > 0, f"recallNum must > 0, but get {recallNum}"
+        index_type = values.get("index_type")
+        if index_type == "VECTOR_INDEX_TYPE_HNSW":
+            ef_search = (
+                32 if search_params is None else search_params.get("efSearch", 32)
+            )
+            assert ef_search >= 0, f"efSearch must >= 0, but get {ef_search}"
+            parameter.hnsw.CopyFrom(SearchHNSWParam(efSearch=ef_search))
+        elif index_type == "VECTOR_INDEX_TYPE_FLAT":
             parameter.flat.CopyFrom(
                 SearchFlatParam(
                     parallel_on_queries=0
                     if search_params is None
                     else search_params.get("parallelOnQueries", 0)
+                )
+            )
+        elif index_type == "VECTOR_INDEX_TYPE_IVF_FLAT":
+            parameter.ivf_flat.CopyFrom(
+                SearchIvfFlatParam(
+                    parallel_on_queries=0
+                    if search_params is None
+                    else search_params.get("parallelOnQueries", 0),
+                    nprobe=nprobe,
+                )
+            )
+        elif index_type == "VECTOR_INDEX_TYPE_IVF_PQ":
+            parameter.ivf_pq.CopyFrom(
+                SearchIvfPqParam(
+                    nprobe=nprobe,
+                    parallel_on_queries=0
+                    if search_params is None
+                    else search_params.get("parallelOnQueries", 0),
+                    recall_num=recallNum,
                 )
             )
 

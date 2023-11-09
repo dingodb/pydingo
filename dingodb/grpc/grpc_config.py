@@ -32,7 +32,8 @@ index_config = {
                 metric_type=None,
                 ncentroids=256,
                 nsubvector=8,
-                bucket_init_size=0,
+                bucket_init_size=1000,
+                bucket_max_size=128000
             ),
             vector_index_type=VECTOR_INDEX_TYPE_IVF_PQ,
         ),
