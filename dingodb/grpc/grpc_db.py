@@ -118,7 +118,7 @@ class GrpcDingoDB:
         Args:
             index_name (str): the name of index
             dimension (int): dimension of vector
-            index_type (str, optional): index type, one of {"flat", "hnsw"}. Defaults to "hnsw".
+            index_type (str, optional): index type, one of {"flat", "hnsw", ,"ivf_flat", "ivf_pq"}. Defaults to "hnsw".
             metric_type (str, optional): metric type, one of {"dotproduct", "euclidean", "cosine"}. Defaults to "cosine"
             replicas (int, optional): dingoDB store replicas. Defaults to 3.
             index_config (dict, optional): Advanced configuration options for the index. Defaults to None.
@@ -198,7 +198,9 @@ class GrpcDingoDB:
         """
 
         update_index_max_element_request = UpdateMaxElementsRequest(
-            schema_name=self.schema_name, index_name=index_name, max_elements=max_element
+            schema_name=self.schema_name,
+            index_name=index_name,
+            max_elements=max_element,
         )
 
         update_index_max_element_response = self.meta_stub.UpdateMaxElements.future(
@@ -227,7 +229,8 @@ class GrpcDingoDB:
         """
         # "name", "version", "index_partition", "replica", "index_parameter", "with_auto_increment", "auto_increment"
         update_index_request = UpdateIndexRequest(
-            schema_name=self.schema_name, definition=ParseDict(definition, IndexDefinition())
+            schema_name=self.schema_name,
+            definition=ParseDict(definition, IndexDefinition()),
         )
 
         update_index_response = self.meta_stub.UpdateIndex.future(update_index_request)
@@ -315,7 +318,10 @@ class GrpcDingoDB:
                 for vec in vec_add_response.result().vectors
             )
             if vec_add_response.result().error.errmsg:
-                return {"message": vec_add_response.result().error.errmsg, "data": add_res}
+                return {
+                    "message": vec_add_response.result().error.errmsg,
+                    "data": add_res,
+                }
             return add_res
         else:
             raise RuntimeError(vec_add_response.result().error.errmsg)
@@ -514,9 +520,15 @@ class GrpcDingoDB:
         Returns:
             List[dict]: search results
         """
+        index_info = self.describe_index_info(index_name)
+        index_type = index_info["indexParameter"]["vectorIndexParameter"][
+            "vectorIndexType"
+        ]
+
         params = CheckVectorSearchParam(
             index_name=index_name,
             xq=xq,
+            index_type=index_type,
             top_k=top_k,
             pre_filter=pre_filter,
             search_params=search_params,

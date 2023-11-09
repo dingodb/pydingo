@@ -24,8 +24,8 @@ index_config = {
             },
     "ivf_pq": {
                 "ivfPqParam": {
-                    "bucketInitSize": 0,
-                    "bucketMaxSize": 0,
+                    "bucketInitSize": 1000,
+                    "bucketMaxSize": 128000,
                     "dimension": None,
                     "metricType": None,
                     "ncentroids": 256,
