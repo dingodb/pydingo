@@ -29,7 +29,8 @@ index_config = {
                     "dimension": None,
                     "metricType": None,
                     "ncentroids": 256,
-                    "nsubvector": 8
+                    "nsubvector": 8,
+                    "nbitsPerIdx": 0
                 },
                 "vectorIndexType": "VECTOR_INDEX_TYPE_IVF_PQ"
             },
