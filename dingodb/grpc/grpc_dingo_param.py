@@ -80,6 +80,8 @@ class CheckCreateIndexParam(BaseModel):
                             warnings.warn(f"nlinks:{v} suggestion in 16-64")
 
                     if key == "nsubvector":
+                        if dimension % v != 0:
+                            raise Exception(f"dimension/nsubvector must Divisible")
                         if v <= 0:
                             raise Exception(f"{key} must > 0")
                         if v > 256 or v < 4:
@@ -95,6 +97,9 @@ class CheckCreateIndexParam(BaseModel):
                     if key == "bucketMaxSize":
                         if v <= 0:
                             raise Exception(f"{key} must > 0")
+                    if key == "nbitsPerIdx":
+                        if v < 0:
+                            raise Exception(f"{key} must >= 0")
 
                 else:
                     warnings.warn(f"index_config {key} not in {index_type}")

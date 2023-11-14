@@ -220,20 +220,22 @@ class CreateIvfFlatParam(_message.Message):
     def __init__(self, dimension: _Optional[int] = ..., metric_type: _Optional[_Union[MetricType, str]] = ..., ncentroids: _Optional[int] = ...) -> None: ...
 
 class CreateIvfPqParam(_message.Message):
-    __slots__ = ["dimension", "metric_type", "ncentroids", "nsubvector", "bucket_init_size", "bucket_max_size"]
+    __slots__ = ["dimension", "metric_type", "ncentroids", "nsubvector", "bucket_init_size", "bucket_max_size", "nbits_per_idx"]
     DIMENSION_FIELD_NUMBER: _ClassVar[int]
     METRIC_TYPE_FIELD_NUMBER: _ClassVar[int]
     NCENTROIDS_FIELD_NUMBER: _ClassVar[int]
     NSUBVECTOR_FIELD_NUMBER: _ClassVar[int]
     BUCKET_INIT_SIZE_FIELD_NUMBER: _ClassVar[int]
     BUCKET_MAX_SIZE_FIELD_NUMBER: _ClassVar[int]
+    NBITS_PER_IDX_FIELD_NUMBER: _ClassVar[int]
     dimension: int
     metric_type: MetricType
     ncentroids: int
     nsubvector: int
     bucket_init_size: int
     bucket_max_size: int
-    def __init__(self, dimension: _Optional[int] = ..., metric_type: _Optional[_Union[MetricType, str]] = ..., ncentroids: _Optional[int] = ..., nsubvector: _Optional[int] = ..., bucket_init_size: _Optional[int] = ..., bucket_max_size: _Optional[int] = ...) -> None: ...
+    nbits_per_idx: int
+    def __init__(self, dimension: _Optional[int] = ..., metric_type: _Optional[_Union[MetricType, str]] = ..., ncentroids: _Optional[int] = ..., nsubvector: _Optional[int] = ..., bucket_init_size: _Optional[int] = ..., bucket_max_size: _Optional[int] = ..., nbits_per_idx: _Optional[int] = ...) -> None: ...
 
 class CreateHnswParam(_message.Message):
     __slots__ = ["dimension", "metric_type", "efConstruction", "max_elements", "nlinks"]
