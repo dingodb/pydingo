@@ -197,6 +197,7 @@ class CheckVectorScanParam(BaseModel):
 class CheckVectorSearchParam(BaseModel):
     index_name: str
     xq: list
+    index_type: str
     top_k: int = 10
     pre_filter: bool = True
     search_params: dict = None
@@ -234,6 +235,7 @@ class CheckVectorSearchParam(BaseModel):
             100 if search_params is None else search_params.get("recallNum", 100)
         )
         assert recallNum > 0, f"recallNum must > 0, but get {recallNum}"
+        index_type = values.get("index_type")
 
         with_Scalar_data = "false"
         with_vector_data = "false"
@@ -252,18 +254,30 @@ class CheckVectorSearchParam(BaseModel):
         parallel = (
             0 if search_params is None else search_params.get("parallelOnQueries", 0)
         )
-        payload = {
-            "parameter": {
-                "search": {
-                    "hnswParam": {"efSearch": ef_search},
-                    "flat": {"parallelOnQueries": parallel},
-                    "ivfFlatParam": {"nprobe": nprobe, "parallelOnQueries": parallel},
-                    "ivfPqParam": {
+        if index_type == "VECTOR_INDEX_TYPE_HNSW":
+            search = {
+                "hnswParam": {"efSearch": ef_search}
+            }
+        elif index_type == "VECTOR_INDEX_TYPE_FLAT":
+            search = {
+                "flat": {"parallelOnQueries": parallel}
+            }
+        elif index_type == "VECTOR_INDEX_TYPE_IVF_FLAT":
+            search = {
+                "ivfFlatParam": {"nprobe": nprobe, "parallelOnQueries": parallel}
+            }
+        elif index_type == "VECTOR_INDEX_TYPE_IVF_PQ":
+            search = {
+                "ivfPqParam": {
                         "nprobe": nprobe,
                         "parallelOnQueries": parallel,
                         "recallNum": recallNum,
-                    },
-                },
+                    }
+            }
+
+        payload = {
+            "parameter": {
+                "search": search,
                 "selectedKeys": [],
                 "topN": values.get("top_k"),
                 "withoutScalarData": with_vector_data,
