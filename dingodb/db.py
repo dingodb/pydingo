@@ -398,13 +398,18 @@ class DingoDB:
         Returns:
             List[dict]: search results
         """
+        index_info = self.describe_index_info(index_name)
+        index_type = index_info["indexParameter"]["vectorIndexParameter"][
+            "vectorIndexType"
+        ]
         params = CheckVectorSearchParam(
             index_name=index_name,
             xq=xq,
+            index_type=index_type,
             top_k=top_k,
             pre_filter=pre_filter,
             search_params=search_params,
-        )
+        ) 
         res = self.session.post(
             f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}",
             headers=self.headers,
