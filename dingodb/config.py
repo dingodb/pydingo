@@ -30,7 +30,7 @@ index_config = {
                     "metricType": None,
                     "ncentroids": 256,
                     "nsubvector": 8,
-                    "nbitsPerIdx": 0
+                    "nbitsPerIdx": 8    
                 },
                 "vectorIndexType": "VECTOR_INDEX_TYPE_IVF_PQ"
             },

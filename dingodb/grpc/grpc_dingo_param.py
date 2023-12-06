@@ -98,8 +98,8 @@ class CheckCreateIndexParam(BaseModel):
                         if v <= 0:
                             raise Exception(f"{key} must > 0")
                     if key == "nbitsPerIdx":
-                        if v < 0:
-                            raise Exception(f"{key} must >= 0")
+                        if v <= 0 or v > 16:
+                            raise Exception(f"{key} must > 0 and <=16")
 
                 else:
                     warnings.warn(f"index_config {key} not in {index_type}")
