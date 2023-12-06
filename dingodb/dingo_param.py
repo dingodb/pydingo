@@ -97,8 +97,8 @@ class CheckCreateIndexParam(BaseModel):
                         if v <= 0:
                             raise Exception(f"{key} must > 0")
                     if key == "nbitsPerIdx":
-                        if v < 0:
-                            raise Exception(f"{key} must >= 0")
+                        if v <= 0 or v > 16:
+                            raise Exception(f"{key} must > 0 and <=16")
                 else:
                     warnings.warn(f"index_config {key} not in {index_type}")
 
@@ -230,7 +230,7 @@ class CheckVectorSearchParam(BaseModel):
         assert ef_search >= 0, f"efSearch must >= 0, but get {ef_search}"
 
         nprobe = 16 if search_params is None else search_params.get("nprobe", 16)
-        assert nprobe > 0, f"nprobe must > 0, but get {nprobe}"
+        assert nprobe >= 0, f"nprobe must >= 0, but get {nprobe}"
         recallNum = (
             100 if search_params is None else search_params.get("recallNum", 100)
         )

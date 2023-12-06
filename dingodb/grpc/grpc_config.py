@@ -34,7 +34,7 @@ index_config = {
                 nsubvector=8,
                 bucket_init_size=1000,
                 bucket_max_size=128000,
-                nbits_per_idx=0
+                nbits_per_idx=8
             ),
             vector_index_type=VECTOR_INDEX_TYPE_IVF_PQ,
         ),
