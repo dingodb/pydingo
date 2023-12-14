@@ -31,6 +31,7 @@ class VectorIndexType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     VECTOR_INDEX_TYPE_IVF_PQ: _ClassVar[VectorIndexType]
     VECTOR_INDEX_TYPE_HNSW: _ClassVar[VectorIndexType]
     VECTOR_INDEX_TYPE_DISKANN: _ClassVar[VectorIndexType]
+    VECTOR_INDEX_TYPE_BRUTEFORCE: _ClassVar[VectorIndexType]
 
 class MetricType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
@@ -76,6 +77,7 @@ VECTOR_INDEX_TYPE_IVF_FLAT: VectorIndexType
 VECTOR_INDEX_TYPE_IVF_PQ: VectorIndexType
 VECTOR_INDEX_TYPE_HNSW: VectorIndexType
 VECTOR_INDEX_TYPE_DISKANN: VectorIndexType
+VECTOR_INDEX_TYPE_BRUTEFORCE: VectorIndexType
 METRIC_TYPE_NONE: MetricType
 METRIC_TYPE_L2: MetricType
 METRIC_TYPE_INNER_PRODUCT: MetricType
@@ -265,21 +267,31 @@ class CreateDiskAnnParam(_message.Message):
     num_threads: int
     def __init__(self, dimension: _Optional[int] = ..., metric_type: _Optional[_Union[MetricType, str]] = ..., num_trees: _Optional[int] = ..., num_neighbors: _Optional[int] = ..., num_threads: _Optional[int] = ...) -> None: ...
 
+class CreateBruteForceParam(_message.Message):
+    __slots__ = ["dimension", "metric_type"]
+    DIMENSION_FIELD_NUMBER: _ClassVar[int]
+    METRIC_TYPE_FIELD_NUMBER: _ClassVar[int]
+    dimension: int
+    metric_type: MetricType
+    def __init__(self, dimension: _Optional[int] = ..., metric_type: _Optional[_Union[MetricType, str]] = ...) -> None: ...
+
 class VectorIndexParameter(_message.Message):
-    __slots__ = ["vector_index_type", "flat_parameter", "ivf_flat_parameter", "ivf_pq_parameter", "hnsw_parameter", "diskann_parameter"]
+    __slots__ = ["vector_index_type", "flat_parameter", "ivf_flat_parameter", "ivf_pq_parameter", "hnsw_parameter", "diskann_parameter", "bruteforce_parameter"]
     VECTOR_INDEX_TYPE_FIELD_NUMBER: _ClassVar[int]
     FLAT_PARAMETER_FIELD_NUMBER: _ClassVar[int]
     IVF_FLAT_PARAMETER_FIELD_NUMBER: _ClassVar[int]
     IVF_PQ_PARAMETER_FIELD_NUMBER: _ClassVar[int]
     HNSW_PARAMETER_FIELD_NUMBER: _ClassVar[int]
     DISKANN_PARAMETER_FIELD_NUMBER: _ClassVar[int]
+    BRUTEFORCE_PARAMETER_FIELD_NUMBER: _ClassVar[int]
     vector_index_type: VectorIndexType
     flat_parameter: CreateFlatParam
     ivf_flat_parameter: CreateIvfFlatParam
     ivf_pq_parameter: CreateIvfPqParam
     hnsw_parameter: CreateHnswParam
     diskann_parameter: CreateDiskAnnParam
-    def __init__(self, vector_index_type: _Optional[_Union[VectorIndexType, str]] = ..., flat_parameter: _Optional[_Union[CreateFlatParam, _Mapping]] = ..., ivf_flat_parameter: _Optional[_Union[CreateIvfFlatParam, _Mapping]] = ..., ivf_pq_parameter: _Optional[_Union[CreateIvfPqParam, _Mapping]] = ..., hnsw_parameter: _Optional[_Union[CreateHnswParam, _Mapping]] = ..., diskann_parameter: _Optional[_Union[CreateDiskAnnParam, _Mapping]] = ...) -> None: ...
+    bruteforce_parameter: CreateBruteForceParam
+    def __init__(self, vector_index_type: _Optional[_Union[VectorIndexType, str]] = ..., flat_parameter: _Optional[_Union[CreateFlatParam, _Mapping]] = ..., ivf_flat_parameter: _Optional[_Union[CreateIvfFlatParam, _Mapping]] = ..., ivf_pq_parameter: _Optional[_Union[CreateIvfPqParam, _Mapping]] = ..., hnsw_parameter: _Optional[_Union[CreateHnswParam, _Mapping]] = ..., diskann_parameter: _Optional[_Union[CreateDiskAnnParam, _Mapping]] = ..., bruteforce_parameter: _Optional[_Union[CreateBruteForceParam, _Mapping]] = ...) -> None: ...
 
 class VectorSchema(_message.Message):
     __slots__ = ["type", "is_key", "is_nullable", "index"]
@@ -348,7 +360,7 @@ class SearchDiskAnnParam(_message.Message):
     def __init__(self) -> None: ...
 
 class VectorSearchParameter(_message.Message):
-    __slots__ = ["top_n", "without_vector_data", "without_scalar_data", "selected_keys", "without_table_data", "flat", "ivf_flat", "ivf_pq", "hnsw", "diskann", "use_scalar_filter", "vector_filter", "vector_filter_type", "vector_coprocessor", "vector_ids"]
+    __slots__ = ["top_n", "without_vector_data", "without_scalar_data", "selected_keys", "without_table_data", "flat", "ivf_flat", "ivf_pq", "hnsw", "diskann", "use_scalar_filter", "vector_filter", "vector_filter_type", "vector_coprocessor", "vector_ids", "use_brute_force"]
     TOP_N_FIELD_NUMBER: _ClassVar[int]
     WITHOUT_VECTOR_DATA_FIELD_NUMBER: _ClassVar[int]
     WITHOUT_SCALAR_DATA_FIELD_NUMBER: _ClassVar[int]
@@ -364,6 +376,7 @@ class VectorSearchParameter(_message.Message):
     VECTOR_FILTER_TYPE_FIELD_NUMBER: _ClassVar[int]
     VECTOR_COPROCESSOR_FIELD_NUMBER: _ClassVar[int]
     VECTOR_IDS_FIELD_NUMBER: _ClassVar[int]
+    USE_BRUTE_FORCE_FIELD_NUMBER: _ClassVar[int]
     top_n: int
     without_vector_data: bool
     without_scalar_data: bool
@@ -379,7 +392,8 @@ class VectorSearchParameter(_message.Message):
     vector_filter_type: VectorFilterType
     vector_coprocessor: VectorCoprocessor
     vector_ids: _containers.RepeatedScalarFieldContainer[int]
-    def __init__(self, top_n: _Optional[int] = ..., without_vector_data: bool = ..., without_scalar_data: bool = ..., selected_keys: _Optional[_Iterable[str]] = ..., without_table_data: bool = ..., flat: _Optional[_Union[SearchFlatParam, _Mapping]] = ..., ivf_flat: _Optional[_Union[SearchIvfFlatParam, _Mapping]] = ..., ivf_pq: _Optional[_Union[SearchIvfPqParam, _Mapping]] = ..., hnsw: _Optional[_Union[SearchHNSWParam, _Mapping]] = ..., diskann: _Optional[_Union[SearchDiskAnnParam, _Mapping]] = ..., use_scalar_filter: bool = ..., vector_filter: _Optional[_Union[VectorFilter, str]] = ..., vector_filter_type: _Optional[_Union[VectorFilterType, str]] = ..., vector_coprocessor: _Optional[_Union[VectorCoprocessor, _Mapping]] = ..., vector_ids: _Optional[_Iterable[int]] = ...) -> None: ...
+    use_brute_force: bool
+    def __init__(self, top_n: _Optional[int] = ..., without_vector_data: bool = ..., without_scalar_data: bool = ..., selected_keys: _Optional[_Iterable[str]] = ..., without_table_data: bool = ..., flat: _Optional[_Union[SearchFlatParam, _Mapping]] = ..., ivf_flat: _Optional[_Union[SearchIvfFlatParam, _Mapping]] = ..., ivf_pq: _Optional[_Union[SearchIvfPqParam, _Mapping]] = ..., hnsw: _Optional[_Union[SearchHNSWParam, _Mapping]] = ..., diskann: _Optional[_Union[SearchDiskAnnParam, _Mapping]] = ..., use_scalar_filter: bool = ..., vector_filter: _Optional[_Union[VectorFilter, str]] = ..., vector_filter_type: _Optional[_Union[VectorFilterType, str]] = ..., vector_coprocessor: _Optional[_Union[VectorCoprocessor, _Mapping]] = ..., vector_ids: _Optional[_Iterable[int]] = ..., use_brute_force: bool = ...) -> None: ...
 
 class VectorCoprocessor(_message.Message):
     __slots__ = ["schema_version", "original_schema", "selection_columns", "expression"]

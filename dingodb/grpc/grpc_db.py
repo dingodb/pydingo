@@ -118,7 +118,7 @@ class GrpcDingoDB:
         Args:
             index_name (str): the name of index
             dimension (int): dimension of vector
-            index_type (str, optional): index type, one of {"flat", "hnsw", ,"ivf_flat", "ivf_pq"}. Defaults to "hnsw".
+            index_type (str, optional): index type, one of {"flat", "hnsw", ,"ivf_flat", "ivf_pq", "brute"}. Defaults to "hnsw".
             metric_type (str, optional): metric type, one of {"dotproduct", "euclidean", "cosine"}. Defaults to "cosine"
             replicas (int, optional): dingoDB store replicas. Defaults to 3.
             index_config (dict, optional): Advanced configuration options for the index. Defaults to None.
@@ -503,6 +503,7 @@ class GrpcDingoDB:
         top_k: int = 10,
         search_params: dict = None,
         pre_filter: bool = True,
+        brute: bool =False
     ) -> list:
         """
         vector_search search vector
@@ -513,6 +514,7 @@ class GrpcDingoDB:
             top_k (int, optional): top k search. Defaults to 10.
             search_params (dict, optional): search params for index. Defaults to None.
             pre_filter (bool, optional): filter type for index, False is post-filter. Defaults to True.
+            brute (bool, optional): whether to turn on brute force search. Defaults to True.
 
         Raises:
             RuntimeError: return error
@@ -532,6 +534,7 @@ class GrpcDingoDB:
             top_k=top_k,
             pre_filter=pre_filter,
             search_params=search_params,
+            brute=brute
         )
 
         vec_search_response = self.index_stub.VectorSearch.future(params.search_params)

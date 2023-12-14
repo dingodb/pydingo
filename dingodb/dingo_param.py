@@ -200,6 +200,7 @@ class CheckVectorSearchParam(BaseModel):
     index_type: str
     top_k: int = 10
     pre_filter: bool = True
+    brute:bool = False
     search_params: dict = None
 
     @validator("xq", always=True)
@@ -262,6 +263,8 @@ class CheckVectorSearchParam(BaseModel):
             search = {
                 "flat": {"parallelOnQueries": parallel}
             }
+        elif index_type == "VECTOR_INDEX_TYPE_BRUTEFORCE":
+            search = {}
         elif index_type == "VECTOR_INDEX_TYPE_IVF_FLAT":
             search = {
                 "ivfFlatParam": {"nprobe": nprobe, "parallelOnQueries": parallel}
@@ -277,10 +280,11 @@ class CheckVectorSearchParam(BaseModel):
 
         payload = {
             "parameter": {
+                "useBruteForce": "true" if values.get("brute") else "false", 
                 "search": search,
                 "selectedKeys": [],
                 "topN": values.get("top_k"),
-                "withoutScalarData": with_vector_data,
+                "withoutScalarData": with_Scalar_data,
                 "withoutVectorData": with_vector_data,
                 "useScalarFilter": use_scalar_filter,
                 "vectorFilter": "SCALAR_FILTER",

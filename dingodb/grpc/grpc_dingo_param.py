@@ -199,6 +199,7 @@ class CheckVectorSearchParam(BaseModel):
     top_k: int = 10
     fields: list = None
     pre_filter: bool = True
+    brute: bool = False
     search_params: dict = None
 
     @validator("xq", always=True)
@@ -222,7 +223,7 @@ class CheckVectorSearchParam(BaseModel):
     @validator("search_params", always=True)
     def check_search_params(cls, search_params, values):
         parameter = VectorSearchParameter(
-            selected_keys=values.get("fields"), top_n=values.get("top_k")
+            selected_keys=values.get("fields"), top_n=values.get("top_k"),use_brute_force=values.get("brute")
         )
 
         with_vector_data = (

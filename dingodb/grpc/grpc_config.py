@@ -60,4 +60,11 @@ index_config = {
         ),
         including_default_value_fields=True,
     ),
+    "brute": MessageToDict(
+        VectorIndexParameter(
+            bruteforce_parameter=CreateBruteForceParam(dimension=None, metric_type=None),
+            vector_index_type=VECTOR_INDEX_TYPE_BRUTEFORCE,
+        ),
+        including_default_value_fields=True,
+    ),
 }

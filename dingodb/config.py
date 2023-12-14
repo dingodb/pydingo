@@ -50,5 +50,12 @@ index_config = {
                     "metricType": None
                 },
                 "vectorIndexType": "VECTOR_INDEX_TYPE_DISKANN"
+            },
+    "brute": {
+                "bruteForceParam": {
+                    "dimension": None,
+                    "metricType": None
+                },
+                "vectorIndexType": "VECTOR_INDEX_TYPE_BRUTEFORCE"
             }
 }
