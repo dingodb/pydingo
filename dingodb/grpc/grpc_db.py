@@ -15,7 +15,10 @@ from .grpc_dingo_param import (
     CheckVectorGetParam,
     CheckVectorScanParam,
     CheckVectorSearchParam,
+    auto_value_type,
+    config
 )
+
 
 from .json_format import MessageToDict, MessageToJson, ParseDict
 
@@ -299,9 +302,11 @@ class GrpcDingoDB:
             vec_grpc = VectorWithId()
             for key, value in params.datas[i].items():
                 entry = vec_grpc.scalar_data[key]
-                entry.field_type = STRING
+                value_type = config.GRPC_TYPE_MAP[auto_value_type(value)]
+                entry.field_type = value_type[0]
                 field = entry.fields.add()
-                field.string_data = value
+                attribute_name = value_type[1]
+                setattr(field, attribute_name, value)
 
             vec_grpc.vector.CopyFrom(
                 Vector(dimension=len(v), float_values=v, value_type=FLOAT)

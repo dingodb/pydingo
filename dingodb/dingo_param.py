@@ -1,9 +1,10 @@
 import warnings
-from typing import List
+from typing import List, Union
 
 from pydantic import BaseModel, validator
 
 from . import config
+from dingodb.utils.tools import auto_value_type, auto_expr_type
 
 
 class CheckClintParam(BaseModel):
@@ -187,7 +188,7 @@ class CheckVectorScanParam(BaseModel):
             return {}
         else:
             scalar_data = dict(
-                (key, {"fieldType": "STRING", "fields": [{"data": value}]})
+                (key, {"fieldType": auto_value_type(value), "fields": [{"data": value}]})
                 for key, value in value.items()
             )
             value = scalar_data
@@ -218,14 +219,19 @@ class CheckVectorSearchParam(BaseModel):
     @validator("search_params", always=True)
     def check_search_params(cls, search_params, values):
         scalar_data = {}
+        lanchain_json = {}
         use_scalar_filter = "false"
         if search_params is not None and "meta_expr" in search_params.keys():
             if search_params["meta_expr"] is not None:
                 use_scalar_filter = "true"
                 scalar_data = dict(
-                    (key, {"fieldType": "STRING", "fields": [{"data": value}]})
+                    (key, {"fieldType": auto_value_type(value), "fields": [{"data": value}]})
                     for key, value in search_params["meta_expr"].items()
                 )
+        lanchain_json = {}
+        if search_params is not None and "langchain_expr" in search_params.keys():
+            if search_params["langchain_expr"] is not None:
+                lanchain_json = auto_expr_type(search_params["langchain_expr"])
 
         ef_search = 32 if search_params is None else search_params.get("efSearch", 32)
         assert ef_search >= 0, f"efSearch must >= 0, but get {ef_search}"
@@ -282,6 +288,7 @@ class CheckVectorSearchParam(BaseModel):
             "parameter": {
                 "useBruteForce": "true" if values.get("brute") else "false", 
                 "search": search,
+                "langchainExpr": lanchain_json,
                 "selectedKeys": [],
                 "topN": values.get("top_k"),
                 "withoutScalarData": with_Scalar_data,

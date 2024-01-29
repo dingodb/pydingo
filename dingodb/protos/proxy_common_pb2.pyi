@@ -360,7 +360,7 @@ class SearchDiskAnnParam(_message.Message):
     def __init__(self) -> None: ...
 
 class VectorSearchParameter(_message.Message):
-    __slots__ = ["top_n", "without_vector_data", "without_scalar_data", "selected_keys", "without_table_data", "flat", "ivf_flat", "ivf_pq", "hnsw", "diskann", "use_scalar_filter", "vector_filter", "vector_filter_type", "vector_coprocessor", "vector_ids", "use_brute_force"]
+    __slots__ = ["top_n", "without_vector_data", "without_scalar_data", "selected_keys", "without_table_data", "flat", "ivf_flat", "ivf_pq", "hnsw", "diskann", "use_scalar_filter", "vector_filter", "vector_filter_type", "vector_coprocessor", "vector_ids", "use_brute_force", "langchain_expr"]
     TOP_N_FIELD_NUMBER: _ClassVar[int]
     WITHOUT_VECTOR_DATA_FIELD_NUMBER: _ClassVar[int]
     WITHOUT_SCALAR_DATA_FIELD_NUMBER: _ClassVar[int]
@@ -377,6 +377,7 @@ class VectorSearchParameter(_message.Message):
     VECTOR_COPROCESSOR_FIELD_NUMBER: _ClassVar[int]
     VECTOR_IDS_FIELD_NUMBER: _ClassVar[int]
     USE_BRUTE_FORCE_FIELD_NUMBER: _ClassVar[int]
+    LANGCHAIN_EXPR_FIELD_NUMBER: _ClassVar[int]
     top_n: int
     without_vector_data: bool
     without_scalar_data: bool
@@ -393,7 +394,8 @@ class VectorSearchParameter(_message.Message):
     vector_coprocessor: VectorCoprocessor
     vector_ids: _containers.RepeatedScalarFieldContainer[int]
     use_brute_force: bool
-    def __init__(self, top_n: _Optional[int] = ..., without_vector_data: bool = ..., without_scalar_data: bool = ..., selected_keys: _Optional[_Iterable[str]] = ..., without_table_data: bool = ..., flat: _Optional[_Union[SearchFlatParam, _Mapping]] = ..., ivf_flat: _Optional[_Union[SearchIvfFlatParam, _Mapping]] = ..., ivf_pq: _Optional[_Union[SearchIvfPqParam, _Mapping]] = ..., hnsw: _Optional[_Union[SearchHNSWParam, _Mapping]] = ..., diskann: _Optional[_Union[SearchDiskAnnParam, _Mapping]] = ..., use_scalar_filter: bool = ..., vector_filter: _Optional[_Union[VectorFilter, str]] = ..., vector_filter_type: _Optional[_Union[VectorFilterType, str]] = ..., vector_coprocessor: _Optional[_Union[VectorCoprocessor, _Mapping]] = ..., vector_ids: _Optional[_Iterable[int]] = ..., use_brute_force: bool = ...) -> None: ...
+    langchain_expr: str
+    def __init__(self, top_n: _Optional[int] = ..., without_vector_data: bool = ..., without_scalar_data: bool = ..., selected_keys: _Optional[_Iterable[str]] = ..., without_table_data: bool = ..., flat: _Optional[_Union[SearchFlatParam, _Mapping]] = ..., ivf_flat: _Optional[_Union[SearchIvfFlatParam, _Mapping]] = ..., ivf_pq: _Optional[_Union[SearchIvfPqParam, _Mapping]] = ..., hnsw: _Optional[_Union[SearchHNSWParam, _Mapping]] = ..., diskann: _Optional[_Union[SearchDiskAnnParam, _Mapping]] = ..., use_scalar_filter: bool = ..., vector_filter: _Optional[_Union[VectorFilter, str]] = ..., vector_filter_type: _Optional[_Union[VectorFilterType, str]] = ..., vector_coprocessor: _Optional[_Union[VectorCoprocessor, _Mapping]] = ..., vector_ids: _Optional[_Iterable[int]] = ..., use_brute_force: bool = ..., langchain_expr: _Optional[str] = ...) -> None: ...
 
 class VectorCoprocessor(_message.Message):
     __slots__ = ["schema_version", "original_schema", "selection_columns", "expression"]
