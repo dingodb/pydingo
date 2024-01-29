@@ -68,3 +68,10 @@ index_config = {
         including_default_value_fields=True,
     ),
 }
+
+GRPC_TYPE_MAP = {
+    "STRING": (STRING, "string_data"),
+    "DOUBLE": (DOUBLE, "double_data"),
+    "INT64": (INT64, "long_data"),
+    "BOOL": (BOOL, "bool_data")
+}

@@ -4,7 +4,8 @@ from typing import List
 from dingodb.protos.proxy_common_pb2 import *
 from dingodb.protos.proxy_index_pb2 import *
 from pydantic import BaseModel, validator
-
+from dingodb.utils.tools import auto_value_type, auto_expr_type
+import json
 from . import grpc_config as config
 
 
@@ -240,13 +241,18 @@ class CheckVectorSearchParam(BaseModel):
             schema_name="dingo", index_name=values.get("index_name")
         )
         use_scalar_filter = False
+        parameter.vector_filter_type = (
+                    QUERY_PRE if values.get("pre_filter") else QUERY_POST
+                )
         if search_params is not None and "meta_expr" in search_params.keys():
             if search_params["meta_expr"] is not None:
                 use_scalar_filter = True
                 parameter.vector_filter = SCALAR_FILTER
-                parameter.vector_filter_type = (
-                    QUERY_PRE if values.get("pre_filter") else QUERY_POST
-                )
+                
+                
+        if search_params is not None and "langchain_expr" in search_params.keys():
+            if search_params["langchain_expr"] is not None:
+                parameter.langchain_expr = json.dumps(auto_expr_type(search_params["langchain_expr"]), ensure_ascii=False)
 
         parameter.use_scalar_filter = use_scalar_filter
         # scalar_data_map = {}
@@ -257,9 +263,12 @@ class CheckVectorSearchParam(BaseModel):
             if use_scalar_filter:
                 for key, value in search_params["meta_expr"].items():
                     entry = vec_with_id.scalar_data[key]
-                    entry.field_type = STRING
+                    value_type = config.GRPC_TYPE_MAP[auto_value_type(value)]
+                    entry.field_type = value_type[0]
                     field = entry.fields.add()
-                    field.string_data = value
+                    attribute_name = value_type[1]
+                    setattr(field, attribute_name, value)
+                    # field.string_data = value
 
             vec_search_request.vectors.append(vec_with_id)
 

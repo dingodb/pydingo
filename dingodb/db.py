@@ -11,6 +11,7 @@ from .dingo_param import (
     CheckVectorGetParam,
     CheckVectorScanParam,
     CheckVectorSearchParam,
+    auto_value_type
 )
 
 
@@ -212,7 +213,7 @@ class DingoDB:
         records = []
         for i, v in enumerate(params.vectors):
             scalar_data = dict(
-                (key, {"fieldType": "STRING", "fields": [{"data": value}]})
+                (key, {"fieldType": auto_value_type(value), "fields": [{"data": value}]})
                 for key, value in params.datas[i].items()
             )
             vector = {
