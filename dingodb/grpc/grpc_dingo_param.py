@@ -241,19 +241,27 @@ class CheckVectorSearchParam(BaseModel):
             schema_name="dingo", index_name=values.get("index_name")
         )
         use_scalar_filter = False
+        
+        if search_params is not None:
+            if "meta_expr" in search_params.keys() and "langchain_expr" in search_params.keys():
+                raise ValueError(f"meta_expr and langchain_expr cannot coexist")
+            elif "meta_expr" in search_params.keys():
+                if search_params["meta_expr"] is not None:
+                    values["pre_filter"] = False
+                    use_scalar_filter = True
+                    parameter.vector_filter = SCALAR_FILTER
+            elif "langchain_expr" in search_params.keys():
+                if search_params["langchain_expr"] is not None:
+                    values["pre_filter"] = True
+                    parameter.langchain_expr = json.dumps(auto_expr_type(search_params["langchain_expr"]), ensure_ascii=False)
+            else:
+                values["pre_filter"] = False
+        else:
+            values["pre_filter"] = False
+                           
         parameter.vector_filter_type = (
                     QUERY_PRE if values.get("pre_filter") else QUERY_POST
                 )
-        if search_params is not None and "meta_expr" in search_params.keys():
-            if search_params["meta_expr"] is not None:
-                use_scalar_filter = True
-                parameter.vector_filter = SCALAR_FILTER
-                
-                
-        if search_params is not None and "langchain_expr" in search_params.keys():
-            if search_params["langchain_expr"] is not None:
-                parameter.langchain_expr = json.dumps(auto_expr_type(search_params["langchain_expr"]), ensure_ascii=False)
-
         parameter.use_scalar_filter = use_scalar_filter
         # scalar_data_map = {}
         for xq in values.get("xq"):
