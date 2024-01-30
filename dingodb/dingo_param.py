@@ -219,19 +219,28 @@ class CheckVectorSearchParam(BaseModel):
     @validator("search_params", always=True)
     def check_search_params(cls, search_params, values):
         scalar_data = {}
-        lanchain_json = {}
         use_scalar_filter = "false"
-        if search_params is not None and "meta_expr" in search_params.keys():
-            if search_params["meta_expr"] is not None:
-                use_scalar_filter = "true"
-                scalar_data = dict(
-                    (key, {"fieldType": auto_value_type(value), "fields": [{"data": value}]})
-                    for key, value in search_params["meta_expr"].items()
-                )
-        lanchain_json = {}
-        if search_params is not None and "langchain_expr" in search_params.keys():
-            if search_params["langchain_expr"] is not None:
-                lanchain_json = auto_expr_type(search_params["langchain_expr"])
+        lanchain_json = None
+        if search_params is not None:
+            if "meta_expr" in search_params.keys() and "langchain_expr" in search_params.keys():
+                raise ValueError(f"meta_expr and langchain_expr cannot coexist") 
+            elif "meta_expr" in search_params.keys():
+                if search_params["meta_expr"] is not None:
+                    values["pre_filter"] = False
+                    use_scalar_filter = "true"
+                    scalar_data = dict(
+                        (key, {"fieldType": auto_value_type(value), "fields": [{"data": value}]})
+                        for key, value in search_params["meta_expr"].items()
+                    )
+                    
+            elif "langchain_expr" in search_params.keys():
+                if search_params["langchain_expr"] is not None:
+                    values["pre_filter"] = True
+                    lanchain_json = auto_expr_type(search_params["langchain_expr"])
+            else:
+                values["pre_filter"] = False
+        else:
+             values["pre_filter"] = False   
 
         ef_search = 32 if search_params is None else search_params.get("efSearch", 32)
         assert ef_search >= 0, f"efSearch must >= 0, but get {ef_search}"
@@ -288,7 +297,6 @@ class CheckVectorSearchParam(BaseModel):
             "parameter": {
                 "useBruteForce": "true" if values.get("brute") else "false", 
                 "search": search,
-                "langchainExpr": lanchain_json,
                 "selectedKeys": [],
                 "topN": values.get("top_k"),
                 "withoutScalarData": with_Scalar_data,
@@ -312,6 +320,8 @@ class CheckVectorSearchParam(BaseModel):
                 for xq in values.get("xq")
             ],
         }
+        payload["parameter"].update({"langchainExpr": lanchain_json,
+}) if lanchain_json is not None else ...
         return payload
 
 
