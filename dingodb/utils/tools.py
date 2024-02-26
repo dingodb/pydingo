@@ -38,7 +38,7 @@ def auto_value_type(value):
 def auto_expr_type(value):
     if value is None:
         return {}
-    elif isinstance(value, Operation) or isinstance(value, Comparison):
+    elif value.__class__.__name__ == 'Operation' or value.__class__.__name__ == 'Comparison':
         return parser_json(value)
     elif isinstance(value, str):
         return parser_json(DEFAULT_PARSER.parse(value))
