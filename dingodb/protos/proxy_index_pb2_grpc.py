@@ -24,6 +24,11 @@ class IndexServiceStub(object):
                 request_serializer=proxy__index__pb2.VectorGetRequest.SerializeToString,
                 response_deserializer=proxy__index__pb2.VectorGetResponse.FromString,
                 )
+        self.VectorUpsert = channel.unary_unary(
+                '/dingodb.pb.proxy.index.IndexService/VectorUpsert',
+                request_serializer=proxy__index__pb2.VectorAddRequest.SerializeToString,
+                response_deserializer=proxy__index__pb2.VectorAddResponse.FromString,
+                )
         self.VectorSearch = channel.unary_unary(
                 '/dingodb.pb.proxy.index.IndexService/VectorSearch',
                 request_serializer=proxy__index__pb2.VectorSearchRequest.SerializeToString,
@@ -66,6 +71,12 @@ class IndexServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def VectorGet(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def VectorUpsert(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -119,6 +130,11 @@ def add_IndexServiceServicer_to_server(servicer, server):
                     servicer.VectorGet,
                     request_deserializer=proxy__index__pb2.VectorGetRequest.FromString,
                     response_serializer=proxy__index__pb2.VectorGetResponse.SerializeToString,
+            ),
+            'VectorUpsert': grpc.unary_unary_rpc_method_handler(
+                    servicer.VectorUpsert,
+                    request_deserializer=proxy__index__pb2.VectorAddRequest.FromString,
+                    response_serializer=proxy__index__pb2.VectorAddResponse.SerializeToString,
             ),
             'VectorSearch': grpc.unary_unary_rpc_method_handler(
                     servicer.VectorSearch,
@@ -191,6 +207,23 @@ class IndexService(object):
         return grpc.experimental.unary_unary(request, target, '/dingodb.pb.proxy.index.IndexService/VectorGet',
             proxy__index__pb2.VectorGetRequest.SerializeToString,
             proxy__index__pb2.VectorGetResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def VectorUpsert(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/dingodb.pb.proxy.index.IndexService/VectorUpsert',
+            proxy__index__pb2.VectorAddRequest.SerializeToString,
+            proxy__index__pb2.VectorAddResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

@@ -16,7 +16,7 @@ from .grpc_dingo_param import (
     CheckVectorScanParam,
     CheckVectorSearchParam,
     auto_value_type,
-    config
+    config,
 )
 
 
@@ -331,6 +331,64 @@ class GrpcDingoDB:
         else:
             raise RuntimeError(vec_add_response.result().error.errmsg)
 
+    def vector_upsert(
+        self, index_name: str, datas: list, vectors: list, ids: list = None
+    ) -> list:
+        """
+        vector_upsert upsert vector
+
+        Args:
+            index_name (str): the name of index
+            datas (list): metadata list
+            vectors (list): vector list
+            ids (list, optional): id list. Defaults to None.
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: upsert vector info in dingoDB
+        """
+        params = CheckVectorAddParam(
+            index_name=index_name, datas=datas, vectors=vectors, ids=ids
+        )
+
+        vec_add_request = VectorAddRequest(
+            schema_name=self.schema_name, index_name=params.index_name
+        )
+        for i, v in enumerate(params.vectors):
+            vec_grpc = VectorWithId()
+            for key, value in params.datas[i].items():
+                entry = vec_grpc.scalar_data[key]
+                value_type = config.GRPC_TYPE_MAP[auto_value_type(value)]
+                entry.field_type = value_type[0]
+                field = entry.fields.add()
+                attribute_name = value_type[1]
+                setattr(field, attribute_name, value)
+
+            vec_grpc.vector.CopyFrom(
+                Vector(dimension=len(v), float_values=v, value_type=FLOAT)
+            )
+            if ids is not None:
+                vec_grpc.id = params.ids[i]
+            vec_add_request.vectors.append(vec_grpc)
+
+        vec_upsert_response = self.index_stub.VectorUpsert.future(vec_add_request)
+
+        if vec_upsert_response.result().error.errcode == 0:
+            add_res = list(
+                self.convert_message_to_dict(vec)
+                for vec in vec_upsert_response.result().vectors
+            )
+            if vec_upsert_response.result().error.errmsg:
+                return {
+                    "message": vec_upsert_response.result().error.errmsg,
+                    "data": add_res,
+                }
+            return add_res
+        else:
+            raise RuntimeError(vec_upsert_response.result().error.errmsg)
+
     def vector_count(self, index_name: str):
         """
         vector_count count in index
@@ -508,7 +566,7 @@ class GrpcDingoDB:
         top_k: int = 10,
         search_params: dict = None,
         pre_filter: bool = True,
-        brute: bool =False
+        brute: bool = False,
     ) -> list:
         """
         vector_search search vector
@@ -539,7 +597,7 @@ class GrpcDingoDB:
             top_k=top_k,
             pre_filter=pre_filter,
             search_params=search_params,
-            brute=brute
+            brute=brute,
         )
 
         vec_search_response = self.index_stub.VectorSearch.future(params.search_params)

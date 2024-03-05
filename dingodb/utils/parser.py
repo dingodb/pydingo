@@ -76,14 +76,14 @@ class QueryTransformer(Transformer):
             return Operation(operator=func, arguments=args)
 
     def _match_func_name(self, func_name: str) -> Union[Operator, Comparator]:
-        if func_name in set(Comparator):
+        if func_name.lower() in set(Comparator):
             if self.allowed_comparators is not None:
                 if func_name not in self.allowed_comparators:
                     raise ValueError(
                         f"Received disallowed comparator {func_name}. Allowed "
                         f"comparators are {self.allowed_comparators}"
                     )
-            return Comparator(func_name)
+            return Comparator(func_name.lower())
         elif func_name in set(Operator):
             if self.allowed_operators is not None:
                 if func_name not in self.allowed_operators:

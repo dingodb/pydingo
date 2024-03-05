@@ -11,7 +11,7 @@ from .dingo_param import (
     CheckVectorGetParam,
     CheckVectorScanParam,
     CheckVectorSearchParam,
-    auto_value_type
+    auto_value_type,
 )
 
 
@@ -213,7 +213,10 @@ class DingoDB:
         records = []
         for i, v in enumerate(params.vectors):
             scalar_data = dict(
-                (key, {"fieldType": auto_value_type(value), "fields": [{"data": value}]})
+                (
+                    key,
+                    {"fieldType": auto_value_type(value), "fields": [{"data": value}]},
+                )
                 for key, value in params.datas[i].items()
             )
             vector = {
@@ -229,6 +232,56 @@ class DingoDB:
             records.append(record)
         res = self.session.put(
             f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}",
+            headers=self.headers,
+            data=json.dumps(records),
+        )
+
+        return self.make_response(res)
+
+    def vector_upsert(
+        self, index_name: str, datas: list, vectors: list, ids: list = None
+    ) -> list:
+        """
+        vector_upsert upsert vector
+
+        Args:
+            index_name (str): the name of index
+            datas (list): metadata list
+            vectors (list): vector list
+            ids (list, optional): id list. Defaults to None.
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: upsert vector info in dingoDB
+        """
+        params = CheckVectorAddParam(
+            index_name=index_name, datas=datas, vectors=vectors, ids=ids
+        )
+
+        records = []
+        for i, v in enumerate(params.vectors):
+            scalar_data = dict(
+                (
+                    key,
+                    {"fieldType": auto_value_type(value), "fields": [{"data": value}]},
+                )
+                for key, value in params.datas[i].items()
+            )
+            vector = {
+                "binaryValues": [],
+                "dimension": len(v),
+                "floatValues": v,
+                "valueType": "FLOAT",
+            }
+            record = {"scalarData": scalar_data, "vector": vector}
+            if ids is not None:
+                record.update({"id": params.ids[i]})
+
+            records.append(record)
+        res = self.session.put(
+            f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}/upsert",
             headers=self.headers,
             data=json.dumps(records),
         )
@@ -382,7 +435,7 @@ class DingoDB:
         top_k: int = 10,
         search_params: dict = None,
         pre_filter: bool = True,
-        brute: bool =False
+        brute: bool = False,
     ) -> dict:
         """
         vector_search search vector
@@ -412,8 +465,8 @@ class DingoDB:
             top_k=top_k,
             pre_filter=pre_filter,
             search_params=search_params,
-            brute=brute
-        ) 
+            brute=brute,
+        )
         res = self.session.post(
             f"{self.requestProto}{self.host[0]}{self.vectorApi}{params.index_name}",
             headers=self.headers,

@@ -4,7 +4,7 @@ from typing import List
 from dingodb.protos.proxy_common_pb2 import *
 from dingodb.protos.proxy_index_pb2 import *
 from pydantic import BaseModel, validator
-from dingodb.utils.tools import auto_value_type, auto_expr_type
+from dingodb.utils.tools import auto_value_type, auto_expr_type, convert_dict_to_expr
 import json
 from . import grpc_config as config
 
@@ -224,7 +224,9 @@ class CheckVectorSearchParam(BaseModel):
     @validator("search_params", always=True)
     def check_search_params(cls, search_params, values):
         parameter = VectorSearchParameter(
-            selected_keys=values.get("fields"), top_n=values.get("top_k"),use_brute_force=values.get("brute")
+            selected_keys=values.get("fields"),
+            top_n=values.get("top_k"),
+            use_brute_force=values.get("brute"),
         )
 
         with_vector_data = (
@@ -241,42 +243,39 @@ class CheckVectorSearchParam(BaseModel):
             schema_name="dingo", index_name=values.get("index_name")
         )
         use_scalar_filter = False
-        
         if search_params is not None:
-            if "meta_expr" in search_params.keys() and "langchain_expr" in search_params.keys():
+            if (
+                "meta_expr" in search_params.keys()
+                and "langchain_expr" in search_params.keys()
+            ):
                 raise ValueError(f"meta_expr and langchain_expr cannot coexist")
             elif "meta_expr" in search_params.keys():
                 if search_params["meta_expr"] is not None:
-                    values["pre_filter"] = False
-                    use_scalar_filter = True
                     parameter.vector_filter = SCALAR_FILTER
+                    parameter.langchain_expr = json.dumps(
+                        auto_expr_type(
+                            convert_dict_to_expr(search_params["meta_expr"])
+                        ),
+                        ensure_ascii=False,
+                    )
+                    parameter.vector_filter_type = (
+                        QUERY_PRE if values.get("pre_filter") else QUERY_POST
+                    )
             elif "langchain_expr" in search_params.keys():
                 if search_params["langchain_expr"] is not None:
-                    values["pre_filter"] = True
-                    parameter.langchain_expr = json.dumps(auto_expr_type(search_params["langchain_expr"]), ensure_ascii=False)
-            else:
-                values["pre_filter"] = False
-        else:
-            values["pre_filter"] = False
-                           
-        parameter.vector_filter_type = (
-                    QUERY_PRE if values.get("pre_filter") else QUERY_POST
-                )
+                    parameter.langchain_expr = json.dumps(
+                        auto_expr_type(search_params["langchain_expr"]),
+                        ensure_ascii=False,
+                    )
+                    parameter.vector_filter_type = (
+                        QUERY_PRE if values.get("pre_filter") else QUERY_POST
+                    )
+
         parameter.use_scalar_filter = use_scalar_filter
-        # scalar_data_map = {}
         for xq in values.get("xq"):
             vec_with_id = VectorWithId(
                 vector=Vector(dimension=len(xq), float_values=xq, value_type=FLOAT)
             )
-            if use_scalar_filter:
-                for key, value in search_params["meta_expr"].items():
-                    entry = vec_with_id.scalar_data[key]
-                    value_type = config.GRPC_TYPE_MAP[auto_value_type(value)]
-                    entry.field_type = value_type[0]
-                    field = entry.fields.add()
-                    attribute_name = value_type[1]
-                    setattr(field, attribute_name, value)
-                    # field.string_data = value
 
             vec_search_request.vectors.append(vec_with_id)
 
