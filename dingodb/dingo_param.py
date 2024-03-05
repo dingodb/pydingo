@@ -4,7 +4,7 @@ from typing import List, Union
 from pydantic import BaseModel, validator
 
 from . import config
-from dingodb.utils.tools import auto_value_type, auto_expr_type
+from dingodb.utils.tools import auto_value_type, auto_expr_type, convert_dict_to_expr
 
 
 class CheckClintParam(BaseModel):
@@ -188,7 +188,10 @@ class CheckVectorScanParam(BaseModel):
             return {}
         else:
             scalar_data = dict(
-                (key, {"fieldType": auto_value_type(value), "fields": [{"data": value}]})
+                (
+                    key,
+                    {"fieldType": auto_value_type(value), "fields": [{"data": value}]},
+                )
                 for key, value in value.items()
             )
             value = scalar_data
@@ -201,7 +204,7 @@ class CheckVectorSearchParam(BaseModel):
     index_type: str
     top_k: int = 10
     pre_filter: bool = True
-    brute:bool = False
+    brute: bool = False
     search_params: dict = None
 
     @validator("xq", always=True)
@@ -222,25 +225,20 @@ class CheckVectorSearchParam(BaseModel):
         use_scalar_filter = "false"
         lanchain_json = None
         if search_params is not None:
-            if "meta_expr" in search_params.keys() and "langchain_expr" in search_params.keys():
-                raise ValueError(f"meta_expr and langchain_expr cannot coexist") 
+            if (
+                "meta_expr" in search_params.keys()
+                and "langchain_expr" in search_params.keys()
+            ):
+                raise ValueError(f"meta_expr and langchain_expr cannot coexist")
             elif "meta_expr" in search_params.keys():
                 if search_params["meta_expr"] is not None:
-                    values["pre_filter"] = False
-                    use_scalar_filter = "true"
-                    scalar_data = dict(
-                        (key, {"fieldType": auto_value_type(value), "fields": [{"data": value}]})
-                        for key, value in search_params["meta_expr"].items()
+                    lanchain_json = auto_expr_type(
+                        convert_dict_to_expr(search_params["meta_expr"])
                     )
-                    
+
             elif "langchain_expr" in search_params.keys():
                 if search_params["langchain_expr"] is not None:
-                    values["pre_filter"] = True
                     lanchain_json = auto_expr_type(search_params["langchain_expr"])
-            else:
-                values["pre_filter"] = False
-        else:
-             values["pre_filter"] = False   
 
         ef_search = 32 if search_params is None else search_params.get("efSearch", 32)
         assert ef_search >= 0, f"efSearch must >= 0, but get {ef_search}"
@@ -271,31 +269,25 @@ class CheckVectorSearchParam(BaseModel):
             0 if search_params is None else search_params.get("parallelOnQueries", 0)
         )
         if index_type == "VECTOR_INDEX_TYPE_HNSW":
-            search = {
-                "hnswParam": {"efSearch": ef_search}
-            }
+            search = {"hnswParam": {"efSearch": ef_search}}
         elif index_type == "VECTOR_INDEX_TYPE_FLAT":
-            search = {
-                "flat": {"parallelOnQueries": parallel}
-            }
+            search = {"flat": {"parallelOnQueries": parallel}}
         elif index_type == "VECTOR_INDEX_TYPE_BRUTEFORCE":
             search = {}
         elif index_type == "VECTOR_INDEX_TYPE_IVF_FLAT":
-            search = {
-                "ivfFlatParam": {"nprobe": nprobe, "parallelOnQueries": parallel}
-            }
+            search = {"ivfFlatParam": {"nprobe": nprobe, "parallelOnQueries": parallel}}
         elif index_type == "VECTOR_INDEX_TYPE_IVF_PQ":
             search = {
                 "ivfPqParam": {
-                        "nprobe": nprobe,
-                        "parallelOnQueries": parallel,
-                        "recallNum": recallNum,
-                    }
+                    "nprobe": nprobe,
+                    "parallelOnQueries": parallel,
+                    "recallNum": recallNum,
+                }
             }
 
         payload = {
             "parameter": {
-                "useBruteForce": "true" if values.get("brute") else "false", 
+                "useBruteForce": "true" if values.get("brute") else "false",
                 "search": search,
                 "selectedKeys": [],
                 "topN": values.get("top_k"),
@@ -320,8 +312,11 @@ class CheckVectorSearchParam(BaseModel):
                 for xq in values.get("xq")
             ],
         }
-        payload["parameter"].update({"langchainExpr": lanchain_json,
-}) if lanchain_json is not None else ...
+        payload["parameter"].update(
+            {
+                "langchainExpr": lanchain_json,
+            }
+        ) if lanchain_json is not None else ...
         return payload
 
 

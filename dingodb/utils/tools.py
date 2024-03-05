@@ -46,6 +46,14 @@ def auto_expr_type(value):
         raise Exception(f"expr type must in [str,Operation, Comparison]")
 
 
+def convert_dict_to_expr(d):
+    conditions = []
+    for key, value in d.items():
+        condition = f'eq("{key}", {value})'
+        conditions.append(condition)
+        
+    return f'and({", ".join(conditions)})' if len(conditions)  > 1 else conditions[0]
+
 if __name__ == "__main__":
     print(auto_value_type(1))
     print(auto_value_type("1"))
