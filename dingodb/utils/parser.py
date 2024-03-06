@@ -84,14 +84,14 @@ class QueryTransformer(Transformer):
                         f"comparators are {self.allowed_comparators}"
                     )
             return Comparator(func_name.lower())
-        elif func_name in set(Operator):
+        elif func_name.lower() in set(Operator):
             if self.allowed_operators is not None:
                 if func_name not in self.allowed_operators:
                     raise ValueError(
                         f"Received disallowed operator {func_name}. Allowed operators"
                         f" are {self.allowed_operators}"
                     )
-            return Operator(func_name)
+            return Operator(func_name.lower())
         else:
             raise ValueError(
                 f"Received unrecognized function {func_name}. Valid functions are "
