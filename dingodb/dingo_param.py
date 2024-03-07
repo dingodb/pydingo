@@ -239,6 +239,10 @@ class CheckVectorSearchParam(BaseModel):
             elif "langchain_expr" in search_params.keys():
                 if search_params["langchain_expr"] is not None:
                     lanchain_json = auto_expr_type(search_params["langchain_expr"])
+            else:
+                values["pre_filter"] = False
+        else:
+            values["pre_filter"] = False
 
         ef_search = 32 if search_params is None else search_params.get("efSearch", 32)
         assert ef_search >= 0, f"efSearch must >= 0, but get {ef_search}"

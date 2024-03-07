@@ -49,7 +49,7 @@ def auto_expr_type(value):
 def convert_dict_to_expr(d):
     conditions = []
     for key, value in d.items():
-        condition = f'eq("{key}", {value})'
+        condition = f'eq("{key}", "{value}")' if isinstance(value, str) else  f'eq("{key}", {value})'
         conditions.append(condition)
         
     return f'and({", ".join(conditions)})' if len(conditions)  > 1 else conditions[0]
