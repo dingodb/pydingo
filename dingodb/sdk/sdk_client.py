@@ -38,7 +38,7 @@ class SDKClient:
             coor_url (str): coordinator url, try to use like file://./coor_list
         """
         self.schema_id = 2
-        s, self.client = dingosdk.Client.Build(coor_url)
+        s, self.client = dingosdk.Client.BuildAndInitLog(coor_url)
         if not s.ok():
             raise RuntimeError(f"dongo client build fail: {s.ToString()}")
         s, self.vector_client = self.client.NewVectorClient()
