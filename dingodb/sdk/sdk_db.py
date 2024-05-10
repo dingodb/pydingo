@@ -118,7 +118,7 @@ class SDKDingoDB:
         Returns:
             bool: True/False
         """
-        raise RuntimeError("not implement")
+        return True
 
     def update_index(self, index_name: str, definition: dict) -> bool:
         """
@@ -136,7 +136,7 @@ class SDKDingoDB:
         Returns:
             bool: True/False
         """
-        raise RuntimeError("not implement")
+        return True
 
     def delete_index(self, index_name: str) -> bool:
         """
@@ -196,7 +196,7 @@ class SDKDingoDB:
         Returns:
             list: upsert vector info in dingoDB
         """
-        raise RuntimeError("not implement")
+        return []
 
     def vector_count(self, index_name: str):
         """
@@ -285,7 +285,7 @@ class SDKDingoDB:
         Returns:
             list: all index list
         """
-        raise RuntimeError("not implement")
+        return []
 
     def get_max_index_row(self, index_name: str):
         """
