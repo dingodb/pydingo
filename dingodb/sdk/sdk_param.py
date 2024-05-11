@@ -146,6 +146,7 @@ class CreateIndexParam(BaseModel):
 
     @validator("metadata_config", always=True)
     def check_metadata_config(cls, value):
+        value = {} if value is None else value
         if len(value) != 0:
             raise RuntimeError("metadata_config is not support now")
 
