@@ -150,7 +150,7 @@ class CreateIndexParam(BaseModel):
             raise RuntimeError("metadata_config is not support now")
 
     @validator("start_id", always=True)
-    def check_metadata_config(cls, value, values):
+    def check_start_id(cls, value, values):
         auto_id = values.get("auto_id")
         if auto_id:
             if value < 1:
