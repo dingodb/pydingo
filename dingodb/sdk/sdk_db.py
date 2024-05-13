@@ -2,6 +2,8 @@
 
 from dingodb.sdk.sdk_client import SDKClient
 
+from dingodb.common.rep import ScalarSchema
+
 from .sdk_param import (
     CreateIndexParam,
     VectorAddParam,
@@ -101,6 +103,62 @@ class SDKDingoDB:
         )
 
         return self.client.create_index(params)
+
+
+    def create_index_with_schema(
+        self,
+        index_name: str,
+        dimension: int,
+        schema : ScalarSchema,
+        index_type: str = "hnsw",
+        metric_type: str = "cosine",
+        replicas: int = 3,
+        index_config: dict = None,
+        metadata_config: dict = None,
+        partition_rule: dict = None,
+        operand: list = None,
+        auto_id: bool = True,
+        start_id: int = 1,
+    ) -> bool:
+        """
+        create_index create index
+
+        Args:
+            index_name (str): the name of index
+            dimension (int): dimension of vector
+            schema (ScalarSchema): schema of scalar
+            index_type (str, optional): index type, one of {"flat", "hnsw","ivf_flat", "ivf_pq", "brute"}. Defaults to "hnsw".
+            metric_type (str, optional): metric type, one of {"dotproduct", "euclidean", "cosine"}. Defaults to "cosine"
+            replicas (int, optional): dingoDB store replicas. Defaults to 3.
+            index_config (dict, optional): Advanced configuration options for the index. Defaults to None.
+            metadata_config (dict, optional): metadata. Defaults to None.NOT Support Now , used for schema
+            partition_rule (dict, optional): partition rule. Defaults to None. NOT Support Now
+            operand (list, optional): operand. Defaults to None.
+            auto_id (bool, optional): isAutoIncrement or not isAutoIncrement. Defaults to True.
+            start_id (int, optional): autoIncrement start id. Defaults to 1.
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            bool: create table status
+        """
+        params = CreateIndexParam(
+            index_name=index_name,
+            dimension=dimension,
+            index_type=index_type,
+            metric_type=metric_type,
+            replicas=replicas,
+            index_config=index_config,
+            metadata_config=metadata_config,
+            partition_rule=partition_rule,
+            operand=operand,
+            auto_id=auto_id,
+            start_id=start_id,
+        )
+
+        return self.client.create_index(param=params, schema=schema)
+
 
     def update_index_max_element(self, index_name: str, max_element: int) -> bool:
         """
