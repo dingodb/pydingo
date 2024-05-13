@@ -8,6 +8,26 @@ class ScalarType(Enum):
     STRING = "STRING"
 
 
+class VectorValueType(Enum):
+    FLOAT = "FLOAT"
+    BINARY = "BINARY"
+
+
+class ScalarColumn:
+    def __init__(self, key: str, type: ScalarType, speed: bool = False) -> None:
+        self.key = key
+        self.type = type
+        self.speed = speed
+
+
+class ScalarSchema:
+    def __init__(self):
+        self.cols = []
+
+    def add_scalar_column(self, col: ScalarColumn):
+        self.cols.append(col)
+
+
 class ScarlarValue:
     def __init__(self, scalar_type: ScalarType, fields: list):
         self.scalar_type = scalar_type
@@ -26,11 +46,6 @@ class ScalarData:
 
     def to_dict(self):
         return {key: value.to_dict() for key, value in self.data.items()}
-
-
-class VectorValueType(Enum):
-    FLOAT = "FLOAT"
-    BINARY = "BINARY"
 
 
 class Vector:

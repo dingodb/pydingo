@@ -4,6 +4,7 @@ import json
 import dingosdk
 from dingodb.utils.tools import auto_value_type
 from dingodb.common import constants
+from dingodb.common.rep import ScalarSchema, ScalarType
 from dingodb.utils.tools import auto_value_type, auto_expr_type, convert_dict_to_expr
 
 from .sdk_param import (
@@ -28,6 +29,13 @@ sdk_types = {
     "BOOL": dingosdk.kBOOL,
 }
 
+scalar_type_to_sdk_type = {
+    ScalarType.BOOL: dingosdk.kBOOL,
+    ScalarType.INT64: dingosdk.kINT64,
+    ScalarType.DOUBLE: dingosdk.kDOUBLE,
+    ScalarType.STRING: dingosdk.kSTRING,
+}
+
 
 class SDKClient:
     def __init__(self, coor_url: str):
@@ -45,12 +53,15 @@ class SDKClient:
         if not s.ok():
             raise RuntimeError(f"dongo vector client build fail: {s.ToString()}")
 
-    def create_index(self, param: CreateIndexParam) -> bool:
+    def create_index(
+        self, param: CreateIndexParam, schema: ScalarSchema = None
+    ) -> bool:
         """
         create_index create index
 
         Args:
             param (CreateIndexParam): create index param
+            schema (ScalarSchema): scalar data schema
 
         Returns:
             bool: create index result
@@ -94,6 +105,18 @@ class SDKClient:
 
         if param.auto_id:
             creator.SetAutoIncrementStart(param.start_id)
+
+        if schema is not None and len(schema.cols) != 0:
+            sdk_scalar_schem = dingosdk.VectorScalarSchema()
+
+            for col in schema.cols:
+                sdk_col = dingosdk.VectorScalarColumnSchema(
+                    col.key, scalar_type_to_sdk_type[col.type], col.speed
+                )
+
+                sdk_scalar_schem.AddScalarColumn(sdk_col)
+
+            creator.SetScalarSchema(sdk_scalar_schem)
 
         index_id = -1
         s, index_id = creator.Create()
@@ -182,7 +205,6 @@ class SDKClient:
 
         if s.ok():
             return [sdk_vector_with_id_to_vector_with_id(v).to_dict() for v in vectors]
-            # return list(map(lambda v: v.id, vectors))
         else:
             raise RuntimeError(
                 f"add vector in {add_param.index_name} fail: {s.ToString()}"
