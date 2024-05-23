@@ -12,6 +12,7 @@ from dingodb.common.rep import (
     SearchResult,
     VectorWithDistance,
     MetricType,
+    IndexMetric,
 )
 
 sdk_value_type_to_vector_value_type = {
@@ -108,4 +109,19 @@ def sdk_search_result_to_search_result(
             sdk_vector_with_distance_to_vector_with_distance(x)
             for x in sdk_search_result.vector_datas
         ]
+    )
+
+
+def sdk_index_metrics_result_to_index_metric(
+    sdk_index_metrics_result: dingosdk.IndexMetricsResult,
+) -> IndexMetric:
+    return IndexMetric(
+        index_type=dingosdk.VectorIndexTypeToString(
+            sdk_index_metrics_result.index_type
+        ),
+        count=sdk_index_metrics_result.count,
+        deleted_count=sdk_index_metrics_result.deleted_count,
+        max_vector_id=sdk_index_metrics_result.max_vector_id,
+        min_vector_id=sdk_index_metrics_result.min_vector_id,
+        memory_bytes=sdk_index_metrics_result.memory_bytes,
     )

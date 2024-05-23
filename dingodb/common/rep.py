@@ -116,3 +116,31 @@ class SearchResult:
         return {
             "vectorWithDistances": [v.to_dict() for v in self.vector_with_distance_list]
         }
+
+
+class IndexMetric:
+    def __init__(
+        self,
+        index_type: str,
+        count: int,
+        deleted_count: int,
+        max_vector_id: int,
+        min_vector_id: int,
+        memory_bytes: int,
+    ):
+        self.index_type = index_type
+        self.count = count
+        self.deleted_count = deleted_count
+        self.max_vector_id = max_vector_id
+        self.min_vector_id = min_vector_id
+        self.memory_bytes = memory_bytes
+
+    def to_dict(self):
+        return {
+            "indexType": self.index_type,
+            "count": self.count,
+            "deletedCount": self.deleted_count,
+            "maxVectorId": self.max_vector_id,
+            "minVectorId": self.min_vector_id,
+            "memoryBytes": self.memory_bytes,
+        }
