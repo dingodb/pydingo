@@ -104,12 +104,11 @@ class SDKDingoDB:
 
         return self.client.create_index(params)
 
-
     def create_index_with_schema(
         self,
         index_name: str,
         dimension: int,
-        schema : ScalarSchema,
+        schema: ScalarSchema,
         index_type: str = "hnsw",
         metric_type: str = "cosine",
         replicas: int = 3,
@@ -158,7 +157,6 @@ class SDKDingoDB:
         )
 
         return self.client.create_index(param=params, schema=schema)
-
 
     def update_index_max_element(self, index_name: str, max_element: int) -> bool:
         """
@@ -271,7 +269,6 @@ class SDKDingoDB:
         """
         return self.client.vector_count(index_name)
 
-    # TODO: unify the return
     def vector_metrics(self, index_name: str):
         """
         vector_metrics metrics in index
@@ -358,7 +355,7 @@ class SDKDingoDB:
         Returns:
             int: max id value
         """
-        raise RuntimeError("not implement")
+        return self.client.get_max_index_row(index_name=index_name)
 
     def vector_search(
         self,

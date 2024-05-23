@@ -20,6 +20,7 @@ from .sdk_param_factory import SDKParamFactory
 from .sdk_adapter import (
     sdk_search_result_to_search_result,
     sdk_vector_with_id_to_vector_with_id,
+    sdk_index_metrics_result_to_index_metric,
 )
 
 sdk_types = {
@@ -229,7 +230,6 @@ class SDKClient:
         else:
             raise RuntimeError(f"count index {index_name} fail: {s.ToString()}")
 
-    # TODO: unify the return
     def vector_metrics(self, index_name: str):
         """
         vector_metrics metrics in index
@@ -244,7 +244,7 @@ class SDKClient:
             self.schema_id, index_name
         )
         if s.ok():
-            return result.ToString()
+            return sdk_index_metrics_result_to_index_metric(result).to_dict()
         else:
             raise RuntimeError(f"get index {index_name} metrics fail: {s.ToString()}")
 
@@ -308,6 +308,28 @@ class SDKClient:
             raise RuntimeError(
                 f"scan index {scan_param.index_name} fail: {s.ToString()}"
             )
+
+    def get_max_index_row(self, index_name: str) -> int:
+        """
+        get_max_index_row get max index row
+
+        Args:
+            index_name (str): the name of in index
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            int: max vector id
+        """
+        s, result = self.vector_client.GetIndexMetricsByIndexName(
+            self.schema_id, index_name
+        )
+        if s.ok():
+            metric = sdk_index_metrics_result_to_index_metric(result)
+            return metric.max_vector_id
+        else:
+            raise RuntimeError(f"get index {index_name} metrics fail: {s.ToString()}")
 
     def vector_search(self, param: VectorSearchParam) -> list:
         """
