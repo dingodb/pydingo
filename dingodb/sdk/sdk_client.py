@@ -39,15 +39,15 @@ scalar_type_to_sdk_type = {
 
 
 class SDKClient:
-    def __init__(self, coor_url: str):
+    def __init__(self, addrs: str):
         """
         __init__ init Client
 
         Args:
-            coor_url (str): coordinator url, try to use like file://./coor_list
+            addrs (str): coordinator addrs, try to use like 127.0.0.1:22001,127.0.0.1:22002,127.0.0.1:22003
         """
         self.schema_id = 2
-        s, self.client = dingosdk.Client.BuildAndInitLog(coor_url)
+        s, self.client = dingosdk.Client.BuildAndInitLog(addrs)
         if not s.ok():
             raise RuntimeError(f"dongo client build fail: {s.ToString()}")
         s, self.vector_client = self.client.NewVectorClient()

@@ -15,15 +15,14 @@ from .sdk_param import (
 
 
 class SDKDingoDB:
-    def __init__(self, coor_url: str):
+    def __init__(self, addrs: str):
         """
         __init__ init DingoSDK
 
         Args:
-            coor_url (str): coordinator url, try to use like file://./coor_list
+            addrs (str): coordinator addrs, try to use like 127.0.0.1:22001,127.0.0.1:22002,127.0.0.1:22003
         """
-        self.coor_url = coor_url
-        self.client = SDKClient(coor_url)
+        self.client = SDKClient(addrs)
 
     def describe_index_info(self, index_name: str) -> dict:
         """
