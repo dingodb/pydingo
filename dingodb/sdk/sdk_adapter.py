@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import dingosdk
+import dingosdk.dingosdk as dingosdk
 
 from dingodb.common.rep import (
     ScalarType,

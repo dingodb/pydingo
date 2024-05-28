@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import dingosdk
+import dingosdk.dingosdk as dingosdk
 
 
 class SDKParamFactory:
