@@ -4,7 +4,7 @@ import warnings
 from pydantic import BaseModel, validator
 from typing import List
 
-import dingosdk
+import dingosdk.dingosdk as dingosdk
 
 index_types = {
     "flat": dingosdk.kFlat,
