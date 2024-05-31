@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import json
-import dingosdk.dingosdk as dingosdk
+import dingosdk
 from dingodb.utils.tools import auto_value_type
 from dingodb.common import constants
 from dingodb.common.rep import ScalarSchema, ScalarType
