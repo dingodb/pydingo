@@ -72,8 +72,9 @@ class SDKClient:
         creator.SetSchemaId(self.schema_id)
         creator.SetName(param.index_name)
         creator.SetReplicaNum(param.replicas)
-        if not param.operand:
-            creator.SetRangePartitions(param.operand)
+        if param.operand is not None:
+            if len(param.operand) != 0:
+                creator.SetRangePartitions(param.operand)
 
         index_type = param.index_type
         if index_type == "flat":
