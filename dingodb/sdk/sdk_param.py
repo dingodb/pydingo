@@ -4,7 +4,7 @@ import warnings
 from pydantic import BaseModel, validator
 from typing import List
 
-import dingosdk.dingosdk as dingosdk
+import dingosdk
 
 index_types = {
     "flat": dingosdk.kFlat,
@@ -253,21 +253,21 @@ class VectorSearchParam(BaseModel):
 
     @validator("search_params", always=True)
     def check_search_params(cls, search_params, values):
-        if search_params is None:
+        if search_params is None or len(search_params) == 0:
             search_params = {}
             values["pre_filter"] = False
             return search_params
 
-        if search_params is not None:
-            values["with_vector_data"] = search_params.get("withVectorData", True)
-            values["with_scalar_data"] = search_params.get("withScalarData", True)
+        assert search_params is not None, "search_params is None"
 
-        if search_params is not None:
-            if (
-                "meta_expr" in search_params.keys()
-                and "langchain_expr" in search_params.keys()
-            ):
-                raise ValueError(f"meta_expr and langchain_expr cannot coexist")
+        values["with_vector_data"] = search_params.get("withVectorData", True)
+        values["with_scalar_data"] = search_params.get("withScalarData", True)
+
+        if (
+            "meta_expr" in search_params.keys()
+            and "langchain_expr" in search_params.keys()
+        ):
+            raise ValueError(f"meta_expr and langchain_expr cannot coexist")
 
         return search_params
 
