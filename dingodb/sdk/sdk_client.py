@@ -463,10 +463,17 @@ class SDKClient:
             self.schema_id, param.index_name, sdk_param
         )
         if s.ok():
-            return [
-                sdk_vector_with_id_to_vector_with_id(v).to_dict()
-                for v in result.vectors
-            ]
+            get_results = {
+                v.id: sdk_vector_with_id_to_vector_with_id(v) for v in result.vectors
+            }
+
+            return_result = []
+            for id in param.ids:
+                if id in get_results:
+                    return_result.append(get_results[id].to_dict())
+                else:
+                    return_result.append(None)
+            return return_result
         else:
             raise RuntimeError(
                 f"vector get form index:{param.index_name} fail: {s.ToString()}"
