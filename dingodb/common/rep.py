@@ -112,6 +112,9 @@ class SearchResult:
     def __init__(self, vector_with_distance_list: list):
         self.vector_with_distance_list = vector_with_distance_list
 
+    def is_empty(self):
+        return len(self.vector_with_distance_list) == 0
+
     def to_dict(self):
         return {
             "vectorWithDistances": [v.to_dict() for v in self.vector_with_distance_list]
