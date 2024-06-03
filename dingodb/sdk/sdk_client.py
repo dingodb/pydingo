@@ -270,11 +270,15 @@ class SDKClient:
         sdk_param.with_vector_data = scan_param.with_vector_data
         sdk_param.with_scalar_data = scan_param.with_scalar_data
         sdk_param.with_table_data = scan_param.with_table_data
+
+        selected_keys = dingosdk.StringVector()
         for key in scan_param.fields:
-            sdk_param.selected_keys.append(key)
+            selected_keys.append(key)
+        sdk_param.selected_keys = selected_keys
 
         if scan_param.filter_scalar:
             sdk_param.use_scalar_filter = True
+            scarlar_data = dingosdk.ScalarDataMap()
             for key, value in scan_param.filter_scalar.items():
                 scarlar_value = dingosdk.ScalarValue()
                 scarlar_value.type = sdk_types[auto_value_type(value)]
@@ -292,9 +296,14 @@ class SDKClient:
                 else:
                     raise RuntimeError(f"not support type: {scarlar_value.type}")
 
-                scarlar_value.fields.append(scarlar_field)
+                # TODO: support vector with multiple fields
+                fields = dingosdk.ScalarFieldVector()
+                fields.append(scarlar_field)
+                scarlar_value.fields = fields
 
-                sdk_param.scalar_data[key] = scarlar_value
+                scarlar_data[key] = scarlar_value
+
+            sdk_param.scalar_data = scarlar_data
 
         s, result = self.vector_client.ScanQueryByIndexName(
             self.schema_id, scan_param.index_name, sdk_param
@@ -353,8 +362,10 @@ class SDKClient:
         sdk_param.with_vector_data = param.with_vector_data
         sdk_param.with_scalar_data = param.with_scalar_data
 
+        selected_keys = dingosdk.StringVector()
         for key in param.fields:
-            sdk_param.selected_keys.append(key)
+            selected_keys.append(key)
+        sdk_param.selected_keys = selected_keys
 
         # TODO: support vecotr id filter
         sdk_param.filter_source = dingosdk.kScalarFilter
@@ -425,7 +436,6 @@ class SDKClient:
                 return []
             else:
                 return [s.to_dict() for s in search_result]
-
 
         else:
             raise RuntimeError(f"search index:{param.index_name} fail: {s.ToString()}")
