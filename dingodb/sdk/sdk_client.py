@@ -413,7 +413,20 @@ class SDKClient:
         )
 
         if s.ok():
-            return [sdk_search_result_to_search_result(v).to_dict() for v in result]
+            search_result = [sdk_search_result_to_search_result(v) for v in result]
+
+            empty = True
+            for s in search_result:
+                if not s.is_empty():
+                    empty = False
+                    break
+
+            if empty:
+                return []
+            else:
+                return [s.to_dict() for s in search_result]
+
+
         else:
             raise RuntimeError(f"search index:{param.index_name} fail: {s.ToString()}")
 
