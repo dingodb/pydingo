@@ -76,6 +76,8 @@ class CreateIndexParam(BaseModel):
     def check_replicas(cls, value):
         if value < 0:
             raise Exception(f"{value} must >= 0")
+        if value == 0:
+            value = 3
         return value
 
     @validator("index_config", always=True)
@@ -268,6 +270,12 @@ class VectorSearchParam(BaseModel):
             and "langchain_expr" in search_params.keys()
         ):
             raise ValueError(f"meta_expr and langchain_expr cannot coexist")
+
+        if (
+            "meta_expr" not in search_params.keys()
+            and "langchain_expr" not in search_params.keys()
+        ):
+            values["pre_filter"] = False
 
         return search_params
 
