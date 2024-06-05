@@ -454,7 +454,7 @@ class SDKClient:
             list: _description_
         """
         sdk_param = dingosdk.QueryParam()
-        sdk_param.vector_ids = param.ids
+        sdk_param.vector_ids = list(set(param.ids))
         sdk_param.with_vector_data = param.with_vector_data
         sdk_param.with_scalar_data = param.with_scalar_data
 
