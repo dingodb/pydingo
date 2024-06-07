@@ -25,19 +25,19 @@ index_params = {
     "flat": {"dimension": None, "metricType": None},
     "ivf_flat": {"dimension": None, "metricType": None, "ncentroids": 256},
     "ivf_pq": {
-        "bucketInitSize": 1000,
-        "bucketMaxSize": 128000,
         "dimension": None,
         "metricType": None,
         "ncentroids": 256,
+        "bucketInitSize": 1000,
+        "bucketMaxSize": 128000,
         "nsubvector": 8,
         "nbitsPerIdx": 8,
     },
     "hnsw": {
         "dimension": None,
+        "metricType": None,
         "efConstruction": 200,
         "maxElements": 50000,
-        "metricType": None,
         "nlinks": 32,
     },
     "diskann": {"dimension": None, "metricType": None},
@@ -131,6 +131,8 @@ class CreateIndexParam(BaseModel):
                     if key == "nbitsPerIdx":
                         if v <= 0 or v > 16:
                             raise Exception(f"{key} must > 0 and <=16")
+
+                    vector_index_parameter[key] = v
                 else:
                     warnings.warn(f"index_config {key} not in {index_type}")
 
