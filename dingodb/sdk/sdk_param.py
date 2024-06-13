@@ -7,18 +7,18 @@ from typing import List
 import dingosdk
 
 index_types = {
-    "flat": dingosdk.kFlat,
-    "ivf_flat": dingosdk.kIvfFlat,
-    "ivf_pq": dingosdk.kIvfPq,
-    "hnsw": dingosdk.kHnsw,
-    "diskann": dingosdk.kDiskAnn,
-    "brute": dingosdk.kBruteForce,
+    "flat": dingosdk.VectorIndexType.kFlat,
+    "ivf_flat": dingosdk.VectorIndexType.kIvfFlat,
+    "ivf_pq": dingosdk.VectorIndexType.kIvfPq,
+    "hnsw": dingosdk.VectorIndexType.kHnsw,
+    "diskann": dingosdk.VectorIndexType.kDiskAnn,
+    "brute": dingosdk.VectorIndexType.kBruteForce,
 }
 
 metric_types = {
-    "euclidean": dingosdk.kL2,
-    "dotproduct": dingosdk.kInnerProduct,
-    "cosine": dingosdk.kCosine,
+    "euclidean": dingosdk.MetricType.kL2,
+    "dotproduct": dingosdk.MetricType.kInnerProduct,
+    "cosine": dingosdk.MetricType.kCosine,
 }
 
 index_params = {

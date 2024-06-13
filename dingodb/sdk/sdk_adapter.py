@@ -15,27 +15,29 @@ from dingodb.common.rep import (
     IndexMetric,
 )
 
+from typing import List, Dict
+
 sdk_value_type_to_vector_value_type = {
-    dingosdk.kFloat: VectorValueType.FLOAT,
-    dingosdk.kUint8: VectorValueType.BINARY,
+    dingosdk.ValueType.kFloat: VectorValueType.FLOAT,
+    dingosdk.ValueType.kUint8: VectorValueType.BINARY,
 }
 
 sdk_type_to_scalar_type = {
-    dingosdk.kBOOL: ScalarType.BOOL,
-    dingosdk.kINT64: ScalarType.INT64,
-    dingosdk.kDOUBLE: ScalarType.DOUBLE,
-    dingosdk.kSTRING: ScalarType.STRING,
+    dingosdk.Type.kBOOL: ScalarType.BOOL,
+    dingosdk.Type.kINT64: ScalarType.INT64,
+    dingosdk.Type.kDOUBLE: ScalarType.DOUBLE,
+    dingosdk.Type.kSTRING: ScalarType.STRING,
 }
 
 sdk_metric_type_to_metric_type = {
-    dingosdk.kL2: MetricType.L2,
-    dingosdk.kInnerProduct: MetricType.INNER_PRODUCT,
-    dingosdk.kCosine: MetricType.COSINE,
+    dingosdk.MetricType.kL2: MetricType.L2,
+    dingosdk.MetricType.kInnerProduct: MetricType.INNER_PRODUCT,
+    dingosdk.MetricType.kCosine: MetricType.COSINE,
 }
 
 
 def sdk_scalar_fields_to_fields_list(
-    scalar_type: ScalarType, sdk_scalar_fileds: dingosdk.ScalarFieldVector
+    scalar_type: ScalarType, sdk_scalar_fileds: List
 ) -> list:
     if scalar_type == ScalarType.BOOL:
         return [x.bool_data for x in sdk_scalar_fileds]
@@ -61,7 +63,7 @@ def sdk_scalar_value_to_scalar_value(
 
 
 def sdk_scalar_data_to_scalar_data(
-    sdk_scalar_data: dingosdk.ScalarDataMap,
+    sdk_scalar_data: Dict,
 ) -> ScalarData:
     scalar_data = ScalarData()
     for key, value in sdk_scalar_data.items():
