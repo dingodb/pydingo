@@ -4,21 +4,21 @@ import warnings
 from pydantic import BaseModel, validator
 from typing import List
 
-import dingosdk
+from  dingosdk import dingo_store
 
 index_types = {
-    "flat": dingosdk.kFlat,
-    "ivf_flat": dingosdk.kIvfFlat,
-    "ivf_pq": dingosdk.kIvfPq,
-    "hnsw": dingosdk.kHnsw,
-    "diskann": dingosdk.kDiskAnn,
-    "brute": dingosdk.kBruteForce,
+    "flat": dingo_store.VectorIndexType.kFlat,
+    "ivf_flat": dingo_store.VectorIndexType.kIvfFlat,
+    "ivf_pq": dingo_store.VectorIndexType.kIvfPq,
+    "hnsw": dingo_store.VectorIndexType.kHnsw,
+    "diskann": dingo_store.VectorIndexType.kDiskAnn,
+    "brute": dingo_store.VectorIndexType.kBruteForce,
 }
 
 metric_types = {
-    "euclidean": dingosdk.kL2,
-    "dotproduct": dingosdk.kInnerProduct,
-    "cosine": dingosdk.kCosine,
+    "euclidean": dingo_store.MetricType.kL2,
+    "dotproduct": dingo_store.MetricType.kInnerProduct,
+    "cosine": dingo_store.MetricType.kCosine,
 }
 
 index_params = {

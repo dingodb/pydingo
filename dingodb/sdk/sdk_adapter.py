@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import dingosdk
+from dingosdk import dingo_store
 
 from dingodb.common.rep import (
     ScalarType,
@@ -15,27 +15,29 @@ from dingodb.common.rep import (
     IndexMetric,
 )
 
+from typing import List, Dict
+
 sdk_value_type_to_vector_value_type = {
-    dingosdk.kFloat: VectorValueType.FLOAT,
-    dingosdk.kUint8: VectorValueType.BINARY,
+    dingo_store.ValueType.kFloat: VectorValueType.FLOAT,
+    dingo_store.ValueType.kUint8: VectorValueType.BINARY,
 }
 
 sdk_type_to_scalar_type = {
-    dingosdk.kBOOL: ScalarType.BOOL,
-    dingosdk.kINT64: ScalarType.INT64,
-    dingosdk.kDOUBLE: ScalarType.DOUBLE,
-    dingosdk.kSTRING: ScalarType.STRING,
+    dingo_store.Type.kBOOL: ScalarType.BOOL,
+    dingo_store.Type.kINT64: ScalarType.INT64,
+    dingo_store.Type.kDOUBLE: ScalarType.DOUBLE,
+    dingo_store.Type.kSTRING: ScalarType.STRING,
 }
 
 sdk_metric_type_to_metric_type = {
-    dingosdk.kL2: MetricType.L2,
-    dingosdk.kInnerProduct: MetricType.INNER_PRODUCT,
-    dingosdk.kCosine: MetricType.COSINE,
+    dingo_store.MetricType.kL2: MetricType.L2,
+    dingo_store.MetricType.kInnerProduct: MetricType.INNER_PRODUCT,
+    dingo_store.MetricType.kCosine: MetricType.COSINE,
 }
 
 
 def sdk_scalar_fields_to_fields_list(
-    scalar_type: ScalarType, sdk_scalar_fileds: dingosdk.ScalarFieldVector
+    scalar_type: ScalarType, sdk_scalar_fileds: List
 ) -> list:
     if scalar_type == ScalarType.BOOL:
         return [x.bool_data for x in sdk_scalar_fileds]
@@ -50,7 +52,7 @@ def sdk_scalar_fields_to_fields_list(
 
 
 def sdk_scalar_value_to_scalar_value(
-    sdk_scalar_value: dingosdk.ScalarValue,
+    sdk_scalar_value: dingo_store.ScalarValue,
 ) -> ScarlarValue:
     return ScarlarValue(
         scalar_type=sdk_type_to_scalar_type[sdk_scalar_value.type],
@@ -61,7 +63,7 @@ def sdk_scalar_value_to_scalar_value(
 
 
 def sdk_scalar_data_to_scalar_data(
-    sdk_scalar_data: dingosdk.ScalarDataMap,
+    sdk_scalar_data: Dict,
 ) -> ScalarData:
     scalar_data = ScalarData()
     for key, value in sdk_scalar_data.items():
@@ -71,7 +73,7 @@ def sdk_scalar_data_to_scalar_data(
 
 
 def sdk_vector_with_id_to_vector_with_id(
-    sdk_vector_with_id: dingosdk.VectorWithId,
+    sdk_vector_with_id: dingo_store.VectorWithId,
 ) -> VectorWithId:
     return VectorWithId(
         id=sdk_vector_with_id.id,
@@ -88,7 +90,7 @@ def sdk_vector_with_id_to_vector_with_id(
 
 
 def sdk_vector_with_distance_to_vector_with_distance(
-    sdk_vector_with_distance: dingosdk.VectorWithDistance,
+    sdk_vector_with_distance: dingo_store.VectorWithDistance,
 ) -> VectorWithDistance:
     return VectorWithDistance(
         vector_with_id=sdk_vector_with_id_to_vector_with_id(
@@ -102,7 +104,7 @@ def sdk_vector_with_distance_to_vector_with_distance(
 
 
 def sdk_search_result_to_search_result(
-    sdk_search_result: dingosdk.SearchResult,
+    sdk_search_result: dingo_store.SearchResult,
 ) -> SearchResult:
     return SearchResult(
         vector_with_distance_list=[
@@ -113,10 +115,10 @@ def sdk_search_result_to_search_result(
 
 
 def sdk_index_metrics_result_to_index_metric(
-    sdk_index_metrics_result: dingosdk.IndexMetricsResult,
+    sdk_index_metrics_result: dingo_store.IndexMetricsResult,
 ) -> IndexMetric:
     return IndexMetric(
-        index_type=dingosdk.VectorIndexTypeToString(
+        index_type=dingo_store.VectorIndexTypeToString(
             sdk_index_metrics_result.index_type
         ),
         count=sdk_index_metrics_result.count,

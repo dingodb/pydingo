@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import dingosdk
+from  dingosdk import dingo_store
 
 
 class SDKParamFactory:
@@ -8,20 +8,20 @@ class SDKParamFactory:
         pass
 
     @staticmethod
-    def create_flat_param(index_type: str, flat_param_dict: dict) -> dingosdk.FlatParam:
+    def create_flat_param(index_type: str, flat_param_dict: dict) -> dingo_store.FlatParam:
         assert index_type == "flat"
 
-        return dingosdk.FlatParam(
+        return dingo_store.FlatParam(
             flat_param_dict["dimension"], flat_param_dict["metricType"]
         )
 
     @staticmethod
     def create_ivf_flat_param(
         index_type: str, ivf_flat_param_dict: dict
-    ) -> dingosdk.IvfFlatParam:
+    ) -> dingo_store.IvfFlatParam:
         assert index_type == "ivf_flat"
 
-        param = dingosdk.IvfFlatParam(
+        param = dingo_store.IvfFlatParam(
             ivf_flat_param_dict["dimension"],
             ivf_flat_param_dict["metricType"],
         )
@@ -32,10 +32,10 @@ class SDKParamFactory:
     @staticmethod
     def create_ivf_pq_param(
         index_type: str, ivf_pq_param_dict: dict
-    ) -> dingosdk.IvfPqParam:
+    ) -> dingo_store.IvfPqParam:
         assert index_type == "ivf_pq"
 
-        param = dingosdk.IvfPqParam(
+        param = dingo_store.IvfPqParam(
             ivf_pq_param_dict["dimension"],
             ivf_pq_param_dict["metricType"],
         )
@@ -48,10 +48,10 @@ class SDKParamFactory:
         return param
 
     @staticmethod
-    def create_hnsw_param(index_type: str, hnsw_param_dict: dict) -> dingosdk.HnswParam:
+    def create_hnsw_param(index_type: str, hnsw_param_dict: dict) -> dingo_store.HnswParam:
         assert index_type == "hnsw"
 
-        param = dingosdk.HnswParam(
+        param = dingo_store.HnswParam(
             hnsw_param_dict["dimension"],
             hnsw_param_dict["metricType"],
             hnsw_param_dict["maxElements"],
@@ -64,17 +64,17 @@ class SDKParamFactory:
     @staticmethod
     def create_diskann_param(
         index_type: str, diskann_param_dict: dict
-    ) -> dingosdk.DiskAnnParam:
+    ) -> dingo_store.DiskAnnParam:
         assert index_type == "hnsw"
         raise Exception(f"index_type diskann is not support now")
 
     @staticmethod
     def create_brute_param(
         index_type: str, brute_param_dict: dict
-    ) -> dingosdk.BruteForceParam:
+    ) -> dingo_store.BruteForceParam:
         assert index_type == "brute"
 
-        return dingosdk.BruteForceParam(
+        return dingo_store.BruteForceParam(
             brute_param_dict["dimension"],
             brute_param_dict["metricType"],
         )
