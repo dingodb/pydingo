@@ -24,17 +24,17 @@ from .sdk_adapter import (
 )
 
 sdk_types = {
-    "STRING": dingosdk.kSTRING,
-    "DOUBLE": dingosdk.kDOUBLE,
-    "INT64": dingosdk.kINT64,
-    "BOOL": dingosdk.kBOOL,
+    "STRING": dingosdk.Type.kSTRING,
+    "DOUBLE": dingosdk.Type.kDOUBLE,
+    "INT64": dingosdk.Type.kINT64,
+    "BOOL": dingosdk.Type.kBOOL,
 }
 
 scalar_type_to_sdk_type = {
-    ScalarType.BOOL: dingosdk.kBOOL,
-    ScalarType.INT64: dingosdk.kINT64,
-    ScalarType.DOUBLE: dingosdk.kDOUBLE,
-    ScalarType.STRING: dingosdk.kSTRING,
+    ScalarType.BOOL: dingosdk.Type.kBOOL,
+    ScalarType.INT64: dingosdk.Type.kINT64,
+    ScalarType.DOUBLE: dingosdk.Type.kDOUBLE,
+    ScalarType.STRING: dingosdk.Type.kSTRING,
 }
 
 
@@ -161,38 +161,38 @@ class SDKClient:
         Returns:
             list: vector id list
         """
-        vectors = dingosdk.VectorWithIdVector()
+        vectors = []
         for i, v in enumerate(add_param.vectors):
             id = 0
             if add_param.ids is not None:
                 id = add_param.ids[i]
 
             # TODO: support unit8
-            tmp_vector = dingosdk.Vector(dingosdk.kFloat, len(v))
+            tmp_vector = dingosdk.Vector(dingosdk.ValueType.kFloat, len(v))
             tmp_vector.float_values = v
 
             vector_with_id = dingosdk.VectorWithId(id, tmp_vector)
 
-            scarlar_data = dingosdk.ScalarDataMap()
+            scarlar_data = {}
             for key, value in add_param.datas[i].items():
                 scarlar_value = dingosdk.ScalarValue()
                 scarlar_value.type = sdk_types[auto_value_type(value)]
 
                 scalar_type = scarlar_value.type
                 scarlar_field = dingosdk.ScalarField()
-                if scalar_type == dingosdk.kSTRING:
+                if scalar_type == dingosdk.Type.kSTRING:
                     scarlar_field.string_data = value
-                elif scalar_type == dingosdk.kDOUBLE:
+                elif scalar_type == dingosdk.Type.kDOUBLE:
                     scarlar_field.double_data = value
-                elif scalar_type == dingosdk.kINT64:
+                elif scalar_type == dingosdk.Type.kINT64:
                     scarlar_field.long_data = value
-                elif scalar_type == dingosdk.kBOOL:
+                elif scalar_type == dingosdk.Type.kBOOL:
                     scarlar_field.bool_data = value
                 else:
                     raise RuntimeError(f"not support type: {scarlar_value.type}")
 
                 # TODO: support vector with multiple fields
-                fields = dingosdk.ScalarFieldVector()
+                fields = []
                 fields.append(scarlar_field)
                 scarlar_value.fields = fields
 
@@ -201,7 +201,7 @@ class SDKClient:
             vector_with_id.scalar_data = scarlar_data
             vectors.append(vector_with_id)
 
-        s = self.vector_client.AddByIndexName(
+        s, vectors = self.vector_client.AddByIndexName(
             self.schema_id, add_param.index_name, vectors
         )
 
@@ -271,14 +271,14 @@ class SDKClient:
         sdk_param.with_scalar_data = scan_param.with_scalar_data
         sdk_param.with_table_data = scan_param.with_table_data
 
-        selected_keys = dingosdk.StringVector()
+        selected_keys = []
         for key in scan_param.fields:
             selected_keys.append(key)
         sdk_param.selected_keys = selected_keys
 
         if scan_param.filter_scalar:
             sdk_param.use_scalar_filter = True
-            scarlar_data = dingosdk.ScalarDataMap()
+            scarlar_data = {}
             for key, value in scan_param.filter_scalar.items():
                 scarlar_value = dingosdk.ScalarValue()
                 scarlar_value.type = sdk_types[auto_value_type(value)]
@@ -362,31 +362,31 @@ class SDKClient:
         sdk_param.with_vector_data = param.with_vector_data
         sdk_param.with_scalar_data = param.with_scalar_data
 
-        selected_keys = dingosdk.StringVector()
+        selected_keys = []
         for key in param.fields:
             selected_keys.append(key)
         sdk_param.selected_keys = selected_keys
 
         # TODO: support vecotr id filter
-        sdk_param.filter_source = dingosdk.kScalarFilter
+        sdk_param.filter_source = dingosdk.FilterSource.kScalarFilter
 
-        sdk_param.filter_type = dingosdk.kQueryPre
+        sdk_param.filter_type = dingosdk.FilterType.kQueryPre
         if not param.pre_filter:
-            sdk_param.filter_type = dingosdk.kQueryPost
+            sdk_param.filter_type = dingosdk.FilterType.kQueryPost
 
         sdk_param.use_brute_force = param.brute
 
-        extra_params_map = dingosdk.SearchExtraParamMap()
-        extra_params_map[dingosdk.kNprobe] = param.search_params.get(
+        extra_params_map = {}
+        extra_params_map[dingosdk.SearchExtraParamType.kNprobe] = param.search_params.get(
             "nprobe", constants.N_PROBES
         )
-        extra_params_map[dingosdk.kRecallNum] = param.search_params.get(
+        extra_params_map[dingosdk.SearchExtraParamType.kRecallNum] = param.search_params.get(
             "recallNum", constants.RECALL_NUM
         )
-        extra_params_map[dingosdk.kParallelOnQueries] = param.search_params.get(
+        extra_params_map[dingosdk.SearchExtraParamType.kParallelOnQueries] = param.search_params.get(
             "parallelOnQueries", constants.PARALLEL_ON_QUERIES
         )
-        extra_params_map[dingosdk.kEfSearch] = param.search_params.get(
+        extra_params_map[dingosdk.SearchExtraParamType.kEfSearch] = param.search_params.get(
             "efSearch", constants.EF_SEARCH
         )
 
@@ -410,7 +410,7 @@ class SDKClient:
         target_vectors = []
         for xq in param.xq:
             # TODO: support  uint8
-            tmp_vector = dingosdk.Vector(dingosdk.kFloat, len(xq))
+            tmp_vector = dingosdk.Vector(dingosdk.ValueType.kFloat, len(xq))
             tmp_vector.float_values = xq
 
             tmp = dingosdk.VectorWithId()
@@ -418,7 +418,7 @@ class SDKClient:
 
             target_vectors.append(tmp)
 
-        result = dingosdk.SearchResultVector()
+        result = []
         s, result = self.vector_client.SearchByIndexName(
             self.schema_id, param.index_name, sdk_param, target_vectors
         )
@@ -492,7 +492,7 @@ class SDKClient:
         Returns:
             list : [True, False, ...]
         """
-        result = dingosdk.DeleteResultVector()
+        result = []
         s, result = self.vector_client.DeleteByIndexName(
             self.schema_id, param.index_name, param.ids
         )
