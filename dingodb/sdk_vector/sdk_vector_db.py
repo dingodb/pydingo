@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 
-from dingodb.sdk.sdk_client import SDKClient
+from dingodb.sdk_client import SDKClient
+from dingodb.sdk_vector.sdk_vector_client import SDKVectorClient
 
-from dingodb.common.rep import ScalarSchema
+from dingodb.common.vector_rep import ScalarSchema
 
-from .sdk_param import (
+from .sdk_vector_param import (
     CreateIndexParam,
     VectorAddParam,
     VectorScanParam,
@@ -14,15 +15,15 @@ from .sdk_param import (
 )
 
 
-class SDKDingoDB:
-    def __init__(self, addrs: str):
+class SDKVectorDingoDB:
+    def __init__(self, client: SDKClient):
         """
         __init__ init DingoSDK
 
         Args:
-            addrs (str): coordinator addrs, try to use like 127.0.0.1:22001,127.0.0.1:22002,127.0.0.1:22003
+            client: SDKClient
         """
-        self.client = SDKClient(addrs)
+        self.client = SDKVectorClient(client)
 
     def describe_index_info(self, index_name: str) -> dict:
         """

@@ -2,7 +2,7 @@
 
 import dingosdk
 
-from dingodb.common.rep import (
+from dingodb.common.vector_rep import (
     ScalarType,
     ScarlarValue,
     ScalarData,
