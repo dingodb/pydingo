@@ -2,12 +2,14 @@
 
 import json
 import dingosdk
+from dingodb.sdk_client import SDKClient
+
 from dingodb.utils.tools import auto_value_type
 from dingodb.common import constants
-from dingodb.common.rep import ScalarSchema, ScalarType
+from dingodb.common.vector_rep import ScalarSchema, ScalarType
 from dingodb.utils.tools import auto_value_type, auto_expr_type, convert_dict_to_expr
 
-from .sdk_param import (
+from .sdk_vector_param import (
     CreateIndexParam,
     VectorAddParam,
     VectorScanParam,
@@ -16,8 +18,8 @@ from .sdk_param import (
     VectorDeleteParam,
 )
 
-from .sdk_param_factory import SDKParamFactory
-from .sdk_adapter import (
+from .sdk_vector_param_factory import SDKParamFactory
+from .sdk_vector_adapter import (
     sdk_search_result_to_search_result,
     sdk_vector_with_id_to_vector_with_id,
     sdk_index_metrics_result_to_index_metric,
@@ -38,18 +40,17 @@ scalar_type_to_sdk_type = {
 }
 
 
-class SDKClient:
-    def __init__(self, addrs: str):
+class SDKVectorClient:
+    def __init__(self, client: SDKClient):
         """
         __init__ init Client
 
         Args:
-            addrs (str): coordinator addrs, try to use like 127.0.0.1:22001,127.0.0.1:22002,127.0.0.1:22003
+            client: SDKClient
         """
         self.schema_id = 2
-        s, self.client = dingosdk.Client.BuildAndInitLog(addrs)
-        if not s.ok():
-            raise RuntimeError(f"dongo client build fail: {s.ToString()}")
+        self.client = client.dingosdk_client
+
         s, self.vector_client = self.client.NewVectorClient()
         if not s.ok():
             raise RuntimeError(f"dongo vector client build fail: {s.ToString()}")
@@ -120,7 +121,7 @@ class SDKClient:
 
             creator.SetScalarSchema(sdk_scalar_schem)
 
-        index_id = -1
+        # index_id = -1
         s, index_id = creator.Create()
         if s.ok():
             return True
@@ -142,7 +143,7 @@ class SDKClient:
         Returns:
             bool: True/False
         """
-        s = self.client.DropIndexByName(self.schema_id, index_name)
+        s = self.client.DropVectorIndexByName(self.schema_id, index_name)
         if s.ok():
             return True
         else:
@@ -418,7 +419,6 @@ class SDKClient:
 
             target_vectors.append(tmp)
 
-        result = []
         s, result = self.vector_client.SearchByIndexName(
             self.schema_id, param.index_name, sdk_param, target_vectors
         )
@@ -458,7 +458,7 @@ class SDKClient:
         sdk_param.with_vector_data = param.with_vector_data
         sdk_param.with_scalar_data = param.with_scalar_data
 
-        result = dingosdk.QueryResult()
+        # result = dingosdk.QueryResult()
         s, result = self.vector_client.BatchQueryByIndexName(
             self.schema_id, param.index_name, sdk_param
         )
@@ -492,7 +492,6 @@ class SDKClient:
         Returns:
             list : [True, False, ...]
         """
-        result = []
         s, result = self.vector_client.DeleteByIndexName(
             self.schema_id, param.index_name, param.ids
         )
