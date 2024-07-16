@@ -8,7 +8,6 @@ class CreateIndexParam(BaseModel):
     operand: List[int] = None
     start_id: int = 0
     json_params: str = ""
-    metadata_config: Dict = None
 
     @validator("replicas", always=True)
     def check_replicas(cls, value):
@@ -27,12 +26,6 @@ class CreateIndexParam(BaseModel):
     @validator("json_params", always=True)
     def check_json_params(cls, value):
         return value
-
-    @validator("metadata_config", always=True)
-    def check_metadata_config(cls, value):
-        value = {} if value is None else value
-        if len(value) != 0:
-            raise RuntimeError("metadata_config is not support now")
 
 
 class DocumentDeleteParam(BaseModel):
@@ -84,7 +77,7 @@ class DocumentSearchParam(BaseModel):
     @validator("top_n", pre=True, always=True)
     def check_top_k(cls, value, field):
         if not value > 0:
-            raise ValueError(f"{field.name} must >= 0")
+            raise ValueError(f"{field.name} must > 0")
         return value
 
     @validator("doc_ids", always=True)
@@ -140,12 +133,12 @@ class DocumentScanQueryParam(BaseModel):
 
     @validator("is_reverse", always=True)
     def check_is_reverse(cls, value, values):
-        if values.get("doc_id_end") > values.get("doc_id_start"):
-            if value == True:
-                raise ValueError("is_reverse must be false")
-        elif values.get("doc_id_end") < values.get("doc_id_start"):
-            if value == False:
-                raise ValueError("is_reverse must be true")
+        if value:
+            if values.get("doc_id_start") <= values.get("doc_id_end"):
+                raise ValueError("doc_id_end must be less than doc_id_start in reverse scan")
+        elif not value:
+            if values.get("doc_id_start") >= values.get("doc_id_end") and values.get("doc_id_end") != 0:
+                raise ValueError("doc_id_end must be greater than doc_id_start in forward scan")
         return value
 
     @validator("selected_keys", always=True)
@@ -162,6 +155,6 @@ class DocumentCountParam(BaseModel):
 
     @validator("doc_id_end", always=True)
     def check_doc_id_end(cls, value, values):
-        if value < values.get("doc_id_start"):
-            raise ValueError(f"doc_id_end must >= doc_id_start")
+        if value <= values.get("doc_id_start"):
+            raise ValueError(f"doc_id_end must > doc_id_start")
         return value
