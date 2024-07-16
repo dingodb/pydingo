@@ -1,7 +1,16 @@
 import dingosdk
 
 from dingodb.sdk_client import SDKClient
-from dingodb.common.document_rep import DocumentType, DocumentSchema
+from dingodb.common.document_rep import (
+    DocumentType,
+    DocumentSchema,
+    AddResult,
+    DocSearchResult,
+    DocQueryResult,
+    DocScanQueryResult,
+    DocIndexMetricsResult,
+    DocDeleteResult
+)
 
 from .sdk_document_param import (
     CreateIndexParam,
@@ -24,7 +33,6 @@ from .sdk_document_adapter import (
 )
 
 from typing import List, Dict
-from pprint import pprint
 
 scalar_type_to_document_type = {
     DocumentType.BOOL: dingosdk.Type.kBOOL,
@@ -117,7 +125,7 @@ class SDKDocumentClient:
         else:
             raise RuntimeError(f"delete index {index_name} fail: {s.ToString()}")
 
-    def document_add(self, add_param: DocumentAddParam) -> List:
+    def document_add(self, add_param: DocumentAddParam) -> AddResult:
         """
         document_add add document
 
@@ -128,7 +136,7 @@ class SDKDocumentClient:
             RuntimeError: return error
 
         Returns:
-            list: document id list
+            AddResult: dingodb.common.document_rep.AddResult
         """
         documents = []
         schema_dict = self.client.GetDocumentIndex(self.schema_id, add_param.index_name)[1].GetSchema()
@@ -158,7 +166,6 @@ class SDKDocumentClient:
         )
 
         if s.ok():
-            print("document_add .......")
             return document_add_result_to_add_result(documents)
 
         else:
@@ -166,7 +173,7 @@ class SDKDocumentClient:
                 f"add document in {add_param.index_name} fail: {s.ToString()}"
             )
 
-    def document_search(self, param: DocumentSearchParam) -> List:
+    def document_search(self, param: DocumentSearchParam) -> DocSearchResult:
         """
         document_search search document
 
@@ -177,7 +184,7 @@ class SDKDocumentClient:
             RuntimeError: return error
 
         Returns:
-            List[dict]: search results
+            DocSearchResult: dingodb.common.document_rep.DocSearchResult
         """
 
         document_param = dingosdk.DocSearchParam()
@@ -200,13 +207,12 @@ class SDKDocumentClient:
         )
 
         if s.ok():
-            print("document_search ......")
             # print(result.ToString())
-            return document_search_result_to_search_result(result).to_dict()
+            return document_search_result_to_search_result(result)
         else:
             raise RuntimeError(f"search index:{param.index_name} fail: {s.ToString()}")
 
-    def document_query(self, param: DocumentQueryParam) -> List:
+    def document_query(self, param: DocumentQueryParam) -> DocQueryResult:
         """
         document_query query document
 
@@ -217,7 +223,7 @@ class SDKDocumentClient:
             RuntimeError: return error
 
         Returns:
-            List[dict]: query results
+            DocQueryResult: dingodb.common.document_rep.DocQueryResult
         """
         document_param = dingosdk.DocQueryParam()
         document_param.doc_ids = param.doc_ids
@@ -230,9 +236,8 @@ class SDKDocumentClient:
         )
 
         if s.ok():
-            print("document_query ......")
             # print(result.ToString())
-            return document_query_result_to_query_result(result).to_dict()
+            return document_query_result_to_query_result(result)
         else:
             raise RuntimeError(f"query index:{param.index_name} fail: {s.ToString()}")
 
@@ -254,12 +259,11 @@ class SDKDocumentClient:
         )
 
         if s.ok():
-            print("document_get_border ......")
             return result
         else:
             raise RuntimeError(f"get_border index:{param.index_name} fail: {s.ToString()}")
 
-    def document_scan_query(self, param: DocumentScanQueryParam) -> List:
+    def document_scan_query(self, param: DocumentScanQueryParam) -> DocScanQueryResult:
         """
         document_scan_query scan_query document
 
@@ -270,7 +274,7 @@ class SDKDocumentClient:
             RuntimeError: return error
 
         Returns:
-            List[dict]: scan_query results
+            DocScanQueryResult: dingodb.common.document_rep.DocScanQueryResult
         """
         document_param = dingosdk.DocScanQueryParam()
         document_param.doc_id_start = param.doc_id_start
@@ -287,13 +291,12 @@ class SDKDocumentClient:
         )
 
         if s.ok():
-            print("document_scan_query ......")
             # print(result.ToString())
-            return document_scan_query_result_to_scan_query_result(result).to_dict()
+            return document_scan_query_result_to_scan_query_result(result)
         else:
             raise RuntimeError(f"scan_query index:{param.index_name} fail: {s.ToString()}")
 
-    def document_index_metrics(self, index_name: str) -> Dict:
+    def document_index_metrics(self, index_name: str) -> DocIndexMetricsResult:
         """
         document_index_metrics index_metrics in index
 
@@ -304,15 +307,14 @@ class SDKDocumentClient:
             RuntimeError: return error
 
         Returns:
-            Dict: index_metrics dict
+            DocIndexMetricsResult: dingodb.common.document_rep.DocIndexMetricsResult
         """
         s, result = self.document_client.GetIndexMetricsByIndexName(
             self.schema_id, index_name
         )
         if s.ok():
-            print("document_index_metrics ......")
             # print(result.ToString())
-            return document_get_index_metrics_to_get_index_metrics(result).to_dict()
+            return document_get_index_metrics_to_get_index_metrics(result)
         else:
             raise RuntimeError(f"get index {index_name} metrics fail: {s.ToString()}")
 
@@ -334,12 +336,11 @@ class SDKDocumentClient:
         )
 
         if s.ok():
-            print("document_count ......")
             return result
         else:
             raise RuntimeError(f"count index:{param.index_name} fail: {s.ToString()}")
 
-    def document_delete(self, param: DocumentDeleteParam) -> List:
+    def document_delete(self, param: DocumentDeleteParam) -> List[DocDeleteResult]:
         """
         document_delete delete document with ids
 
@@ -350,16 +351,15 @@ class SDKDocumentClient:
             RuntimeError: return error
 
         Returns:
-            list : [{}, {}, ...]
+            List[DocDeleteResult] : dingodb.common.document_rep.DocDeleteResult
         """
         s, result = self.document_client.DeleteByIndexName(
             self.schema_id, param.index_name, param.ids
         )
 
         if s.ok():
-            print("document_delete ......")
             # print([res.ToString() for res in result])
-            return [document_delete_result_to_delete_result(res).to_dict() for res in result]
+            return [document_delete_result_to_delete_result(res) for res in result]
         else:
             raise RuntimeError(
                 f"document delete form index:{param.index_name} fail: {s.ToString()}"

@@ -286,19 +286,19 @@ class SDKVectorClient:
                 scalar_type = scarlar_value.type
 
                 scarlar_field = dingosdk.ScalarField()
-                if scalar_type == dingosdk.kSTRING:
+                if scalar_type == dingosdk.Type.kSTRING:
                     scarlar_field.string_data = value
-                elif scalar_type == dingosdk.kDOUBLE:
+                elif scalar_type == dingosdk.Type.kDOUBLE:
                     scarlar_field.double_data = value
-                elif scalar_type == dingosdk.kINT64:
+                elif scalar_type == dingosdk.Type.kINT64:
                     scarlar_field.long_data = value
-                elif scalar_type == dingosdk.kBOOL:
+                elif scalar_type == dingosdk.Type.kBOOL:
                     scarlar_field.bool_data = value
                 else:
                     raise RuntimeError(f"not support type: {scarlar_value.type}")
 
                 # TODO: support vector with multiple fields
-                fields = dingosdk.ScalarFieldVector()
+                fields = []
                 fields.append(scarlar_field)
                 scarlar_value.fields = fields
 
@@ -484,7 +484,7 @@ class SDKVectorClient:
         vector_delete delete vector with ids
 
         Args:
-            params: VectorDeleteParam
+            param: VectorDeleteParam
 
         Raises:
             RuntimeError: return error
