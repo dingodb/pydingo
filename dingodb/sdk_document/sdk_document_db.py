@@ -34,8 +34,7 @@ class SDKDocumentDingoDB:
             replicas: int = 3,
             operand: List[int] = None,
             start_id: int = 0,
-            json_params: str = "",
-            metadata_config: Dict = None
+            json_params: str = ""
     ) -> bool:
         """
         create_index create index
@@ -47,7 +46,6 @@ class SDKDocumentDingoDB:
             operand (list, optional): operand. Defaults to None.
             start_id (int, optional): autoIncrement start id. Defaults to 0.
             json_params (str, optional): the json params of index. Defaults to "".
-            metadata_config (dict, optional): metadata. Defaults to None.NOT Support Now , used for schema
 
         Raises:
             RuntimeError: return error
@@ -60,8 +58,7 @@ class SDKDocumentDingoDB:
             replicas=replicas,
             operand=operand,
             start_id=start_id,
-            json_params=json_params,
-            metadata_config=metadata_config,
+            json_params=json_params
         )
 
         return self.client.create_index(params, schema=schema)
