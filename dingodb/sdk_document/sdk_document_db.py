@@ -3,7 +3,15 @@ from typing import List, Dict, Union
 from dingodb.sdk_client import SDKClient
 from dingodb.sdk_document.sdk_document_client import SDKDocumentClient
 
-from dingodb.common.document_rep import DocumentSchema
+from dingodb.common.document_rep import (
+    DocumentSchema,
+    AddResult,
+    DocSearchResult,
+    DocQueryResult,
+    DocScanQueryResult,
+    DocIndexMetricsResult,
+    DocDeleteResult
+)
 
 from .sdk_document_param import (
     CreateIndexParam,
@@ -80,7 +88,7 @@ class SDKDocumentDingoDB:
 
     def document_add(
             self, index_name: str, documents: List, ids: List
-    ) -> List:
+    ) -> AddResult:
         """
         document_add add document
 
@@ -93,7 +101,7 @@ class SDKDocumentDingoDB:
             RuntimeError: return error
 
         Returns:
-            list: document id list
+            AddResult: dingodb.common.document_rep.AddResult
         """
         params = DocumentAddParam(
             index_name=index_name, documents=documents, ids=ids
@@ -111,7 +119,7 @@ class SDKDocumentDingoDB:
             with_scalar_data: bool = False,
             column_names: List[str] = None,
             selected_keys: List[str] = None
-    ) -> List:
+    ) -> DocSearchResult:
         """
         document_search search document
 
@@ -129,7 +137,7 @@ class SDKDocumentDingoDB:
             RuntimeError: return error
 
         Returns:
-            List[dict]: search results
+            DocSearchResult: dingodb.common.document_rep.DocSearchResult
         """
 
         params = DocumentSearchParam(
@@ -151,7 +159,7 @@ class SDKDocumentDingoDB:
             doc_ids: List,
             with_scalar_data: bool = False,
             selected_keys: List = None,
-    ) -> List:
+    ) -> DocQueryResult:
         """
         document_query query document
 
@@ -166,7 +174,7 @@ class SDKDocumentDingoDB:
             RuntimeError: return error
 
         Returns:
-            List[dict]: search results
+            DocQueryResult: dingodb.common.document_rep.DocQueryResult
         """
 
         params = DocumentQueryParam(
@@ -213,7 +221,7 @@ class SDKDocumentDingoDB:
             max_scan_count: int = 0,
             with_scalar_data: bool = True,
             selected_keys: List[str] = None,
-    ) -> List:
+    ) -> DocScanQueryResult:
         """
         document_scan_query scan_query document
 
@@ -235,7 +243,7 @@ class SDKDocumentDingoDB:
             RuntimeError: return error
 
         Returns:
-            List[dict]: scan_query results
+            DocScanQueryResult: dingodb.common.document_rep.DocScanQueryResult
         """
 
         params = DocumentScanQueryParam(
@@ -250,7 +258,7 @@ class SDKDocumentDingoDB:
 
         return self.client.document_scan_query(params)
 
-    def document_index_metrics(self, index_name: str) -> Dict:
+    def document_index_metrics(self, index_name: str) -> DocIndexMetricsResult:
         """
         document_index_metrics index_metrics in index
 
@@ -261,7 +269,7 @@ class SDKDocumentDingoDB:
             RuntimeError: return error
 
         Returns:
-            Dict: index_metrics dict
+            DocIndexMetricsResult: dingodb.common.document_rep.DocIndexMetricsResult
         """
         return self.client.document_index_metrics(index_name)
 
@@ -294,7 +302,7 @@ class SDKDocumentDingoDB:
 
         return self.client.document_count(params)
 
-    def document_delete(self, index_name: str, ids: List) -> List:
+    def document_delete(self, index_name: str, ids: List) -> List[DocDeleteResult]:
         """
         document_delete delete document with ids
 
@@ -306,7 +314,7 @@ class SDKDocumentDingoDB:
             RuntimeError: return error
 
         Returns:
-            list : [{}, {}, ...]
+            List[DocDeleteResult] : dingodb.common.document_rep.DocDeleteResult
         """
         params = DocumentDeleteParam(index_name=index_name, ids=ids)
 

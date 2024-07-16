@@ -91,8 +91,8 @@ class AddResult:
     ):
         self.docs = docs
 
-    def __str__(self):
-        return str([doc.to_dict() for doc in self.docs])
+    def to_dict(self):
+        return [doc.to_dict() for doc in self.docs]
 
 
 class DocSearchResult:
