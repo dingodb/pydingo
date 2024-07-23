@@ -46,7 +46,7 @@ class DocumentDeleteParam(BaseModel):
 class DocumentAddParam(BaseModel):
     index_name: str
     documents: List
-    ids: List
+    ids: List[int] = None
 
     @validator("documents", always=True)
     def check_documents(cls, value):

@@ -138,8 +138,15 @@ class SDKDocumentClient:
         Returns:
             AddResult: dingodb.common.document_rep.AddResult
         """
+        status, out_doc_index = self.client.GetDocumentIndex(self.schema_id, add_param.index_name)
+        if not status.ok():
+            raise RuntimeError(
+                f"get index {add_param.index_name} error: {status.ToString()}"
+            )
+        else:
+            schema_dict = out_doc_index.GetSchema()
+
         documents = []
-        schema_dict = self.client.GetDocumentIndex(self.schema_id, add_param.index_name)[1].GetSchema()
         for i, v in enumerate(add_param.documents):
             id = 0
             if add_param.ids is not None:
@@ -147,6 +154,9 @@ class SDKDocumentClient:
 
             tmp_document = dingosdk.Document()
             for key, value in add_param.documents[i].items():
+                if key not in schema_dict:
+                    raise KeyError(f"The key '{key}' is not in the schema")
+
                 if schema_dict[key] == dingosdk.Type.kINT64:
                     tmp_document.AddField(key, dingosdk.DocValue.FromInt(value))
                 elif schema_dict[key] == dingosdk.Type.kDOUBLE:

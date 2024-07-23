@@ -87,7 +87,7 @@ class SDKDocumentDingoDB:
         return self.client.delete_index(index_name)
 
     def document_add(
-            self, index_name: str, documents: List, ids: List
+            self, index_name: str, documents: List, ids:List[int] = None
     ) -> AddResult:
         """
         document_add add document
