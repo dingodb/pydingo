@@ -34,6 +34,10 @@ class DocValue:
         self.type = type
         self.value = value
 
+    def __str__(self):
+        return str(self.to_dict())
+
+
     def to_dict(self):
         return {"type": self.type.value, "value": self.value}
 
@@ -44,6 +48,9 @@ class Document:
             fields: Dict[str, DocValue]
     ):
         self.fields = fields
+
+    def __str__(self):
+        return str(self.to_dict())
 
     def to_dict(self):
         return {key: value.to_dict() for key, value in self.fields.items()}
@@ -57,6 +64,9 @@ class DocWithId:
     ):
         self.id = id
         self.doc = doc
+
+    def __str__(self):
+        return str(self.to_dict())
 
     def to_dict(self):
         return {
@@ -76,6 +86,9 @@ class DocWithScore:
         self.doc = doc
         self.score = score
 
+    def __str__(self):
+        return str(self.to_dict())
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -91,6 +104,9 @@ class AddResult:
     ):
         self.docs = docs
 
+    def __str__(self):
+        return str(self.to_dict())
+
     def to_dict(self):
         return [doc.to_dict() for doc in self.docs]
 
@@ -101,6 +117,9 @@ class DocSearchResult:
             docs: List[DocWithScore]
     ):
         self.docs = docs
+
+    def __str__(self):
+        return str(self.to_dict())
 
     def to_dict(self):
         return [doc.to_dict() for doc in self.docs]
@@ -113,6 +132,9 @@ class DocQueryResult:
     ):
         self.docs = docs
 
+    def __str__(self):
+        return str(self.to_dict())
+
     def to_dict(self):
         return [doc.to_dict() for doc in self.docs]
 
@@ -123,6 +145,9 @@ class DocScanQueryResult:
             docs: List[DocWithId]
     ):
         self.docs = docs
+
+    def __str__(self):
+        return str(self.to_dict())
 
     def to_dict(self):
         return [doc.to_dict() for doc in self.docs]
@@ -145,6 +170,9 @@ class DocIndexMetricsResult:
         self.meta_json = meta_json
         self.json_parameter = json_parameter
 
+    def __str__(self):
+        return str(self.to_dict())
+
     def to_dict(self):
         return {
             "total_num_docs": self.total_num_docs,
@@ -164,6 +192,9 @@ class DocDeleteResult:
     ):
         self.doc_id = doc_id
         self.deleted = deleted
+
+    def __str__(self):
+        return str(self.to_dict())
 
     def to_dict(self):
         return {
