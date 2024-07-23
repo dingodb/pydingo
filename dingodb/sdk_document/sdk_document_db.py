@@ -86,6 +86,23 @@ class SDKDocumentDingoDB:
         """
         return self.client.delete_index(index_name)
 
+    def get_schema(self, index_name: str) -> DocumentSchema:
+        """
+        get_schema get dschema
+
+        Args:
+            index_name (str): the name of index
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            DocumentSchema: dingodb.common.document_rep.DocumentSchema
+        """
+
+        return self.client.get_schema(index_name)
+
+
     def document_add(
             self, index_name: str, documents: List, ids:List[int] = None
     ) -> AddResult:

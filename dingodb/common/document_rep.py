@@ -16,13 +16,25 @@ class DocumentColumn:
         self.key = key
         self.type = type
 
+    def __str__(self):
+        return str(self.to_dict())
+
+    def to_dict(self):
+        return {"key": self.key, "type": self.type}
+
 
 class DocumentSchema:
     def __init__(self):
         self.cols = []
 
+    def __str__(self):
+        return str(self.to_dict())
+
     def add_document_column(self, col: DocumentColumn):
         self.cols.append(col)
+
+    def to_dict(self):
+        return [col.to_dict() for col in self.cols]
 
 
 class DocValue:

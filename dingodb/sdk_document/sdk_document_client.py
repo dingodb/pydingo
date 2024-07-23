@@ -3,6 +3,7 @@ import dingosdk
 from dingodb.sdk_client import SDKClient
 from dingodb.common.document_rep import (
     DocumentType,
+    DocumentColumn,
     DocumentSchema,
     AddResult,
     DocSearchResult,
@@ -40,6 +41,14 @@ scalar_type_to_document_type = {
     DocumentType.DOUBLE: dingosdk.Type.kDOUBLE,
     DocumentType.STRING: dingosdk.Type.kSTRING,
     DocumentType.BYTES: dingosdk.Type.kBYTES,
+}
+
+document_type_to_scalar_type = {
+    dingosdk.Type.kBOOL: DocumentType.BOOL,
+    dingosdk.Type.kINT64: DocumentType.INT64,
+    dingosdk.Type.kDOUBLE: DocumentType.DOUBLE,
+    dingosdk.Type.kSTRING: DocumentType.STRING,
+    dingosdk.Type.kBYTES: DocumentType.BYTES,
 }
 
 
@@ -124,6 +133,35 @@ class SDKDocumentClient:
             return True
         else:
             raise RuntimeError(f"delete index {index_name} fail: {s.ToString()}")
+
+    def get_schema(self, index_name: str) -> DocumentSchema:
+        """
+        get_schema get dschema
+
+        Args:
+            index_name (str): the name of index
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            DocumentSchema: dingodb.common.document_rep.DocumentSchema
+        """
+        status, out_doc_index = self.client.GetDocumentIndex(self.schema_id, index_name)
+        if not status.ok():
+            raise RuntimeError(
+                f"get index {index_name} error: {status.ToString()}"
+            )
+        else:
+            schema_dict = out_doc_index.GetSchema()
+
+        document_schema = DocumentSchema()
+        for key, value in schema_dict.items():
+            document_column = DocumentColumn(key, document_type_to_scalar_type[value])
+            document_schema.add_document_column(document_column)
+
+        return document_schema
+
 
     def document_add(self, add_param: DocumentAddParam) -> AddResult:
         """
