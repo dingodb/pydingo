@@ -331,7 +331,7 @@ class SDKDocumentDingoDB:
             RuntimeError: return error
 
         Returns:
-            List[DocDeleteResult] : dingodb.common.document_rep.DocDeleteResult
+            List[DocDeleteResult]: dingodb.common.document_rep.DocDeleteResult
         """
         params = DocumentDeleteParam(index_name=index_name, ids=ids)
 

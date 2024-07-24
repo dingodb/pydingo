@@ -25,9 +25,9 @@ from .sdk_document_param import (
 )
 
 from .sdk_document_adapter import (
+    document_doc_with_id_to_doc_with_id,
     document_add_result_to_add_result,
     document_search_result_to_search_result,
-    document_query_result_to_query_result,
     document_scan_query_result_to_scan_query_result,
     document_get_index_metrics_to_get_index_metrics,
     document_delete_result_to_delete_result
@@ -284,8 +284,18 @@ class SDKDocumentClient:
         )
 
         if s.ok():
-            # print(result.ToString())
-            return document_query_result_to_query_result(result)
+            query_results = {
+                doc.id: document_doc_with_id_to_doc_with_id(doc) for doc in result.docs
+            }
+
+            return_result = []
+            for id in param.doc_ids:
+                if id in query_results:
+                    return_result.append(query_results[id])
+                else:
+                    return_result.append(None)
+
+            return DocQueryResult(return_result)
         else:
             raise RuntimeError(f"query index:{param.index_name} fail: {s.ToString()}")
 
@@ -406,8 +416,18 @@ class SDKDocumentClient:
         )
 
         if s.ok():
-            # print([res.ToString() for res in result])
-            return [document_delete_result_to_delete_result(res) for res in result]
+            delete_result = {
+                doc.doc_id: document_delete_result_to_delete_result(doc) for doc in result
+            }
+
+            return_result = {}
+            for id in param.ids:
+                if id in delete_result:
+                    return_result[id] = delete_result[id]
+                else:
+                    return_result[id] = None
+
+            return [delete_result for delete_result in return_result.values()]
         else:
             raise RuntimeError(
                 f"document delete form index:{param.index_name} fail: {s.ToString()}"

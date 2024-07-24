@@ -91,15 +91,6 @@ def document_search_result_to_search_result(
     )
 
 
-def document_query_result_to_query_result(
-        document_query_result: dingosdk.DocQueryResult
-):
-    return DocQueryResult(
-        docs=[
-            document_doc_with_id_to_doc_with_id(x)
-            for x in document_query_result.docs
-        ]
-    )
 
 
 def document_scan_query_result_to_scan_query_result(
