@@ -140,7 +140,7 @@ class DocSearchResult:
 class DocQueryResult:
     def __init__(
             self,
-            docs: List[DocWithId]
+            docs: List[Union[DocWithId, None]]
     ):
         self.docs = docs
 
@@ -148,7 +148,7 @@ class DocQueryResult:
         return str(self.to_dict())
 
     def to_dict(self):
-        return [doc.to_dict() for doc in self.docs]
+        return [doc.to_dict() if doc is not None else None for doc in self.docs]
 
 
 class DocScanQueryResult:
