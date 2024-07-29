@@ -319,7 +319,7 @@ class SDKDocumentDingoDB:
 
         return self.client.document_count(params)
 
-    def document_delete(self, index_name: str, ids: List) -> List[DocDeleteResult]:
+    def document_delete(self, index_name: str, ids: List) -> List[bool]:
         """
         document_delete delete document with ids
 
@@ -331,8 +331,9 @@ class SDKDocumentDingoDB:
             RuntimeError: return error
 
         Returns:
-            List[DocDeleteResult]: dingodb.common.document_rep.DocDeleteResult
+            List[bool]: [True, False, ...]
         """
         params = DocumentDeleteParam(index_name=index_name, ids=ids)
+        document_del_map = {d.doc_id: d.deleted for d in self.client.document_delete(params)} 
 
-        return self.client.document_delete(params)
+        return [document_del_map.get(i) for i in ids]
