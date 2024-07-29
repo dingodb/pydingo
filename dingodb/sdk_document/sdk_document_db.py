@@ -235,7 +235,7 @@ class SDKDocumentDingoDB:
             doc_id_start: int,
             doc_id_end: int = 0,
             is_reverse: bool = False,
-            max_scan_count: int = 0,
+            max_scan_count: int = 1000,
             with_scalar_data: bool = True,
             selected_keys: List[str] = None,
     ) -> DocScanQueryResult:
@@ -251,7 +251,7 @@ class SDKDocumentDingoDB:
                 the real range is [start, end], include start and end
                 if doc_id_end == 0, scan to the end of the region
             is_reverse is true, doc_id_end must be greater than doc_id_start
-            max_scan_count (int, optional): maximum number of scans. Defaults to 0.
+            max_scan_count (int, optional): maximum number of scans. Defaults to 1000.
             with_scalar_data (bool, optional): whether to include scalar data. Defaults to False.
             selected_keys (list, optional): selected keys. Defaults to None.
                 If with_scalar_data is true, selected_keys is used to select scalar data, and if this parameter is null, all scalar data will be returned.
