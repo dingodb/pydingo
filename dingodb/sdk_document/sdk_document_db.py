@@ -336,4 +336,4 @@ class SDKDocumentDingoDB:
         params = DocumentDeleteParam(index_name=index_name, ids=ids)
         document_del_map = {d.doc_id: d.deleted for d in self.client.document_delete(params)} 
 
-        return [document_del_map.get(i) for i in ids]
+        return [document_del_map.get(i) for i in params.ids]
