@@ -338,7 +338,7 @@ class CheckVectorGetParam(BaseModel):
                 raise Exception("id must > 0")
             else:
                 id_list.append(id)
-
+        assert len(id_list) > 0, f"ids list length must > 0, but get {id_list}"
         return id_list
 
 
@@ -354,5 +354,5 @@ class CheckVectorDeleteParam(BaseModel):
                 raise Exception("id must > 0")
             else:
                 id_list.append(id)
-
+        assert len(id_list) > 0, f"ids list length must > 0, but get {id_list}"
         return id_list
