@@ -40,6 +40,7 @@ class DocumentDeleteParam(BaseModel):
                 raise Exception("id must > 0")
             else:
                 id_list.append(id)
+        assert len(id_list) > 0, f"ids list length must > 0, but get {id_list}"
         return id_list
 
 
@@ -109,6 +110,17 @@ class DocumentQueryParam(BaseModel):
     doc_ids: List[int]
     with_scalar_data: bool = False
     selected_keys: List[str] = None
+    
+    @validator("doc_ids", always=True)
+    def check_doc_ids(cls, value):
+        id_list = []
+        for id in value:
+            if id <= 0:
+                raise Exception("id must > 0")
+            else:
+                id_list.append(id)
+        assert len(id_list) > 0, f"doc_ids list length must > 0, but get {id_list}"
+        return id_list
 
     @validator("selected_keys", always=True)
     def check_selected_keys(cls, value):
