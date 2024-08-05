@@ -131,7 +131,6 @@ class SDKDocumentDingoDB:
             index_name: str,
             query_string: str,
             top_n: int,
-            use_id_filter: bool = False,
             doc_ids: List = None,
             with_scalar_data: bool = False,
             column_names: List[str] = None,
@@ -144,7 +143,6 @@ class SDKDocumentDingoDB:
             index_name (str): the name of the index
             query_string (str): the query string
             top_n (int, optional): top n search. Defaults to 0.
-            use_id_filter bool, optional: use id filter. Defaults to False.
             doc_ids (list, optional): document ids. Defaults to None.
             with_scalar_data (bool, optional): whether to include scalar data. Defaults to True.
             column_names (list, optional): column names. Defaults to None.
@@ -161,7 +159,6 @@ class SDKDocumentDingoDB:
             index_name=index_name,
             query_string=query_string,
             top_n=top_n,
-            use_id_filter=use_id_filter,
             doc_ids=doc_ids,
             with_scalar_data=with_scalar_data,
             column_names=column_names,

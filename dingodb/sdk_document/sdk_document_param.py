@@ -83,13 +83,11 @@ class DocumentSearchParam(BaseModel):
 
     @validator("doc_ids", always=True)
     def check_doc_ids(cls, value, values):
-        if values.get("use_id_filter"):
-            if value is None or value == []:
-                raise RuntimeError("when use_id_filter is true, doc_ids must not be empty list")
+        if value is None or value == []:
+            value = []
             return value
         else:
-            if value is None:
-                value = []
+            values["use_id_filter"] = True
             return value
 
     @validator("column_names", always=True)
