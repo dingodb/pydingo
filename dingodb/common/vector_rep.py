@@ -147,3 +147,24 @@ class IndexMetric:
             "minVectorId": self.min_vector_id,
             "memoryBytes": self.memory_bytes,
         }
+
+
+class RegionStatus:
+    def __init__(self, region_id: int, err_msg: str):
+        self.region_id = region_id
+        self.err_msg = err_msg
+
+    def to_dict(self):
+        return {"region_id": self.region_id, "err_msg": self.err_msg}
+
+
+
+
+class RegionState:
+    def __init__(self, region_id: int, state: str):
+        self.region_id = region_id
+        self.state = state
+
+    def to_dict(self):
+            return {"region_id ": self.region_id, "region_state": self.state}
+      

@@ -13,6 +13,8 @@ from dingodb.common.vector_rep import (
     VectorWithDistance,
     MetricType,
     IndexMetric,
+    RegionStatus,
+    RegionState,
 )
 
 from typing import List, Dict
@@ -127,3 +129,25 @@ def sdk_index_metrics_result_to_index_metric(
         min_vector_id=sdk_index_metrics_result.min_vector_id,
         memory_bytes=sdk_index_metrics_result.memory_bytes,
     )
+
+
+def sdk_err_status_result_to_err_status(
+    sdk_err_status_result: dingosdk.ErrStatusResult,
+) -> list[RegionStatus]:
+    err_status: list[RegionStatus] = []
+    for e in sdk_err_status_result.region_status:
+        region_status = RegionStatus(region_id=e.region_id, err_msg=e.status.ToString())
+        err_status.append(region_status)
+    return err_status
+
+
+def sdk_state_result_to_state(sdk_state_result: dingosdk.StateResult) -> list:
+    states: list[RegionState] = []
+    for s in sdk_state_result.region_states:
+        region_state = RegionState(
+            region_id=s.region_id,
+            state=dingosdk.RegionStateToString(s.state),
+        )
+        states.append(region_state)
+
+    return states
