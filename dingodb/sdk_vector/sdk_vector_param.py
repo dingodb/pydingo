@@ -21,6 +21,12 @@ metric_types = {
     "cosine": dingosdk.MetricType.kCosine,
 }
 
+value_type = {
+    "float": dingosdk.ValueType.kFloat,
+    "uint8": dingosdk.ValueType.kUint8,
+    "int8": dingosdk.ValueType.kInt8,
+}
+
 index_params = {
     "flat": {"dimension": None, "metricType": None},
     "ivf_flat": {"dimension": None, "metricType": None, "ncentroids": 256},
@@ -40,7 +46,13 @@ index_params = {
         "maxElements": 50000,
         "nlinks": 32,
     },
-    "diskann": {"dimension": None, "metricType": None},
+    "diskann": {
+        "dimension": None,
+        "metricType": None,
+        "valueType": None,
+        "maxDegree": 64,
+        "searchListSize": 100,
+    },
     "brute": {"dimension": None, "metricType": None},
 }
 
@@ -60,8 +72,6 @@ class CreateIndexParam(BaseModel):
 
     @validator("index_type", always=True)
     def check_index_type(cls, value):
-        if value == "diskann":
-            raise Exception(f"index_type diskann is not support now")
         if value not in index_types.keys():
             raise Exception(f"index_type  must in {list(index_types.keys())}")
         return value
@@ -131,7 +141,17 @@ class CreateIndexParam(BaseModel):
                     if key == "nbitsPerIdx":
                         if v <= 0 or v > 16:
                             raise Exception(f"{key} must > 0 and <=16")
-
+                    if key == "maxDegree":
+                        if v < 60 or v > 150:
+                            raise Exception(f"{key} must >= 60 and <=150")
+                    if key == "searchListSize":
+                        if v < 75 or v > 200:
+                            raise Exception(f"{key} must >= 75 and <=200")
+                    if key == "valueType":
+                        if v != "float":
+                            raise Exception(f"{key} must == float")
+                        vector_index_parameter[key] = value_type.get(v)
+                        continue
                     vector_index_parameter[key] = v
                 else:
                     warnings.warn(f"index_config {key} not in {index_type}")
@@ -236,6 +256,7 @@ class VectorSearchParam(BaseModel):
     search_params: dict = None
     with_vector_data: bool = True
     with_scalar_data: bool = True
+    beamwidth: int = 2
 
     @validator("xq", always=True)
     def check_xq(cls, value):
@@ -301,6 +322,66 @@ class VectorGetParam(BaseModel):
 
 
 class VectorDeleteParam(BaseModel):
+    index_name: str
+    ids: List[int]
+
+    @validator("ids", always=True)
+    def check_ids(cls, value):
+        id_list = []
+        for id in value:
+            if id <= 0:
+                raise Exception("id must > 0")
+            else:
+                id_list.append(id)
+        return id_list
+
+
+class VectorStatusByRegionIdParam(BaseModel):
+    index_name: str
+    ids: List[int]
+
+    @validator("ids", always=True)
+    def check_ids(cls, value):
+        id_list = []
+        for id in value:
+            if id <= 0:
+                raise Exception("id must > 0")
+            else:
+                id_list.append(id)
+        return id_list
+
+
+class VectorBuildByRegionIdParam(BaseModel):
+    index_name: str
+    ids: List[int]
+
+    @validator("ids", always=True)
+    def check_ids(cls, value):
+        id_list = []
+        for id in value:
+            if id <= 0:
+                raise Exception("id must > 0")
+            else:
+                id_list.append(id)
+        return id_list
+
+
+class VectorLoadByRegionIdParam(BaseModel):
+    index_name: str
+    ids: List[int]
+
+    @validator("ids", always=True)
+    def check_ids(cls, value):
+        id_list = []
+        for id in value:
+            if id <= 0:
+                raise Exception("id must > 0")
+            else:
+                id_list.append(id)
+        return id_list
+
+
+class VectorResetByRegionIdParam(BaseModel):
     index_name: str
     ids: List[int]
 

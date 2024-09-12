@@ -3,7 +3,7 @@
 from dingodb.sdk_client import SDKClient
 from dingodb.sdk_vector.sdk_vector_client import SDKVectorClient
 
-from dingodb.common.vector_rep import ScalarSchema
+from dingodb.common.vector_rep import ScalarSchema, RegionState, RegionStatus
 
 from .sdk_vector_param import (
     CreateIndexParam,
@@ -12,6 +12,10 @@ from .sdk_vector_param import (
     VectorSearchParam,
     VectorGetParam,
     VectorDeleteParam,
+    VectorStatusByRegionIdParam,
+    VectorBuildByRegionIdParam,
+    VectorLoadByRegionIdParam,
+    VectorResetByRegionIdParam,
 )
 
 
@@ -439,3 +443,188 @@ class SDKVectorDingoDB:
         params = VectorDeleteParam(index_name=index_name, ids=ids)
 
         return self.client.vector_delete(params)
+
+    def vector_status_by_index(self, index_name: str) -> list[RegionState]:
+        """
+        vector_status_by_index
+
+        Args:
+            index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: state list
+        """
+        return self.client.vector_status_by_index(index_name=index_name)
+
+    def vector_status_by_region(self, index_name: str, ids: list) -> list[RegionState]:
+        """
+        vector_status_by_region
+
+        Args:
+             index_name: str
+              ids: list
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: state list
+        """
+        params = VectorStatusByRegionIdParam(index_name=index_name, ids=ids)
+        return self.client.vector_status_by_region(params)
+
+    def vector_build_by_index(self, index_name: str) -> list[RegionStatus]:
+        """
+        vector_build_by_index
+
+        Args:
+            index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: err_status list
+        """
+        return self.client.vector_build_by_index(index_name=index_name)
+
+    def vector_build_by_region(self, index_name: str, ids: list) -> list[RegionStatus]:
+        """
+        vector_build_by_index
+
+        Args:
+           index_name: str
+            ids: list
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: err_status list
+        """
+        params = VectorBuildByRegionIdParam(index_name=index_name, ids=ids)
+        return self.client.vector_build_by_region(params)
+
+    def vector_load_by_index(self, index_name: str) -> list[RegionStatus]:
+        """
+        vector_load_by_index
+
+        Args:
+            index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: err_status list
+        """
+        return self.client.vector_load_by_index(index_name=index_name)
+
+    def vector_load_by_region(self, index_name: str, ids: list) -> list[RegionStatus]:
+        """
+        vector_load_by_region
+
+        Args:
+            index_name: str
+             ids: list
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: err_status list
+        """
+        params = VectorLoadByRegionIdParam(index_name=index_name, ids=ids)
+        return self.client.vector_load_by_region(params)
+
+    def vector_reset_by_index(self, index_name: str) -> list[RegionStatus]:
+        """
+        vector_reset_by_index
+
+        Args:
+            index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: err_status list
+        """
+        return self.client.vector_reset_by_index(index_name=index_name)
+
+    def vector_reset_by_region(self, index_name: str, ids: list) -> list[RegionStatus]:
+        """
+        vector_reset_by_region
+
+        Args:
+            index_name: str
+             ids: list
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: err_status list
+        """
+        params = VectorResetByRegionIdParam(index_name=index_name, ids=ids)
+        return self.client.vector_reset_by_region(params)
+
+    def vector_import_add(
+        self, index_name: str, datas: list, vectors: list, ids: list = None
+    ) -> list:
+        """
+        vector_import_add add vector
+
+        Args:
+            index_name (str): the name of index
+            datas (list): metadata list
+            vectors (list): vector list
+            ids (list, optional): id list. Defaults to None.
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: vector id list
+        """
+        params = VectorAddParam(
+            index_name=index_name, datas=datas, vectors=vectors, ids=ids
+        )
+
+        return self.client.vector_import_add(params)
+
+    def vector_import_delete(self, index_name: str, ids: list):
+        """
+        vector_delete delete vector with ids
+
+        Args:
+            index_name (str): the name of the index
+            ids (list): id list
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+
+        """
+        params = VectorDeleteParam(index_name=index_name, ids=ids)
+
+        return self.client.vector_import_delete(params)
+
+    def vector_count_memory(self, index_name: str) -> int:
+        """
+        vector_count_memory  count build vectors
+
+        Args:
+           index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            count
+        """
+        return self.client.vector_count_memory(index_name=index_name)

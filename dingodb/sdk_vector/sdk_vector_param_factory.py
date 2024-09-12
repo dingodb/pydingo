@@ -65,8 +65,18 @@ class SDKParamFactory:
     def create_diskann_param(
         index_type: str, diskann_param_dict: dict
     ) -> dingosdk.DiskAnnParam:
-        assert index_type == "hnsw"
-        raise Exception(f"index_type diskann is not support now")
+        assert index_type == "diskann"
+
+        param = dingosdk.DiskAnnParam(
+            diskann_param_dict["dimension"],
+            diskann_param_dict["metricType"],
+            diskann_param_dict["valueType"],
+        )
+
+        param.search_list_size = diskann_param_dict["searchListSize"]
+        param.max_degree = diskann_param_dict["maxDegree"]
+
+        return param
 
     @staticmethod
     def create_brute_param(

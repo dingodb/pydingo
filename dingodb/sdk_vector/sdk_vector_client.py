@@ -6,7 +6,7 @@ from dingodb.sdk_client import SDKClient
 
 from dingodb.utils.tools import auto_value_type
 from dingodb.common import constants
-from dingodb.common.vector_rep import ScalarSchema, ScalarType
+from dingodb.common.vector_rep import ScalarSchema, ScalarType, RegionState,RegionStatus
 from dingodb.utils.tools import auto_value_type, auto_expr_type, convert_dict_to_expr
 
 from .sdk_vector_param import (
@@ -16,6 +16,10 @@ from .sdk_vector_param import (
     VectorSearchParam,
     VectorGetParam,
     VectorDeleteParam,
+    VectorStatusByRegionIdParam,
+    VectorBuildByRegionIdParam,
+    VectorLoadByRegionIdParam,
+    VectorResetByRegionIdParam,
 )
 
 from .sdk_vector_param_factory import SDKParamFactory
@@ -23,6 +27,8 @@ from .sdk_vector_adapter import (
     sdk_search_result_to_search_result,
     sdk_vector_with_id_to_vector_with_id,
     sdk_index_metrics_result_to_index_metric,
+    sdk_err_status_result_to_err_status,
+    sdk_state_result_to_state,
 )
 
 sdk_types = {
@@ -98,6 +104,11 @@ class SDKVectorClient:
                 index_type, param.index_config
             )
             creator.SetHnswParam(sdk_param)
+        elif index_type == "diskann":
+            sdk_param = SDKParamFactory.create_diskann_param(
+                index_type, param.index_config
+            )
+            creator.SetDiskAnnParam(sdk_param)
         elif index_type == "brute":
             sdk_param = SDKParamFactory.create_brute_param(
                 index_type, param.index_config
@@ -378,17 +389,17 @@ class SDKVectorClient:
         sdk_param.use_brute_force = param.brute
 
         extra_params_map = {}
-        extra_params_map[dingosdk.SearchExtraParamType.kNprobe] = param.search_params.get(
-            "nprobe", constants.N_PROBES
+        extra_params_map[dingosdk.SearchExtraParamType.kNprobe] = (
+            param.search_params.get("nprobe", constants.N_PROBES)
         )
-        extra_params_map[dingosdk.SearchExtraParamType.kRecallNum] = param.search_params.get(
-            "recallNum", constants.RECALL_NUM
+        extra_params_map[dingosdk.SearchExtraParamType.kRecallNum] = (
+            param.search_params.get("recallNum", constants.RECALL_NUM)
         )
-        extra_params_map[dingosdk.SearchExtraParamType.kParallelOnQueries] = param.search_params.get(
-            "parallelOnQueries", constants.PARALLEL_ON_QUERIES
+        extra_params_map[dingosdk.SearchExtraParamType.kParallelOnQueries] = (
+            param.search_params.get("parallelOnQueries", constants.PARALLEL_ON_QUERIES)
         )
-        extra_params_map[dingosdk.SearchExtraParamType.kEfSearch] = param.search_params.get(
-            "efSearch", constants.EF_SEARCH
+        extra_params_map[dingosdk.SearchExtraParamType.kEfSearch] = (
+            param.search_params.get("efSearch", constants.EF_SEARCH)
         )
 
         sdk_param.extra_params = extra_params_map
@@ -509,3 +520,298 @@ class SDKVectorClient:
             delete_status.append(result_dict[id])
 
         return delete_status
+
+    def vector_status_by_index(self, index_name: str) -> list[RegionState]:
+        """
+        vector_status_by_index
+
+        Args:
+            index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: state list
+        """
+        s, result = self.vector_client.StatusByIndexName(self.schema_id, index_name)
+        if not s.ok():
+            raise RuntimeError(
+                f"vector status by index form index:{index_name} fail: {s.ToString()}"
+            )
+        status_state = sdk_state_result_to_state(result)
+        return status_state
+
+        # return [s.to_dict() for s in status_state]
+
+    def vector_status_by_region(self, param: VectorStatusByRegionIdParam) -> list[RegionState]:
+        """
+        vector_status_by_region
+
+        Args:
+             param: VectorStatusByRegionIdParam
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: state list
+        """
+
+        s, result = self.vector_client.StatusByRegionIdIndexName(
+            self.schema_id, param.index_name, param.ids
+        )
+
+        if not s.ok():
+            raise RuntimeError(
+                f"vector status by region  form index:{param.index_name} fail: {s.ToString()}"
+            )
+        status_state = sdk_state_result_to_state(result)
+        return status_state
+
+    def vector_build_by_index(self, index_name: str) -> list[RegionStatus]:
+        """
+        vector_build_by_index
+
+        Args:
+            index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: err_status list
+        """
+        s, result = self.vector_client.BuildByIndexName(self.schema_id, index_name)
+        if not s.ok() and not s.IsBuildFailed():
+            raise RuntimeError(
+                f"vector build by index form index:{index_name} fail: {s.ToString()}"
+            )
+        build_status = sdk_err_status_result_to_err_status(result)
+        return build_status
+
+    def vector_build_by_region(self, param: VectorBuildByRegionIdParam) -> list[RegionStatus]:
+        """
+        vector_build_by_index
+
+        Args:
+            param: VectorBuildByRegionIdParam
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: err_status list
+        """
+
+        s, result = self.vector_client.BuildByRegionIdIndexName(
+            self.schema_id, param.index_name, param.ids
+        )
+
+        if not s.ok() and not s.IsBuildFailed():
+            raise RuntimeError(
+                f"vector build by region  form index:{param.index_name} fail: {s.ToString()}"
+            )
+        build_status = sdk_err_status_result_to_err_status(result)
+        return build_status
+
+    def vector_load_by_index(self, index_name: str) -> list[RegionStatus]:
+        """
+        vector_load_by_index
+
+        Args:
+            index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: err_status list
+        """
+        s, result = self.vector_client.LoadByIndexName(self.schema_id, index_name)
+        if not s.ok() and not s.IsLoadFailed():
+            raise RuntimeError(
+                f"vector load by index form index:{index_name} fail: {s.ToString()}"
+            )
+        load_status = sdk_err_status_result_to_err_status(result)
+        return load_status
+
+    def vector_load_by_region(self, param: VectorLoadByRegionIdParam) -> list[RegionStatus]:
+        """
+        vector_load_by_region
+
+        Args:
+            param: VectorLoadByRegionIdParam
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: err_status list
+        """
+
+        s, result = self.vector_client.LoadByRegionIdIndexName(
+            self.schema_id, param.index_name, param.ids
+        )
+
+        if not s.ok() and not s.IsLoadFailed():
+            raise RuntimeError(
+                f"vector load by region  form index:{param.index_name} fail: {s.ToString()}"
+            )
+        load_status = sdk_err_status_result_to_err_status(result)
+        return load_status
+
+    def vector_reset_by_index(self, index_name: str) -> list[RegionStatus]:
+        """
+        vector_reset_by_index
+
+        Args:
+            index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: err_status list
+        """
+        s, result = self.vector_client.ResetByIndexName(self.schema_id, index_name)
+        if not s.ok() and not s.IsResetFailed():
+            raise RuntimeError(
+                f"vector reset by index form index:{index_name} fail: {s.ToString()}"
+            )
+        reset_status = sdk_err_status_result_to_err_status(result)
+        return reset_status
+
+    def vector_reset_by_region(self, param: VectorResetByRegionIdParam) -> list[RegionStatus]:
+        """
+        vector_reset_by_region
+
+        Args:
+            param: VectorResetByRegionIdParam
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: err_status list
+        """
+
+        s, result = self.vector_client.ResetByRegionIdIndexName(
+            self.schema_id, param.index_name, param.ids
+        )
+
+        if not s.ok() and not s.IsResetFailed():
+            raise RuntimeError(
+                f"vector reset by region  form index:{param.index_name} fail: {s.ToString()}"
+            )
+        reset_status = sdk_err_status_result_to_err_status(result)
+        return reset_status
+
+    def vector_import_add(self, add_param: VectorAddParam) -> list:
+        """
+        vector_import_add add vector
+
+        Args:
+            add_param: VectorAddParam
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: vector id list
+        """
+        vectors = []
+        for i, v in enumerate(add_param.vectors):
+            id = 0
+            if add_param.ids is not None:
+                id = add_param.ids[i]
+
+            tmp_vector = dingosdk.Vector(dingosdk.ValueType.kFloat, len(v))
+            tmp_vector.float_values = v
+
+            vector_with_id = dingosdk.VectorWithId(id, tmp_vector)
+
+            scarlar_data = {}
+            for key, value in add_param.datas[i].items():
+                scarlar_value = dingosdk.ScalarValue()
+                scarlar_value.type = sdk_types[auto_value_type(value)]
+
+                scalar_type = scarlar_value.type
+                scarlar_field = dingosdk.ScalarField()
+                if scalar_type == dingosdk.Type.kSTRING:
+                    scarlar_field.string_data = value
+                elif scalar_type == dingosdk.Type.kDOUBLE:
+                    scarlar_field.double_data = value
+                elif scalar_type == dingosdk.Type.kINT64:
+                    scarlar_field.long_data = value
+                elif scalar_type == dingosdk.Type.kBOOL:
+                    scarlar_field.bool_data = value
+                else:
+                    raise RuntimeError(f"not support type: {scarlar_value.type}")
+
+                # TODO: support vector with multiple fields
+                fields = []
+                fields.append(scarlar_field)
+                scarlar_value.fields = fields
+
+                scarlar_data[key] = scarlar_value
+
+            vector_with_id.scalar_data = scarlar_data
+            vectors.append(vector_with_id)
+
+        s, vectors = self.vector_client.ImportAddByIndexName(
+            self.schema_id, add_param.index_name, vectors
+        )
+
+        if s.ok():
+            return [sdk_vector_with_id_to_vector_with_id(v).to_dict() for v in vectors]
+        else:
+            raise RuntimeError(
+                f"add vector in {add_param.index_name} fail: {s.ToString()}"
+            )
+
+    def vector_import_delete(self, param: VectorDeleteParam) :
+        """
+        vector_import_delete delete vector with ids
+
+        Args:
+            param: VectorDeleteParam
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            
+        """
+        s = self.vector_client.ImportDeleteByIndexName(
+            self.schema_id, param.index_name, param.ids
+        )
+
+        if not s.ok():
+            raise RuntimeError(
+                f"vector delete form index:{param.index_name} fail: {s.ToString()}"
+            )
+       
+
+    def vector_count_memory(self, index_name: str) -> int:
+        """
+        vector_count_memory  count build vectors
+
+        Args:
+           index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            count
+        """
+        s, result = self.vector_client.CountMemoryByIndexName(
+            self.schema_id, index_name
+        )
+        if s.ok():
+            return result
+        else:
+            raise RuntimeError(
+                f"vector count memory form index:{index_name} fail: {s.ToString()}"
+            )
