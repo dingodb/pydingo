@@ -151,3 +151,33 @@ def sdk_state_result_to_state(sdk_state_result: dingosdk.StateResult) -> list:
         states.append(region_state)
 
     return states
+
+
+def type_conversion(sdk_type: dingosdk.Type, sch_type: dingosdk.Type) -> bool:
+    if sdk_type == sch_type:
+        return True
+
+    kTypeConversionMatrix = [
+        [True, False, False, False],  # kBOOL can be converted to kBOOL
+        [False, True, True, False],  # kINT64 can be converted to kINT64, kDOUBLE
+        [False, False, True, False],  # kDOUBLE can be converted to kDOUBLE
+        [False, False, False, True],  # kSTRING can be converted to kSTRING
+    ]
+    type_to_index = {
+        dingosdk.Type.kBOOL: 0,
+        dingosdk.Type.kINT64: 1,
+        dingosdk.Type.kDOUBLE: 2,
+        dingosdk.Type.kSTRING: 3,
+    }
+
+    try:
+        row = type_to_index[sdk_type]
+    except KeyError:
+        raise RuntimeError(f"not support sdk_type: {sdk_type}")
+
+    try:
+        col = type_to_index[sch_type]
+    except KeyError:
+        raise RuntimeError(f"not support sch_type: {sch_type}")
+
+    return kTypeConversionMatrix[row][col]
