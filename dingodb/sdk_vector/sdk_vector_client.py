@@ -183,33 +183,33 @@ class SDKVectorClient:
 
             scarlar_data = {}
             for key, value in add_param.datas[i].items():
-                if key not in schema_dict:
-                    raise KeyError(f"The key '{key}' is not in the schema")
 
-                type = sdk_types[auto_value_type(value)]
+                scalar_type = sdk_types[auto_value_type(value)]
 
-                if not type_conversion(type, schema_dict[key]):
-                    raise RuntimeError(
-                        f"type_conversion error {type} to {schema_dict[key]}"
-                    )
+                if key in schema_dict:
+                    if not type_conversion(scalar_type, schema_dict[key]):
+                        raise RuntimeError(
+                            f"type_conversion error {scalar_type} to {schema_dict[key]}"
+                        )
+                    scalar_type = schema_dict[key]
 
                 scarlar_value = dingosdk.ScalarValue()
                 scarlar_field = dingosdk.ScalarField()
 
-                if schema_dict[key] == dingosdk.Type.kSTRING:
+                if scalar_type == dingosdk.Type.kSTRING:
                     scarlar_value.type = dingosdk.Type.kSTRING
                     scarlar_field.string_data = value
-                elif schema_dict[key] == dingosdk.Type.kDOUBLE:
+                elif scalar_type == dingosdk.Type.kDOUBLE:
                     scarlar_value.type = dingosdk.Type.kDOUBLE
                     scarlar_field.double_data = value
-                elif schema_dict[key] == dingosdk.Type.kINT64:
+                elif scalar_type == dingosdk.Type.kINT64:
                     scarlar_value.type = dingosdk.Type.kINT64
                     scarlar_field.long_data = value
-                elif schema_dict[key] == dingosdk.Type.kBOOL:
+                elif scalar_type == dingosdk.Type.kBOOL:
                     scarlar_value.type = dingosdk.Type.kBOOL
                     scarlar_field.bool_data = value
                 else:
-                    raise RuntimeError(f"not support type: {schema_dict[key]}")
+                    raise RuntimeError(f"not support type: {scalar_type}")
 
                 # TODO: support vector with multiple fields
                 fields = []
@@ -222,7 +222,7 @@ class SDKVectorClient:
             vectors.append(vector_with_id)
         return vectors
 
-    def vectors_add_without_schema(add_param: VectorAddParam) -> list:
+    def vectors_add_without_schema(self, add_param: VectorAddParam) -> list:
         vectors = []
         for i, v in enumerate(add_param.vectors):
             id = 0
@@ -358,32 +358,33 @@ class SDKVectorClient:
             sdk_param.use_scalar_filter = True
             scarlar_data = {}
             for key, value in scan_param.filter_scalar.items():
-                if key not in schema_dict:
-                    raise KeyError(f"The key '{key}' is not in the schema")
-                
-                type = sdk_types[auto_value_type(value)]
-                if not type_conversion(type, schema_dict[key]):
-                    raise RuntimeError(
-                        f"type_conversion error {type} to {schema_dict[key]}"
-                    )
+
+                scalar_type = sdk_types[auto_value_type(value)]
+
+                if key in schema_dict:
+                    if not type_conversion(scalar_type, schema_dict[key]):
+                        raise RuntimeError(
+                            f"type_conversion error {scalar_type} to {schema_dict[key]}"
+                        )
+                    scalar_type = schema_dict[key]
 
                 scarlar_value = dingosdk.ScalarValue()
                 scarlar_field = dingosdk.ScalarField()
 
-                if schema_dict[key] == dingosdk.Type.kSTRING:
+                if scalar_type == dingosdk.Type.kSTRING:
                     scarlar_value.type = dingosdk.Type.kSTRING
                     scarlar_field.string_data = value
-                elif schema_dict[key] == dingosdk.Type.kDOUBLE:
+                elif scalar_type == dingosdk.Type.kDOUBLE:
                     scarlar_value.type = dingosdk.Type.kDOUBLE
                     scarlar_field.double_data = value
-                elif schema_dict[key] == dingosdk.Type.kINT64:
+                elif scalar_type == dingosdk.Type.kINT64:
                     scarlar_value.type = dingosdk.Type.kINT64
                     scarlar_field.long_data = value
-                elif schema_dict[key] == dingosdk.Type.kBOOL:
+                elif scalar_type == dingosdk.Type.kBOOL:
                     scarlar_value.type = dingosdk.Type.kBOOL
                     scarlar_field.bool_data = value
                 else:
-                    raise RuntimeError(f"not support type: {scarlar_value.type}")
+                    raise RuntimeError(f"not support type: {scalar_type}")
 
                 # TODO: support vector with multiple fields
                 fields = []
@@ -396,7 +397,7 @@ class SDKVectorClient:
 
         return sdk_param
 
-    def vectors_scan_without_schema(scan_param: VectorScanParam):
+    def vectors_scan_without_schema(self, scan_param: VectorScanParam):
         sdk_param = dingosdk.ScanQueryParam()
         sdk_param.vector_id_start = scan_param.start_id
         sdk_param.vector_id_end = scan_param.end_id
