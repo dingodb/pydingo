@@ -6,7 +6,12 @@ from dingodb.sdk_client import SDKClient
 
 from dingodb.utils.tools import auto_value_type
 from dingodb.common import constants
-from dingodb.common.vector_rep import ScalarSchema, ScalarType, RegionState,RegionStatus
+from dingodb.common.vector_rep import (
+    ScalarSchema,
+    ScalarType,
+    RegionState,
+    RegionStatus,
+)
 from dingodb.utils.tools import auto_value_type, auto_expr_type, convert_dict_to_expr
 
 from .sdk_vector_param import (
@@ -29,6 +34,7 @@ from .sdk_vector_adapter import (
     sdk_index_metrics_result_to_index_metric,
     sdk_err_status_result_to_err_status,
     sdk_state_result_to_state,
+    type_conversion,
 )
 
 sdk_types = {
@@ -160,19 +166,63 @@ class SDKVectorClient:
         else:
             raise RuntimeError(f"delete index {index_name} fail: {s.ToString()}")
 
-    def vector_add(self, add_param: VectorAddParam) -> list:
-        """
-        vector_add add vector
+    def vectors_add_with_schema(
+        self, schema_dict: dict, add_param: VectorAddParam
+    ) -> list:
+        vectors = []
+        for i, v in enumerate(add_param.vectors):
+            id = 0
+            if add_param.ids is not None:
+                id = add_param.ids[i]
 
-        Args:
-            add_param: VectorAddParam
+            # TODO: support unit8
+            tmp_vector = dingosdk.Vector(dingosdk.ValueType.kFloat, len(v))
+            tmp_vector.float_values = v
 
-        Raises:
-            RuntimeError: return error
+            vector_with_id = dingosdk.VectorWithId(id, tmp_vector)
 
-        Returns:
-            list: vector id list
-        """
+            scarlar_data = {}
+            for key, value in add_param.datas[i].items():
+                if key not in schema_dict:
+                    raise KeyError(f"The key '{key}' is not in the schema")
+
+                type = sdk_types[auto_value_type(value)]
+
+                if not type_conversion(type, schema_dict[key]):
+                    raise RuntimeError(
+                        f"type_conversion error {type} to {schema_dict[key]}"
+                    )
+
+                scarlar_value = dingosdk.ScalarValue()
+                scarlar_field = dingosdk.ScalarField()
+
+                if schema_dict[key] == dingosdk.Type.kSTRING:
+                    scarlar_value.type = dingosdk.Type.kSTRING
+                    scarlar_field.string_data = value
+                elif schema_dict[key] == dingosdk.Type.kDOUBLE:
+                    scarlar_value.type = dingosdk.Type.kDOUBLE
+                    scarlar_field.double_data = value
+                elif schema_dict[key] == dingosdk.Type.kINT64:
+                    scarlar_value.type = dingosdk.Type.kINT64
+                    scarlar_field.long_data = value
+                elif schema_dict[key] == dingosdk.Type.kBOOL:
+                    scarlar_value.type = dingosdk.Type.kBOOL
+                    scarlar_field.bool_data = value
+                else:
+                    raise RuntimeError(f"not support type: {schema_dict[key]}")
+
+                # TODO: support vector with multiple fields
+                fields = []
+                fields.append(scarlar_field)
+                scarlar_value.fields = fields
+
+                scarlar_data[key] = scarlar_value
+
+            vector_with_id.scalar_data = scarlar_data
+            vectors.append(vector_with_id)
+        return vectors
+
+    def vectors_add_without_schema(add_param: VectorAddParam) -> list:
         vectors = []
         for i, v in enumerate(add_param.vectors):
             id = 0
@@ -212,6 +262,35 @@ class SDKVectorClient:
 
             vector_with_id.scalar_data = scarlar_data
             vectors.append(vector_with_id)
+        return vectors
+
+    def vector_add(self, add_param: VectorAddParam) -> list:
+        """
+        vector_add add vector
+
+        Args:
+            add_param: VectorAddParam
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: vector id list
+        """
+
+        status, out_vector_index = self.client.GetVectorIndex(
+            self.schema_id, add_param.index_name
+        )
+        if not status.ok():
+            raise RuntimeError(
+                f"get index {add_param.index_name} error: {status.ToString()}"
+            )
+        else:
+            if out_vector_index.HasScalarSchema():
+                schema_dict = out_vector_index.GetSchema()
+                vectors = self.vectors_add_with_schema(schema_dict, add_param)
+            else:
+                vectors = self.vectors_add_without_schema(add_param)
 
         s, vectors = self.vector_client.AddByIndexName(
             self.schema_id, add_param.index_name, vectors
@@ -261,19 +340,7 @@ class SDKVectorClient:
         else:
             raise RuntimeError(f"get index {index_name} metrics fail: {s.ToString()}")
 
-    def vector_scan(self, scan_param: VectorScanParam) -> list:
-        """
-        vector_scan scan with start_id
-
-        Args:
-            scan_param VectorScanParam
-
-        Raises:
-            RuntimeError: return error
-
-        Returns:
-            list:  scan info list
-        """
+    def vectors_scan_with_schema(self, schema_dict: dict, scan_param: VectorScanParam):
         sdk_param = dingosdk.ScanQueryParam()
         sdk_param.vector_id_start = scan_param.start_id
         sdk_param.vector_id_end = scan_param.end_id
@@ -282,7 +349,62 @@ class SDKVectorClient:
         sdk_param.with_vector_data = scan_param.with_vector_data
         sdk_param.with_scalar_data = scan_param.with_scalar_data
         sdk_param.with_table_data = scan_param.with_table_data
+        selected_keys = []
+        for key in scan_param.fields:
+            selected_keys.append(key)
+        sdk_param.selected_keys = selected_keys
 
+        if scan_param.filter_scalar:
+            sdk_param.use_scalar_filter = True
+            scarlar_data = {}
+            for key, value in scan_param.filter_scalar.items():
+                if key not in schema_dict:
+                    raise KeyError(f"The key '{key}' is not in the schema")
+                
+                type = sdk_types[auto_value_type(value)]
+                if not type_conversion(type, schema_dict[key]):
+                    raise RuntimeError(
+                        f"type_conversion error {type} to {schema_dict[key]}"
+                    )
+
+                scarlar_value = dingosdk.ScalarValue()
+                scarlar_field = dingosdk.ScalarField()
+
+                if schema_dict[key] == dingosdk.Type.kSTRING:
+                    scarlar_value.type = dingosdk.Type.kSTRING
+                    scarlar_field.string_data = value
+                elif schema_dict[key] == dingosdk.Type.kDOUBLE:
+                    scarlar_value.type = dingosdk.Type.kDOUBLE
+                    scarlar_field.double_data = value
+                elif schema_dict[key] == dingosdk.Type.kINT64:
+                    scarlar_value.type = dingosdk.Type.kINT64
+                    scarlar_field.long_data = value
+                elif schema_dict[key] == dingosdk.Type.kBOOL:
+                    scarlar_value.type = dingosdk.Type.kBOOL
+                    scarlar_field.bool_data = value
+                else:
+                    raise RuntimeError(f"not support type: {scarlar_value.type}")
+
+                # TODO: support vector with multiple fields
+                fields = []
+                fields.append(scarlar_field)
+                scarlar_value.fields = fields
+
+                scarlar_data[key] = scarlar_value
+
+            sdk_param.scalar_data = scarlar_data
+
+        return sdk_param
+
+    def vectors_scan_without_schema(scan_param: VectorScanParam):
+        sdk_param = dingosdk.ScanQueryParam()
+        sdk_param.vector_id_start = scan_param.start_id
+        sdk_param.vector_id_end = scan_param.end_id
+        sdk_param.max_scan_count = scan_param.max_count
+        sdk_param.is_reverse = scan_param.is_reverse
+        sdk_param.with_vector_data = scan_param.with_vector_data
+        sdk_param.with_scalar_data = scan_param.with_scalar_data
+        sdk_param.with_table_data = scan_param.with_table_data
         selected_keys = []
         for key in scan_param.fields:
             selected_keys.append(key)
@@ -316,6 +438,36 @@ class SDKVectorClient:
                 scarlar_data[key] = scarlar_value
 
             sdk_param.scalar_data = scarlar_data
+
+        return sdk_param
+
+    def vector_scan(self, scan_param: VectorScanParam) -> list:
+        """
+        vector_scan scan with start_id
+
+        Args:
+            scan_param VectorScanParam
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list:  scan info list
+        """
+
+        status, out_vector_index = self.client.GetVectorIndex(
+            self.schema_id, scan_param.index_name
+        )
+        if not status.ok():
+            raise RuntimeError(
+                f"get index {scan_param.index_name} error: {status.ToString()}"
+            )
+        else:
+            if out_vector_index.HasScalarSchema():
+                schema_dict = out_vector_index.GetSchema()
+                sdk_param = self.vectors_scan_with_schema(schema_dict, scan_param)
+            else:
+                sdk_param = self.vectors_scan_without_schema(scan_param)
 
         s, result = self.vector_client.ScanQueryByIndexName(
             self.schema_id, scan_param.index_name, sdk_param
@@ -544,7 +696,9 @@ class SDKVectorClient:
 
         # return [s.to_dict() for s in status_state]
 
-    def vector_status_by_region(self, param: VectorStatusByRegionIdParam) -> list[RegionState]:
+    def vector_status_by_region(
+        self, param: VectorStatusByRegionIdParam
+    ) -> list[RegionState]:
         """
         vector_status_by_region
 
@@ -590,7 +744,9 @@ class SDKVectorClient:
         build_status = sdk_err_status_result_to_err_status(result)
         return build_status
 
-    def vector_build_by_region(self, param: VectorBuildByRegionIdParam) -> list[RegionStatus]:
+    def vector_build_by_region(
+        self, param: VectorBuildByRegionIdParam
+    ) -> list[RegionStatus]:
         """
         vector_build_by_index
 
@@ -636,7 +792,9 @@ class SDKVectorClient:
         load_status = sdk_err_status_result_to_err_status(result)
         return load_status
 
-    def vector_load_by_region(self, param: VectorLoadByRegionIdParam) -> list[RegionStatus]:
+    def vector_load_by_region(
+        self, param: VectorLoadByRegionIdParam
+    ) -> list[RegionStatus]:
         """
         vector_load_by_region
 
@@ -682,7 +840,9 @@ class SDKVectorClient:
         reset_status = sdk_err_status_result_to_err_status(result)
         return reset_status
 
-    def vector_reset_by_region(self, param: VectorResetByRegionIdParam) -> list[RegionStatus]:
+    def vector_reset_by_region(
+        self, param: VectorResetByRegionIdParam
+    ) -> list[RegionStatus]:
         """
         vector_reset_by_region
 
@@ -720,44 +880,19 @@ class SDKVectorClient:
         Returns:
             list: vector id list
         """
-        vectors = []
-        for i, v in enumerate(add_param.vectors):
-            id = 0
-            if add_param.ids is not None:
-                id = add_param.ids[i]
-
-            tmp_vector = dingosdk.Vector(dingosdk.ValueType.kFloat, len(v))
-            tmp_vector.float_values = v
-
-            vector_with_id = dingosdk.VectorWithId(id, tmp_vector)
-
-            scarlar_data = {}
-            for key, value in add_param.datas[i].items():
-                scarlar_value = dingosdk.ScalarValue()
-                scarlar_value.type = sdk_types[auto_value_type(value)]
-
-                scalar_type = scarlar_value.type
-                scarlar_field = dingosdk.ScalarField()
-                if scalar_type == dingosdk.Type.kSTRING:
-                    scarlar_field.string_data = value
-                elif scalar_type == dingosdk.Type.kDOUBLE:
-                    scarlar_field.double_data = value
-                elif scalar_type == dingosdk.Type.kINT64:
-                    scarlar_field.long_data = value
-                elif scalar_type == dingosdk.Type.kBOOL:
-                    scarlar_field.bool_data = value
-                else:
-                    raise RuntimeError(f"not support type: {scarlar_value.type}")
-
-                # TODO: support vector with multiple fields
-                fields = []
-                fields.append(scarlar_field)
-                scarlar_value.fields = fields
-
-                scarlar_data[key] = scarlar_value
-
-            vector_with_id.scalar_data = scarlar_data
-            vectors.append(vector_with_id)
+        status, out_vector_index = self.client.GetVectorIndex(
+            self.schema_id, add_param.index_name
+        )
+        if not status.ok():
+            raise RuntimeError(
+                f"get index {add_param.index_name} error: {status.ToString()}"
+            )
+        else:
+            if out_vector_index.HasScalarSchema():
+                schema_dict = out_vector_index.GetSchema()
+                vectors = self.vectors_add_with_schema(schema_dict, add_param)
+            else:
+                vectors = self.vectors_add_without_schema(add_param)
 
         s, vectors = self.vector_client.ImportAddByIndexName(
             self.schema_id, add_param.index_name, vectors
@@ -770,7 +905,7 @@ class SDKVectorClient:
                 f"add vector in {add_param.index_name} fail: {s.ToString()}"
             )
 
-    def vector_import_delete(self, param: VectorDeleteParam) :
+    def vector_import_delete(self, param: VectorDeleteParam):
         """
         vector_import_delete delete vector with ids
 
@@ -781,7 +916,7 @@ class SDKVectorClient:
             RuntimeError: return error
 
         Returns:
-            
+
         """
         s = self.vector_client.ImportDeleteByIndexName(
             self.schema_id, param.index_name, param.ids
@@ -791,7 +926,6 @@ class SDKVectorClient:
             raise RuntimeError(
                 f"vector delete form index:{param.index_name} fail: {s.ToString()}"
             )
-       
 
     def vector_count_memory(self, index_name: str) -> int:
         """
