@@ -256,7 +256,11 @@ class SDKVectorDingoDB:
         Returns:
             list: upsert vector info in dingoDB
         """
-        return []
+        params = VectorAddParam(
+            index_name=index_name, datas=datas, vectors=vectors, ids=ids
+        )
+
+        return self.client.vector_upsert(params)
 
     def vector_count(self, index_name: str):
         """
