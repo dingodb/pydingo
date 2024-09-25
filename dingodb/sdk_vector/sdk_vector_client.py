@@ -303,6 +303,45 @@ class SDKVectorClient:
                 f"add vector in {add_param.index_name} fail: {s.ToString()}"
             )
 
+    def vector_upsert(self, upsert_param: VectorAddParam) -> list:
+        """
+        vector_upsert upsert vector
+
+        Args:
+            upsert_param: VectorAddParam
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            list: vector id list
+        """
+
+        status, out_vector_index = self.client.GetVectorIndex(
+            self.schema_id, upsert_param.index_name
+        )
+        if not status.ok():
+            raise RuntimeError(
+                f"get index {upsert_param.index_name} error: {status.ToString()}"
+            )
+        else:
+            if out_vector_index.HasScalarSchema():
+                schema_dict = out_vector_index.GetSchema()
+                vectors = self.vectors_add_with_schema(schema_dict, upsert_param)
+            else:
+                vectors = self.vectors_add_without_schema(upsert_param)
+
+        s, vectors = self.vector_client.UpsertByIndexName(
+            self.schema_id, upsert_param.index_name, vectors
+        )
+
+        if s.ok():
+            return [sdk_vector_with_id_to_vector_with_id(v).to_dict() for v in vectors]
+        else:
+            raise RuntimeError(
+                f"upsert vector in {upsert_param.index_name} fail: {s.ToString()}"
+            )
+
     def vector_count(self, index_name: str):
         """
         vector_count count in index
