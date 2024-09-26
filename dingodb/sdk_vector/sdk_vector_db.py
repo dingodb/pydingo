@@ -632,3 +632,35 @@ class SDKVectorDingoDB:
             count
         """
         return self.client.vector_count_memory(index_name=index_name)
+
+    def vector_get_auto_increment_id(self, index_name: str) -> int:
+        """
+        vector_get_auto_increment_id get_auto_increment_id
+
+        Args:
+           index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            auto_increment_id
+        """
+        return self.client.vector_get_auto_increment_memory(index_name=index_name)
+
+    def vector_update_auto_increment_id(self, index_name: str, start_id: int):
+        """
+        vector_update_auto_increment_id update AutoIncrementId
+
+        Args:
+           index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+
+        """
+        return self.client.vector_update_auto_increment_id(
+            index_name=index_name, start_id=start_id
+        )

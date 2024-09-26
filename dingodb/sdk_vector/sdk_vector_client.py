@@ -989,3 +989,47 @@ class SDKVectorClient:
             raise RuntimeError(
                 f"vector count memory form index:{index_name} fail: {s.ToString()}"
             )
+
+    def vector_get_auto_increment_memory(self, index_name: str) -> int:
+        """
+        vector_get_auto_increment_id get_auto_increment_id
+
+        Args:
+           index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            auto_increment_id
+        """
+        s, result = self.vector_client.GetAutoIncrementIdByIndexName(
+            self.schema_id, index_name
+        )
+        if s.ok():
+            return result
+        else:
+            raise RuntimeError(
+                f"vector count memory form index:{index_name} fail: {s.ToString()}"
+            )
+
+    def vector_update_auto_increment_id(self, index_name: str, start_id: int):
+        """
+        vector_update_auto_increment_id update AutoIncrementId
+
+        Args:
+           index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+
+        """
+        s = self.vector_client.UpdateAutoIncrementIdByIndexName(
+            self.schema_id, index_name, start_id
+        )
+        if not s.ok():
+            raise RuntimeError(
+                f"vector count memory form index:{index_name} fail: {s.ToString()}"
+            )

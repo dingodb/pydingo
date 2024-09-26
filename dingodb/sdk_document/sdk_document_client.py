@@ -432,3 +432,47 @@ class SDKDocumentClient:
             raise RuntimeError(
                 f"document delete form index:{param.index_name} fail: {s.ToString()}"
             )
+
+    def document_get_auto_increment_memory(self, index_name: str) -> int:
+        """
+        document_get_auto_increment_id get_auto_increment_id
+
+        Args:
+           index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            auto_increment_id
+        """
+        s, result = self.document_client.GetAutoIncrementIdByIndexName(
+            self.schema_id, index_name
+        )
+        if s.ok():
+            return result
+        else:
+            raise RuntimeError(
+                f"document count memory form index:{index_name} fail: {s.ToString()}"
+            )
+
+    def document_update_auto_increment_id(self, index_name: str, start_id: int):
+        """
+        document_update_auto_increment_id update AutoIncrementId
+
+        Args:
+           index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+
+        """
+        s = self.document_client.UpdateAutoIncrementIdByIndexName(
+            self.schema_id, index_name, start_id
+        )
+        if not s.ok():
+            raise RuntimeError(
+                f"document count memory form index:{index_name} fail: {s.ToString()}"
+            )
