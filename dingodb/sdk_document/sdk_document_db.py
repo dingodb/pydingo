@@ -10,7 +10,7 @@ from dingodb.common.document_rep import (
     DocQueryResult,
     DocScanQueryResult,
     DocIndexMetricsResult,
-    DocDeleteResult
+    DocDeleteResult,
 )
 
 from .sdk_document_param import (
@@ -21,7 +21,7 @@ from .sdk_document_param import (
     DocumentQueryParam,
     DocumentGetBorderParam,
     DocumentScanQueryParam,
-    DocumentCountParam
+    DocumentCountParam,
 )
 
 
@@ -36,13 +36,13 @@ class SDKDocumentDingoDB:
         self.client = SDKDocumentClient(client)
 
     def create_index(
-            self,
-            index_name: str,
-            schema: DocumentSchema,
-            replicas: int = 3,
-            operand: List[int] = None,
-            start_id: int = 0,
-            json_params: str = ""
+        self,
+        index_name: str,
+        schema: DocumentSchema,
+        replicas: int = 3,
+        operand: List[int] = None,
+        start_id: int = 0,
+        json_params: str = "",
     ) -> bool:
         """
         create_index create index
@@ -66,7 +66,7 @@ class SDKDocumentDingoDB:
             replicas=replicas,
             operand=operand,
             start_id=start_id,
-            json_params=json_params
+            json_params=json_params,
         )
 
         return self.client.create_index(params, schema=schema)
@@ -102,9 +102,8 @@ class SDKDocumentDingoDB:
 
         return self.client.get_schema(index_name)
 
-
     def document_add(
-            self, index_name: str, documents: List, ids:List[int] = None
+        self, index_name: str, documents: List, ids: List[int] = None
     ) -> AddResult:
         """
         document_add add document
@@ -120,21 +119,19 @@ class SDKDocumentDingoDB:
         Returns:
             AddResult: dingodb.common.document_rep.AddResult
         """
-        params = DocumentAddParam(
-            index_name=index_name, documents=documents, ids=ids
-        )
+        params = DocumentAddParam(index_name=index_name, documents=documents, ids=ids)
 
         return self.client.document_add(params)
 
     def document_search(
-            self,
-            index_name: str,
-            query_string: str,
-            top_n: int,
-            doc_ids: List = None,
-            with_scalar_data: bool = False,
-            column_names: List[str] = None,
-            selected_keys: List[str] = None
+        self,
+        index_name: str,
+        query_string: str,
+        top_n: int,
+        doc_ids: List = None,
+        with_scalar_data: bool = False,
+        column_names: List[str] = None,
+        selected_keys: List[str] = None,
     ) -> DocSearchResult:
         """
         document_search search document
@@ -162,17 +159,17 @@ class SDKDocumentDingoDB:
             doc_ids=doc_ids,
             with_scalar_data=with_scalar_data,
             column_names=column_names,
-            selected_keys=selected_keys
+            selected_keys=selected_keys,
         )
 
         return self.client.document_search(params)
 
     def document_query(
-            self,
-            index_name: str,
-            doc_ids: List,
-            with_scalar_data: bool = False,
-            selected_keys: List = None,
+        self,
+        index_name: str,
+        doc_ids: List,
+        with_scalar_data: bool = False,
+        selected_keys: List = None,
     ) -> DocQueryResult:
         """
         document_query query document
@@ -195,15 +192,15 @@ class SDKDocumentDingoDB:
             index_name=index_name,
             doc_ids=doc_ids,
             with_scalar_data=with_scalar_data,
-            selected_keys=selected_keys
+            selected_keys=selected_keys,
         )
 
         return self.client.document_query(params)
 
     def document_get_border(
-            self,
-            index_name: str,
-            is_max: bool = True,
+        self,
+        index_name: str,
+        is_max: bool = True,
     ) -> int:
         """
         document_get_border get_border document
@@ -219,22 +216,19 @@ class SDKDocumentDingoDB:
             int: get_border results
         """
 
-        params = DocumentGetBorderParam(
-            index_name=index_name,
-            is_max=is_max
-        )
+        params = DocumentGetBorderParam(index_name=index_name, is_max=is_max)
 
         return self.client.document_get_border(params)
 
     def document_scan_query(
-            self,
-            index_name: str,
-            doc_id_start: int,
-            doc_id_end: int = 0,
-            is_reverse: bool = False,
-            max_scan_count: int = 1000,
-            with_scalar_data: bool = True,
-            selected_keys: List[str] = None,
+        self,
+        index_name: str,
+        doc_id_start: int,
+        doc_id_end: int = 0,
+        is_reverse: bool = False,
+        max_scan_count: int = 1000,
+        with_scalar_data: bool = True,
+        selected_keys: List[str] = None,
     ) -> DocScanQueryResult:
         """
         document_scan_query scan_query document
@@ -267,7 +261,7 @@ class SDKDocumentDingoDB:
             is_reverse=is_reverse,
             max_scan_count=max_scan_count,
             with_scalar_data=with_scalar_data,
-            selected_keys=selected_keys
+            selected_keys=selected_keys,
         )
 
         return self.client.document_scan_query(params)
@@ -288,10 +282,10 @@ class SDKDocumentDingoDB:
         return self.client.document_index_metrics(index_name)
 
     def document_count(
-            self,
-            index_name: str,
-            doc_id_start: int,
-            doc_id_end: int,
+        self,
+        index_name: str,
+        doc_id_start: int,
+        doc_id_end: int,
     ) -> int:
         """
         document_count count in index
@@ -309,9 +303,7 @@ class SDKDocumentDingoDB:
         """
 
         params = DocumentCountParam(
-            index_name=index_name,
-            doc_id_start=doc_id_start,
-            doc_id_end=doc_id_end
+            index_name=index_name, doc_id_start=doc_id_start, doc_id_end=doc_id_end
         )
 
         return self.client.document_count(params)
@@ -331,6 +323,40 @@ class SDKDocumentDingoDB:
             List[bool]: [True, False, ...]
         """
         params = DocumentDeleteParam(index_name=index_name, ids=ids)
-        document_del_map = {d.doc_id: d.deleted for d in self.client.document_delete(params)} 
+        document_del_map = {
+            d.doc_id: d.deleted for d in self.client.document_delete(params)
+        }
 
         return [document_del_map.get(i) for i in params.ids]
+
+    def document_get_auto_increment_id(self, index_name: str) -> int:
+        """
+        document_get_auto_increment_id get_auto_increment_id
+
+        Args:
+           index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            auto_increment_id
+        """
+        return self.client.document_get_auto_increment_memory(index_name=index_name)
+
+    def document_update_auto_increment_id(self, index_name: str, start_id: int):
+        """
+        document_update_auto_increment_id update AutoIncrementId
+
+        Args:
+           index_name: str
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+
+        """
+        return self.client.document_update_auto_increment_id(
+            index_name=index_name, start_id=start_id
+        )
