@@ -1033,3 +1033,17 @@ class SDKVectorClient:
             raise RuntimeError(
                 f"vector count memory form index:{index_name} fail: {s.ToString()}"
             )
+        
+    def vector_dump(self, index_name: str)-> list[str]:
+        s,result = self.vector_client.DumpByIndexName(
+            self.schema_id, index_name
+        )
+        
+        
+
+        if not s.ok():
+            raise RuntimeError(
+                f"vector dump form index:{index_name} fail: {s.ToString()}"
+            )
+
+        return result
