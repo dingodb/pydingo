@@ -664,3 +664,6 @@ class SDKVectorDingoDB:
         return self.client.vector_update_auto_increment_id(
             index_name=index_name, start_id=start_id
         )
+    
+    def vector_dump(self, index_name: str)-> list:
+        return self.client.vector_dump(index_name=index_name)
