@@ -36,6 +36,8 @@ def document_doc_value_to_doc_value(
         return DocValue(DocumentType.STRING, document_doc_value.StringValue())
     elif document_doc_value.GetType() == dingosdk.Type.kBYTES:
         return DocValue(DocumentType.BYTES, document_doc_value.BytesValue())
+    elif document_doc_value.GetType() == dingosdk.Type.kBOOL:
+        return DocValue(DocumentType.BOOL, document_doc_value.BoolValue())
     else:
         raise RuntimeError(f"not support type: {document_doc_value.GetType()}")
 
