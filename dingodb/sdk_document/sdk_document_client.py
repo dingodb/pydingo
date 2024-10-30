@@ -203,6 +203,8 @@ class SDKDocumentClient:
                     tmp_document.AddField(key, dingosdk.DocValue.FromString(value))
                 elif schema_dict[key] == dingosdk.Type.kBYTES:
                     tmp_document.AddField(key, dingosdk.DocValue.FromBytes(value))
+                elif schema_dict[key] == dingosdk.Type.kBOOL:
+                    tmp_document.AddField(key, dingosdk.DocValue.FromBool(value))
                 else:
                     raise RuntimeError(f"not support type: {schema_dict[key]}")
 
