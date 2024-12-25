@@ -120,6 +120,16 @@ class SDKVectorClient:
                 index_type, param.index_config
             )
             creator.SetBruteForceParam(sdk_param)
+        elif index_type == "binary_flat":
+            sdk_param = SDKParamFactory.create_binary_flat_param(
+                index_type,param.index_config
+            )
+            creator.SetBinaryFlatParam(sdk_param)
+        elif index_type == "binary_ivf_flat":
+            sdk_param = SDKParamFactory.create_binary_ivf_flat_param(
+                index_type,param.index_config
+            )
+            creator.SetBinaryIvfFlatParam(sdk_param)
         else:
             raise RuntimeError(f"index_type: {index_type} not support")
 
@@ -175,9 +185,12 @@ class SDKVectorClient:
             if add_param.ids is not None:
                 id = add_param.ids[i]
 
-            # TODO: support unit8
-            tmp_vector = dingosdk.Vector(dingosdk.ValueType.kFloat, len(v))
-            tmp_vector.float_values = v
+            if add_param.value_type == "float" :
+                tmp_vector = dingosdk.Vector(dingosdk.ValueType.kFloat, len(v))
+                tmp_vector.float_values = v
+            elif add_param.value_type=="binary" :
+                tmp_vector = dingosdk.Vector(dingosdk.ValueType.kUint8, len(v))
+                tmp_vector.binary_values = v
 
             vector_with_id = dingosdk.VectorWithId(id, tmp_vector)
 
@@ -229,9 +242,13 @@ class SDKVectorClient:
             if add_param.ids is not None:
                 id = add_param.ids[i]
 
-            # TODO: support unit8
-            tmp_vector = dingosdk.Vector(dingosdk.ValueType.kFloat, len(v))
-            tmp_vector.float_values = v
+            if add_param.value_type == "float" :
+                tmp_vector = dingosdk.Vector(dingosdk.ValueType.kFloat, len(v))
+                tmp_vector.float_values = v
+            elif add_param.value_type=="binary" :
+                tmp_vector = dingosdk.Vector(dingosdk.ValueType.kUint8, len(v))
+                tmp_vector.binary_values = v
+
 
             vector_with_id = dingosdk.VectorWithId(id, tmp_vector)
 
@@ -613,9 +630,14 @@ class SDKVectorClient:
 
         target_vectors = []
         for xq in param.xq:
-            # TODO: support  uint8
-            tmp_vector = dingosdk.Vector(dingosdk.ValueType.kFloat, len(xq))
-            tmp_vector.float_values = xq
+            
+            if param.value_type == "float" :
+                tmp_vector = dingosdk.Vector(dingosdk.ValueType.kFloat, len(xq))
+                tmp_vector.float_values = xq
+            elif param.value_type=="binary" :
+                tmp_vector = dingosdk.Vector(dingosdk.ValueType.kUint8, len(xq))
+                tmp_vector.binary_values = xq
+            
 
             tmp = dingosdk.VectorWithId()
             tmp.vector = tmp_vector

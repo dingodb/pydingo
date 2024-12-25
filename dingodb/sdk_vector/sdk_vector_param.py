@@ -13,12 +13,15 @@ index_types = {
     "hnsw": dingosdk.VectorIndexType.kHnsw,
     "diskann": dingosdk.VectorIndexType.kDiskAnn,
     "brute": dingosdk.VectorIndexType.kBruteForce,
+    "binary_flat": dingosdk.VectorIndexType.kBinaryFlat,
+    "binary_ivf_flat":dingosdk.VectorIndexType.kBinaryIvfFlat,
 }
 
 metric_types = {
     "euclidean": dingosdk.MetricType.kL2,
     "dotproduct": dingosdk.MetricType.kInnerProduct,
     "cosine": dingosdk.MetricType.kCosine,
+    "hamming": dingosdk.MetricType.kHamming
 }
 
 value_type = {
@@ -54,6 +57,8 @@ index_params = {
         "searchListSize": 100,
     },
     "brute": {"dimension": None, "metricType": None},
+    "binary_flat":{"dimension": None, "metricType": None},
+    "binary_ivf_flat": {"dimension": None, "metricType": None, "ncentroids": 256},
 }
 
 
@@ -188,6 +193,15 @@ class VectorAddParam(BaseModel):
     vectors: List[list]
     datas: List[dict] = None
     ids: List[int] = None
+    value_type: str = "float"
+
+    @validator("value_type", always=True)
+    def check_value_type(cls, value, values):
+        if value is None:
+            value = "float"  
+        if value not in {"binary", "float"}:
+            raise Exception("value_type must be 'binary' or 'float'")
+        return value
 
     @validator("datas", always=True)
     def check_datas(cls, value, values):
@@ -208,7 +222,6 @@ class VectorAddParam(BaseModel):
                 if id <= 0:
                     raise Exception("id must > 0")
         return value
-
 
 class VectorScanParam(BaseModel):
     index_name: str
@@ -257,6 +270,15 @@ class VectorSearchParam(BaseModel):
     with_vector_data: bool = True
     with_scalar_data: bool = True
     beamwidth: int = 2
+    value_type: str="float"
+
+    @validator("value_type", always=True)
+    def check_value_type(cls, value, values):
+        if value is None:
+            value = "float"  
+        if value not in {"binary", "float"}:
+            raise Exception("value_type must be 'binary' or 'float'")
+        return value
 
     @validator("xq", always=True)
     def check_xq(cls, value):
