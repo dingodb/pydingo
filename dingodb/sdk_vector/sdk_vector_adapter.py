@@ -35,6 +35,7 @@ sdk_metric_type_to_metric_type = {
     dingosdk.MetricType.kL2: MetricType.L2,
     dingosdk.MetricType.kInnerProduct: MetricType.INNER_PRODUCT,
     dingosdk.MetricType.kCosine: MetricType.COSINE,
+    dingosdk.MetricType.kHamming: MetricType.HAMMING
 }
 
 

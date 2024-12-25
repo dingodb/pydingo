@@ -88,3 +88,26 @@ class SDKParamFactory:
             brute_param_dict["dimension"],
             brute_param_dict["metricType"],
         )
+
+
+    @staticmethod
+    def create_binary_flat_param(index_type: str, binary_flat_param_dict: dict) -> dingosdk.BinaryFlatParam:
+        assert index_type == "binary_flat"
+
+        return dingosdk.BinaryFlatParam(
+            binary_flat_param_dict["dimension"], binary_flat_param_dict["metricType"]
+        )
+
+    @staticmethod
+    def create_binary_ivf_flat_param(
+        index_type: str, binary_ivf_flat_param_dict: dict
+    ) -> dingosdk.BinaryIvfFlatParam:
+        assert index_type == "binary_ivf_flat"
+
+        param = dingosdk.BinaryIvfFlatParam(
+            binary_ivf_flat_param_dict["dimension"],
+            binary_ivf_flat_param_dict["metricType"],
+        )
+        param.ncentroids = binary_ivf_flat_param_dict["ncentroids"]
+
+        return param

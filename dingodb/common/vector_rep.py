@@ -88,6 +88,7 @@ class MetricType(Enum):
     L2 = "METRIC_TYPE_L2"
     INNER_PRODUCT = "METRIC_TYPE_INNER_PRODUCT"
     COSINE = "METRIC_TYPE_COSINE"
+    HAMMING = "METRIC_TYPE_HAMMING"
 
 
 class VectorWithDistance:

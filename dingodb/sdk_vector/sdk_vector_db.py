@@ -130,8 +130,8 @@ class SDKVectorDingoDB:
             index_name (str): the name of index
             dimension (int): dimension of vector
             schema (ScalarSchema): schema of scalar
-            index_type (str, optional): index type, one of {"flat", "hnsw","ivf_flat", "ivf_pq", "brute"}. Defaults to "hnsw".
-            metric_type (str, optional): metric type, one of {"dotproduct", "euclidean", "cosine"}. Defaults to "cosine"
+            index_type (str, optional): index type, one of {"flat", "hnsw","ivf_flat", "ivf_pq", "brute","binary_flat","binary_ivf_flat"}. Defaults to "hnsw".
+            metric_type (str, optional): metric type, one of {"dotproduct", "euclidean", "cosine","hamming"}. Defaults to "cosine"
             replicas (int, optional): dingoDB store replicas. Defaults to 3.
             index_config (dict, optional): Advanced configuration options for the index. Defaults to None.
             metadata_config (dict, optional): metadata. Defaults to None.NOT Support Now , used for schema
@@ -215,7 +215,7 @@ class SDKVectorDingoDB:
 
     # TODO: only return vector ids
     def vector_add(
-        self, index_name: str, datas: list, vectors: list, ids: list = None
+        self, index_name: str, datas: list, vectors: list, ids: list = None,value_type: str="float"
     ) -> list:
         """
         vector_add add vector
@@ -233,13 +233,13 @@ class SDKVectorDingoDB:
             list: vector id list
         """
         params = VectorAddParam(
-            index_name=index_name, datas=datas, vectors=vectors, ids=ids
+            index_name=index_name, datas=datas, vectors=vectors, ids=ids,value_type=value_type
         )
 
         return self.client.vector_add(params)
 
     def vector_upsert(
-        self, index_name: str, datas: list, vectors: list, ids: list = None
+        self, index_name: str, datas: list, vectors: list, ids: list = None ,value_type: str="float"
     ) -> list:
         """
         vector_upsert upsert vector
@@ -257,7 +257,7 @@ class SDKVectorDingoDB:
             list: upsert vector info in dingoDB
         """
         params = VectorAddParam(
-            index_name=index_name, datas=datas, vectors=vectors, ids=ids
+            index_name=index_name, datas=datas, vectors=vectors, ids=ids,value_type=value_type
         )
 
         return self.client.vector_upsert(params)
@@ -373,6 +373,7 @@ class SDKVectorDingoDB:
         search_params: dict = None,
         pre_filter: bool = True,
         brute: bool = False,
+        value_type: str = "float",
     ) -> list:
         """
         vector_search search vector
@@ -399,6 +400,7 @@ class SDKVectorDingoDB:
             pre_filter=pre_filter,
             search_params=search_params,
             brute=brute,
+            value_type=value_type
         )
 
         return self.client.vector_search(params)
