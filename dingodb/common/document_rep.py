@@ -9,6 +9,7 @@ class DocumentType(Enum):
     DOUBLE = "DOUBLE"
     STRING = "STRING"
     BYTES = "BYTES"
+    DATETIME = "DATETIME"
 
 
 class DocumentColumn:

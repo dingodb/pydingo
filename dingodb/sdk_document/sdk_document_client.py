@@ -41,6 +41,7 @@ scalar_type_to_document_type = {
     DocumentType.DOUBLE: dingosdk.Type.kDOUBLE,
     DocumentType.STRING: dingosdk.Type.kSTRING,
     DocumentType.BYTES: dingosdk.Type.kBYTES,
+    DocumentType.DATETIME: dingosdk.Type.kDATETIME,
 }
 
 document_type_to_scalar_type = {
@@ -49,6 +50,7 @@ document_type_to_scalar_type = {
     dingosdk.Type.kDOUBLE: DocumentType.DOUBLE,
     dingosdk.Type.kSTRING: DocumentType.STRING,
     dingosdk.Type.kBYTES: DocumentType.BYTES,
+    dingosdk.Type.kDATETIME: DocumentType.DATETIME,
 }
 
 
@@ -205,6 +207,8 @@ class SDKDocumentClient:
                     tmp_document.AddField(key, dingosdk.DocValue.FromBytes(value))
                 elif schema_dict[key] == dingosdk.Type.kBOOL:
                     tmp_document.AddField(key, dingosdk.DocValue.FromBool(value))
+                elif schema_dict[key] == dingosdk.Type.kDATETIME:
+                    tmp_document.AddField(key, dingosdk.DocValue.FromDatetime(value))
                 else:
                     raise RuntimeError(f"not support type: {schema_dict[key]}")
 

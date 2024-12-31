@@ -22,6 +22,7 @@ document_type_to_scalar_type = {
     dingosdk.Type.kDOUBLE: DocumentType.DOUBLE,
     dingosdk.Type.kSTRING: DocumentType.STRING,
     dingosdk.Type.kBYTES: DocumentType.BYTES,
+    dingosdk.Type.kDATETIME: DocumentType.DATETIME,
 }
 
 
@@ -38,6 +39,8 @@ def document_doc_value_to_doc_value(
         return DocValue(DocumentType.BYTES, document_doc_value.BytesValue())
     elif document_doc_value.GetType() == dingosdk.Type.kBOOL:
         return DocValue(DocumentType.BOOL, document_doc_value.BoolValue())
+    elif document_doc_value.GetType() == dingosdk.Type.kDATETIME:
+        return DocValue(DocumentType.DATETIME, document_doc_value.DatetimeValue())
     else:
         raise RuntimeError(f"not support type: {document_doc_value.GetType()}")
 
