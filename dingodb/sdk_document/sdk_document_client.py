@@ -266,6 +266,44 @@ class SDKDocumentClient:
         else:
             raise RuntimeError(f"search index:{param.index_name} fail: {s.ToString()}")
 
+    def document_search_all(self, param: DocumentSearchParam) -> DocSearchResult:
+        """
+        document_search_all search document
+
+        Args:
+            param : DocumentSearchParam
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            DocSearchResult: dingodb.common.document_rep.DocSearchResult
+        """
+
+        document_param = dingosdk.DocSearchParam()
+        document_param.query_string = param.query_string
+        document_param.query_limited = param.query_limit
+
+        document_param.use_id_filter = param.use_id_filter
+        if param.use_id_filter:
+            document_param.doc_ids = param.doc_ids
+
+        document_param.with_scalar_data = param.with_scalar_data
+
+        if param.column_names:
+            document_param.column_names = param.column_names
+        if param.selected_keys:
+            document_param.selected_keys = param.selected_keys
+
+        s, result = self.document_client.SearchAllByIndexName(
+            self.schema_id, param.index_name, document_param
+        )
+
+        if s.ok():
+            return document_search_result_to_search_result(result)
+        else:
+            raise RuntimeError(f"search index:{param.index_name} fail: {s.ToString()}")
+
     def document_query(self, param: DocumentQueryParam) -> DocQueryResult:
         """
         document_query query document

@@ -74,6 +74,7 @@ class DocumentSearchParam(BaseModel):
     with_scalar_data: bool = False
     column_names: List[str] = None
     selected_keys: List[str] = None
+    query_limit: int = 40960
 
     @validator("top_n", pre=True, always=True)
     def check_top_k(cls, value, field):
@@ -100,6 +101,12 @@ class DocumentSearchParam(BaseModel):
     def check_selected_keys(cls, value):
         if value is None:
             value = []
+        return value
+    
+    @validator("query_limit", always=True)
+    def check_query_limit(cls, value):
+        if value < 0 or value > 40960:
+            raise ValueError(f"{value} must >= 0 and < 40960")
         return value
 
 
