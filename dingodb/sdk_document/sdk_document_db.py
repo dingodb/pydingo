@@ -164,6 +164,50 @@ class SDKDocumentDingoDB:
 
         return self.client.document_search(params)
 
+    def document_search_all(
+        self,
+        index_name: str,
+        query_string: str,
+        top_n: int = 1,
+        doc_ids: List = None,
+        with_scalar_data: bool = False,
+        column_names: List[str] = None,
+        selected_keys: List[str] = None,
+        query_limit: int = 40960,
+    ) -> DocSearchResult:
+        """
+        document_search_all search document
+
+        Args:
+            index_name (str): the name of the index
+            query_string (str): the query string
+            top_n (int, optional): top n search. Defaults to 1 , is useless.
+            doc_ids (list, optional): document ids. Defaults to None.
+            with_scalar_data (bool, optional): whether to include scalar data. Defaults to True.
+            column_names (list, optional): column names. Defaults to None.
+            selected_keys (list, optional): selected keys. Defaults to None.
+            query_limit (int, optional): query limit. Defaults to 40960.
+
+        Raises:
+            RuntimeError: return error
+
+        Returns:
+            DocSearchResult: dingodb.common.document_rep.DocSearchResult
+        """
+
+        params = DocumentSearchParam(
+            index_name=index_name,
+            query_string=query_string,
+            top_n=top_n,
+            doc_ids=doc_ids,
+            with_scalar_data=with_scalar_data,
+            column_names=column_names,
+            selected_keys=selected_keys,
+            query_limit=query_limit,
+        )
+
+        return self.client.document_search_all(params)
+
     def document_query(
         self,
         index_name: str,
