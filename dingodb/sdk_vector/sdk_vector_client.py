@@ -122,12 +122,12 @@ class SDKVectorClient:
             creator.SetBruteForceParam(sdk_param)
         elif index_type == "binary_flat":
             sdk_param = SDKParamFactory.create_binary_flat_param(
-                index_type,param.index_config
+                index_type, param.index_config
             )
             creator.SetBinaryFlatParam(sdk_param)
         elif index_type == "binary_ivf_flat":
             sdk_param = SDKParamFactory.create_binary_ivf_flat_param(
-                index_type,param.index_config
+                index_type, param.index_config
             )
             creator.SetBinaryIvfFlatParam(sdk_param)
         else:
@@ -180,16 +180,19 @@ class SDKVectorClient:
         self, schema_dict: dict, add_param: VectorAddParam
     ) -> list:
         vectors = []
+        BITS_PER_BYTE = 8
         for i, v in enumerate(add_param.vectors):
             id = 0
             if add_param.ids is not None:
                 id = add_param.ids[i]
 
-            if add_param.value_type == "float" :
+            if add_param.value_type == "float":
                 tmp_vector = dingosdk.Vector(dingosdk.ValueType.kFloat, len(v))
                 tmp_vector.float_values = v
-            elif add_param.value_type=="binary" :
-                tmp_vector = dingosdk.Vector(dingosdk.ValueType.kUint8, len(v))
+            elif add_param.value_type == "binary":
+                tmp_vector = dingosdk.Vector(
+                    dingosdk.ValueType.kUint8, len(v) * BITS_PER_BYTE
+                )
                 tmp_vector.binary_values = v
 
             vector_with_id = dingosdk.VectorWithId(id, tmp_vector)
@@ -237,18 +240,20 @@ class SDKVectorClient:
 
     def vectors_add_without_schema(self, add_param: VectorAddParam) -> list:
         vectors = []
+        BITS_PER_BYTE = 8
         for i, v in enumerate(add_param.vectors):
             id = 0
             if add_param.ids is not None:
                 id = add_param.ids[i]
 
-            if add_param.value_type == "float" :
+            if add_param.value_type == "float":
                 tmp_vector = dingosdk.Vector(dingosdk.ValueType.kFloat, len(v))
                 tmp_vector.float_values = v
-            elif add_param.value_type=="binary" :
-                tmp_vector = dingosdk.Vector(dingosdk.ValueType.kUint8, len(v))
+            elif add_param.value_type == "binary":
+                tmp_vector = dingosdk.Vector(
+                    dingosdk.ValueType.kUint8, len(v) * BITS_PER_BYTE
+                )
                 tmp_vector.binary_values = v
-
 
             vector_with_id = dingosdk.VectorWithId(id, tmp_vector)
 
@@ -629,15 +634,17 @@ class SDKVectorClient:
                 )
 
         target_vectors = []
+        BITS_PER_BYTE = 8
         for xq in param.xq:
-            
-            if param.value_type == "float" :
+
+            if param.value_type == "float":
                 tmp_vector = dingosdk.Vector(dingosdk.ValueType.kFloat, len(xq))
                 tmp_vector.float_values = xq
-            elif param.value_type=="binary" :
-                tmp_vector = dingosdk.Vector(dingosdk.ValueType.kUint8, len(xq))
+            elif param.value_type == "binary":
+                tmp_vector = dingosdk.Vector(
+                    dingosdk.ValueType.kUint8, len(xq) * BITS_PER_BYTE
+                )
                 tmp_vector.binary_values = xq
-            
 
             tmp = dingosdk.VectorWithId()
             tmp.vector = tmp_vector
@@ -1055,13 +1062,9 @@ class SDKVectorClient:
             raise RuntimeError(
                 f"vector count memory form index:{index_name} fail: {s.ToString()}"
             )
-        
-    def vector_dump(self, index_name: str)-> list[str]:
-        s,result = self.vector_client.DumpByIndexName(
-            self.schema_id, index_name
-        )
-        
-        
+
+    def vector_dump(self, index_name: str) -> list[str]:
+        s, result = self.vector_client.DumpByIndexName(self.schema_id, index_name)
 
         if not s.ok():
             raise RuntimeError(
