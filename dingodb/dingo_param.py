@@ -1,7 +1,11 @@
 import warnings
 from typing import List, Union
 
-from pydantic import BaseModel, validator
+
+try:
+    from pydantic.v1 import BaseModel, validator
+except ImportError:
+    from pydantic import BaseModel, validator
 
 from . import config
 from dingodb.utils.tools import auto_value_type, auto_expr_type, convert_dict_to_expr
