@@ -1,11 +1,15 @@
 """Internal representation of a structured query language."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, List, Optional, Sequence, Union
 
-from pydantic import BaseModel
+try:
+    from pydantic.v1 import BaseModel, validator
+except ImportError:
+    from pydantic import BaseModel, validator
 
 
 class Visitor(ABC):

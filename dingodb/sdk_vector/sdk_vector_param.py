@@ -1,7 +1,12 @@
 #!/usr/bin/python3
 
 import warnings
-from pydantic import BaseModel, validator
+
+try:
+    from pydantic.v1 import BaseModel, validator
+except ImportError:
+    from pydantic import BaseModel, validator
+
 from typing import List
 
 import dingosdk
