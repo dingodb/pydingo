@@ -51,7 +51,7 @@ class SDKRegionCreatorDingoDB:
             replicas=replicas,
             engine_type=engine_type,
         )
-        self.client.create_region(params)
+        return self.client.create_region(params)
 
     def drop_region(self, region_id: int):
         """
