@@ -245,7 +245,7 @@ class CheckVectorSearchParam(BaseModel):
         parameter.without_scalar_data = not with_scalar_data
 
         vec_search_request = VectorSearchRequest(
-            schema_name="dingo", index_name=values.get("index_name")
+            schema_name="DINGO", index_name=values.get("index_name")
         )
         use_scalar_filter = False
         if search_params is not None:
