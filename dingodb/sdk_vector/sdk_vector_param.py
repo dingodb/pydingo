@@ -79,6 +79,9 @@ class CreateIndexParam(BaseModel):
     operand: list = None
     auto_id: bool = True
     start_id: int = 1
+    enable_scalar_speed_up_with_document: bool = False
+    json_params: str = ""
+
 
     @validator("index_type", always=True)
     def check_index_type(cls, value):
@@ -276,6 +279,8 @@ class VectorSearchParam(BaseModel):
     with_scalar_data: bool = True
     beamwidth: int = 2
     value_type: str="float"
+    is_scalar_speed_up_with_document: bool = False
+    query_string: str = ""
 
     @validator("value_type", always=True)
     def check_value_type(cls, value, values):
@@ -307,10 +312,9 @@ class VectorSearchParam(BaseModel):
     def check_search_params(cls, search_params, values):
         if search_params is None or len(search_params) == 0:
             search_params = {}
-            values["pre_filter"] = False
+            if values.get("is_scalar_speed_up_with_document") == False:
+                values["pre_filter"] = False
             return search_params
-
-        assert search_params is not None, "search_params is None"
 
         values["with_vector_data"] = search_params.get("withVectorData", True)
         values["with_scalar_data"] = search_params.get("withScalarData", True)
@@ -324,6 +328,7 @@ class VectorSearchParam(BaseModel):
         if (
             "meta_expr" not in search_params.keys()
             and "langchain_expr" not in search_params.keys()
+            and values.get("is_scalar_speed_up_with_document") == False
         ):
             values["pre_filter"] = False
 

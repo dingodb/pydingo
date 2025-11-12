@@ -13,6 +13,7 @@ from dingodb.common.vector_rep import (
     RegionStatus,
 )
 from dingodb.utils.tools import auto_value_type, auto_expr_type, convert_dict_to_expr
+from dingodb.common.document_rep import DocumentSchema ,DocumentType
 
 from .sdk_vector_param import (
     CreateIndexParam,
@@ -44,6 +45,16 @@ sdk_types = {
     "BOOL": dingosdk.Type.kBOOL,
 }
 
+scalar_type_to_document_type = {
+    DocumentType.BOOL: dingosdk.Type.kBOOL,
+    DocumentType.INT64: dingosdk.Type.kINT64,
+    DocumentType.DOUBLE: dingosdk.Type.kDOUBLE,
+    DocumentType.STRING: dingosdk.Type.kSTRING,
+    DocumentType.BYTES: dingosdk.Type.kBYTES,
+    DocumentType.DATETIME: dingosdk.Type.kDATETIME,
+}
+
+
 scalar_type_to_sdk_type = {
     ScalarType.BOOL: dingosdk.Type.kBOOL,
     ScalarType.INT64: dingosdk.Type.kINT64,
@@ -68,7 +79,7 @@ class SDKVectorClient:
             raise RuntimeError(f"dongo vector client build fail: {s.ToString()}")
 
     def create_index(
-        self, param: CreateIndexParam, schema: ScalarSchema = None
+        self, param: CreateIndexParam, schema: ScalarSchema = None,document_schema: DocumentSchema = None
     ) -> bool:
         """
         create_index create index
@@ -147,6 +158,23 @@ class SDKVectorClient:
                 sdk_scalar_schem.AddScalarColumn(sdk_col)
 
             creator.SetScalarSchema(sdk_scalar_schem)
+
+        creator.SetEnableScalarSpeedUpWithDocument(param.enable_scalar_speed_up_with_document)
+        creator.SetJsonParams(param.json_params)
+            
+
+        if document_schema is not None and len(document_schema.cols) != 0:
+            document_schema_schem = dingosdk.DocumentSchema()
+
+            for col in document_schema.cols:
+                sdk_col = dingosdk.DocumentColumn(
+                    col.key, scalar_type_to_document_type[col.type]
+                )
+
+                document_schema_schem.AddColumn(sdk_col)
+
+            creator.SetDocumentSchema(document_schema_schem)
+       
 
         # index_id = -1
         s, index_id = creator.Create()
@@ -587,6 +615,8 @@ class SDKVectorClient:
         sdk_param.topk = param.top_k
         sdk_param.with_vector_data = param.with_vector_data
         sdk_param.with_scalar_data = param.with_scalar_data
+        sdk_param.is_scalar_speed_up_with_document = param.is_scalar_speed_up_with_document
+        sdk_param.query_string = param.query_string
 
         selected_keys = []
         for key in param.fields:
