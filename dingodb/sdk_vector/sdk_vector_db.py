@@ -4,6 +4,7 @@ from dingodb.sdk_client import SDKClient
 from dingodb.sdk_vector.sdk_vector_client import SDKVectorClient
 
 from dingodb.common.vector_rep import ScalarSchema, RegionState, RegionStatus
+from dingodb.common.document_rep import DocumentSchema
 
 from .sdk_vector_param import (
     CreateIndexParam,
@@ -122,6 +123,9 @@ class SDKVectorDingoDB:
         operand: list = None,
         auto_id: bool = True,
         start_id: int = 1,
+        enable_scalar_speed_up_with_document: bool = False,
+        json_params: str = "",
+        document_schema: DocumentSchema = None,
     ) -> bool:
         """
         create_index create index
@@ -139,6 +143,9 @@ class SDKVectorDingoDB:
             operand (list, optional): operand. Defaults to None.
             auto_id (bool, optional): isAutoIncrement or not isAutoIncrement. Defaults to True.
             start_id (int, optional): autoIncrement start id. Defaults to 1.
+            enable_scalar_speed_up_with_document (bool, optional) enable_scalar_speed_up_with_document Defaults false
+            json_params(str, optional) json_params for scalar_speed_up_with_document
+            document_schema (ScalarSchema): document_schema of scalar
 
         Raises:
             RuntimeError: return error
@@ -158,9 +165,11 @@ class SDKVectorDingoDB:
             operand=operand,
             auto_id=auto_id,
             start_id=start_id,
+            enable_scalar_speed_up_with_document=enable_scalar_speed_up_with_document,
+            json_params=json_params,
         )
 
-        return self.client.create_index(param=params, schema=schema)
+        return self.client.create_index(param=params, schema=schema,document_schema=document_schema)
 
     def update_index_max_element(self, index_name: str, max_element: int) -> bool:
         """
@@ -374,6 +383,8 @@ class SDKVectorDingoDB:
         pre_filter: bool = True,
         brute: bool = False,
         value_type: str = "float",
+        is_scalar_speed_up_with_document: bool = False,
+        query_string: str = ""
     ) -> list:
         """
         vector_search search vector
@@ -385,6 +396,7 @@ class SDKVectorDingoDB:
             search_params (dict, optional): search params for index. Defaults to None.
             pre_filter (bool, optional): filter type for index, False is post-filter. Defaults to True.
             brute (bool, optional): whether to turn on brute force search. Defaults to True.
+            is_scalar_speed_up_with_document(bool, optional)):Whether to use scalar_speed_up_with_document, Default 
 
         Raises:
             RuntimeError: return error
@@ -400,7 +412,9 @@ class SDKVectorDingoDB:
             pre_filter=pre_filter,
             search_params=search_params,
             brute=brute,
-            value_type=value_type
+            value_type=value_type,
+            is_scalar_speed_up_with_document=is_scalar_speed_up_with_document,
+            query_string=query_string
         )
 
         return self.client.vector_search(params)
