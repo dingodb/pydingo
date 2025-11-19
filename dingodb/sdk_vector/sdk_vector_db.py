@@ -5,6 +5,7 @@ from dingodb.sdk_vector.sdk_vector_client import SDKVectorClient
 
 from dingodb.common.vector_rep import ScalarSchema, RegionState, RegionStatus
 from dingodb.common.document_rep import DocumentSchema
+from typing import  Optional
 
 from .sdk_vector_param import (
     CreateIndexParam,
@@ -124,7 +125,7 @@ class SDKVectorDingoDB:
         auto_id: bool = True,
         start_id: int = 1,
         enable_scalar_speed_up_with_document: bool = False,
-        json_params: str = "",
+        json_params: Optional[str] = None,
         document_schema: DocumentSchema = None,
     ) -> bool:
         """
@@ -410,10 +411,10 @@ class SDKVectorDingoDB:
             xq=xq,
             top_k=top_k,
             pre_filter=pre_filter,
+            is_scalar_speed_up_with_document=is_scalar_speed_up_with_document,
             search_params=search_params,
             brute=brute,
             value_type=value_type,
-            is_scalar_speed_up_with_document=is_scalar_speed_up_with_document,
             query_string=query_string
         )
 
