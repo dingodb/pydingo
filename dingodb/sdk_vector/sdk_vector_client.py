@@ -160,7 +160,8 @@ class SDKVectorClient:
             creator.SetScalarSchema(sdk_scalar_schem)
 
         creator.SetEnableScalarSpeedUpWithDocument(param.enable_scalar_speed_up_with_document)
-        creator.SetJsonParams(param.json_params)
+        if param.json_params is not None:
+            creator.SetJsonParams(param.json_params)
             
 
         if document_schema is not None and len(document_schema.cols) != 0:

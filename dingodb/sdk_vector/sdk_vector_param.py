@@ -7,7 +7,7 @@ try:
 except ImportError:
     from pydantic import BaseModel, validator
 
-from typing import List
+from typing import List, Optional
 
 import dingosdk
 
@@ -80,7 +80,7 @@ class CreateIndexParam(BaseModel):
     auto_id: bool = True
     start_id: int = 1
     enable_scalar_speed_up_with_document: bool = False
-    json_params: str = ""
+    json_params: Optional[str] = None
 
 
     @validator("index_type", always=True)
@@ -274,12 +274,12 @@ class VectorSearchParam(BaseModel):
     fields: list = None  # select keys
     pre_filter: bool = True
     brute: bool = False
+    is_scalar_speed_up_with_document: bool = False 
     search_params: dict = None
     with_vector_data: bool = True
     with_scalar_data: bool = True
     beamwidth: int = 2
     value_type: str="float"
-    is_scalar_speed_up_with_document: bool = False
     query_string: str = ""
 
     @validator("value_type", always=True)
